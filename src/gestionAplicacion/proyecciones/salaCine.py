@@ -1,4 +1,5 @@
 from asiento import Asiento
+from sucursalCine import SucursalCine
 
 class SalaCine:
 
@@ -50,16 +51,93 @@ class SalaCine:
         self._asientos[fila][columna].setDisponibilidad(False)
 
     def _cambiarDisponibilidadAsientoALibre(self, fila, columna):
-        if self._asientos[fila][columna].isDisponibilidad():
+        if not self._asientos[fila][columna].isDisponibilidad():
             self._asientos[fila][columna].setDisponibilidad(True)
 
-    #def filtrarSalasDeCine
+    def filtrarSalasDeCine(self, sucursalCine):
+        salasConPeliculasEnPresentacion = []
+
+        for salaDeCine in sucursalCine.getSalasDeCine():
+            #Implementar try catch para el caso en el que una salaDeCine no tenga películaEnPresentacion try catch AttributeError
+            if salaDeCine._horarioPeliculaEnPresentacion + salaDeCine._peliculaEnPresentacion.getDuracion() > SucursalCine.getFechaActual():
+                salasConPeliculasEnPresentacion.append(salaDeCine)
+
+        return salasConPeliculasEnPresentacion
 
     #def mostrarSalaCine
 
-    #def verificarTicket
+    def verificarTicket(self, cliente):
 
-    #def actualaizarPeliculasEnPresentacion
+        validacionIngresoASala = False
+        ticketVerificado = None
+
+        for ticket in cliente.getTickets():
+
+            validacionIngresoASala = ( ticket.getSalaCine() is self ) and ( ticket.getPelicula() is self._peliculaEnPresentacion ) and ( self._horarioPeliculaEnPresentacion + self._peliculaEnPresentacion.getDuracion() > SucursalCine.getFechaActual )
+            
+            if validacionIngresoASala : 
+
+                if ticket.getPelicula() not in cliente.getHistorialDePeliculas():
+                    cliente.getPeliculasDisponiblesParaCalificar()
+
+                cliente.getHistorialDePeliculas().append(ticket.getPelicula())
+
+                ticketVerificado = ticket
+
+                break
+        
+        if ticketVerificado is not None : cliente.getTickets.remove(ticketVerificado)
+
+        return validacionIngresoASala
+            
+
+    def actualizarPeliculasEnPresentacion(self):
+        
+        peliculaEnPresentacion = None
+        horarioPeliculaEnPresentacion = None
+
+        primeraComparacionPeliculaEnPresentacion = True
+
+        for pelicula in self._sucursalUbicacion.getCartelera():
+
+            horarioMasCercanoAlActual = None
+
+            if pelicula.getSalaDeCine() is self:
+
+                horariosDiaDeHoy = pelicula.filtrarHorariosPeliculaParaSalaCine()
+
+                if len(horariosDiaDeHoy) == 0: continue
+
+                for horario in horariosDiaDeHoy:
+                    if horariosDiaDeHoy.indexOf(horario) == 0:
+                        horarioMasCercanoAlActual = horario
+                    
+                    if horario > horarioMasCercanoAlActual and horario <= SucursalCine.getFechaActual():
+                        horarioMasCercanoAlActual = horario
+                
+                if horarioMasCercanoAlActual is None: continue
+
+                #Añadir lógica try catch AttrributeError a este bloque (Puede no ser necesario)
+                if horarioMasCercanoAlActual <= SucursalCine.getFechaActual() and primeraComparacionPeliculaEnPresentacion:
+                    horarioPeliculaEnPresentacion = horarioMasCercanoAlActual
+                    peliculaEnPresentacion = pelicula
+                    primeraComparacionPeliculaEnPresentacion = False
+
+                elif horarioMasCercanoAlActual <= SucursalCine.getFechaActual() and horarioMasCercanoAlActual > horarioPeliculaEnPresentacion:
+                    horarioPeliculaEnPresentacion = horarioMasCercanoAlActual
+                    peliculaEnPresentacion = pelicula
+
+        if peliculaEnPresentacion is not None:
+            self._peliculaEnPresentacion = peliculaEnPresentacion
+            self._horarioPeliculaEnPresentacion = horarioPeliculaEnPresentacion
+
+            for i in range (0, len(self._asientos)):
+                for j in range (0, len(self._asientos[i])):
+                    
+                    self._cambiarDisponibilidadAsientoALibre(i, j)
+
+                    if (not self._peliculaEnPresentacion.isDisponibilidadAsientoSalaVirtual(horarioPeliculaEnPresentacion, i+1, j+1)):
+                        self._actualizarDisponibilidadAOcupado(i, j)
 
     def isDisponibilidadAsientoReserva(self, fila, columna):
         return self._asientos[fila - 1][columna - 1].isDisponibilidad()
@@ -68,7 +146,19 @@ class SalaCine:
 
     #def mostrarPantallaSalaCine
 
-    #def tieneHorariosPresentacionHoy
+    def tieneHorariosPresentacionHoy(self):
+
+        for pelicula in self._sucursalUbicacion.getCartelera():
+
+            if pelicula.getSalaCinePresentacion() is self:
+
+                for horario in pelicula.filtrarHorariosPeliculaParaSalaCine():
+
+                    if horario + pelicula.getDuracion() > SucursalCine.getFechaActual:
+                        return True
+                    
+        return False
+
 
 #Getters and Setters
 ################################################
