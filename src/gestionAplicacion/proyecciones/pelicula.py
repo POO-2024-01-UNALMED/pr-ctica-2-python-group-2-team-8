@@ -77,11 +77,31 @@ class Pelicula:
     def _crearPelicula(self, sucursalCine):
         pass
 
-    def seleccionarHorarioMasLejano(self):
-        pass
+    def seleccionar_horario_mas_lejano(self,horario: datetime):
+        horarios_pelicula = None
+        is_asientos_disponibles = False
 
-    def seleccionarAsientoAleatorio(self, horarioProceso):
-        pass
+        horarios = self.filtrar_horarios_pelicula()
+        if len(horarios) > 0:
+            for horario in horarios:
+                is_asientos_disponibles = self.is_disponibilidad_asiento_sala_virtual(horario)
+                if is_asientos_disponibles:
+                    horarios_pelicula = horario
+
+        return horarios_pelicula
+        
+
+    def seleccionar_asiento_aleatorio(self, horario_proceso: datetime) -> str:
+        validacion = True
+        num_asiento = None
+        
+        while validacion:
+            fila = random.randint(1, 8)
+            columna = random.randint(1, 8)
+            validacion = not self.is_disponibilidad_asiento_sala_virtual(horario_proceso, fila, columna)
+            num_asiento = f"{fila}-{columna}"
+        
+        return num_asiento
 
 #Getters and Setters
 ################################################
