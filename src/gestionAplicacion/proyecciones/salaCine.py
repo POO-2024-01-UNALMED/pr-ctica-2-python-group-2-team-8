@@ -142,6 +142,13 @@ class SalaCine:
     def isDisponibilidadAsientoReserva(self, fila, columna):
         return self._asientos[fila - 1][columna - 1].isDisponibilidad()
     
+    def isDisponibilidadAlgunAsientoReserva(self):
+        for filaAsientos in self._asientos:
+            for asiento in filaAsientos:
+                if asiento.isDisponibilidad(): return True
+        
+        return False
+    
     #def mostrarAsientosParaPantalla
 
     #def mostrarPantallaSalaCine

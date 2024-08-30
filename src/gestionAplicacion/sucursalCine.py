@@ -11,6 +11,7 @@ class SucursalCine:
     _INICIO_HORARIO_LABORAL = None
     _FIN_HORARIO_LABORAL = None
     _TIEMPO_LIMPIEZA_SALA_DE_CINE = None
+    _TIEMPO_LIMITE_RESERVA_TICKET = None
     _sucursalesCine = []
     _ticketsDisponibles = []
 
@@ -233,3 +234,7 @@ class SucursalCine:
     @classmethod
     def getTiempoLimpiezaSalaDeCine(cls):
         return SucursalCine._TIEMPO_LIMPIEZA_SALA_DE_CINE
+    
+    @classmethod
+    def getTiempoLimiteReservaTicket(cls):
+        return SucursalCine._TIEMPO_LIMITE_RESERVA_TICKET
