@@ -1,3 +1,5 @@
+from datetime import datetime, time, timedelta
+
 class SucursalCine:
 
 #Attributes
@@ -8,12 +10,15 @@ class SucursalCine:
     _fechaActual = None
     _fechaValidacionNuevoDiaDeTrabajo = None
     _fechaRevisionLogicaDeNegocio = None
-    _INICIO_HORARIO_LABORAL = None
-    _FIN_HORARIO_LABORAL = None
-    _TIEMPO_LIMPIEZA_SALA_DE_CINE = None
-    _TIEMPO_LIMITE_RESERVA_TICKET = None
     _sucursalesCine = []
     _ticketsDisponibles = []
+
+    #Constants
+    _INICIO_HORARIO_LABORAL = time(10,00)
+    _FIN_HORARIO_LABORAL = time(23, 00)
+    _TIEMPO_LIMPIEZA_SALA_DE_CINE = timedelta( minutes=30 )
+    _TIEMPO_LIMITE_RESERVA_TICKET = timedelta( minutes=15 )
+   
 
     #Instance Attributes
     def __init__(self, ubicacion):
@@ -28,6 +33,51 @@ class SucursalCine:
     
 #Methods
 ################################################
+
+    #def mostrarSucursalesCine(cls)
+
+    @classmethod
+    def actualizarPeliculasSalasDeCine(cls):
+        for sede in SucursalCine._sucursalesCine:
+            for salaDeCine in sede._salasDeCine:
+
+                try:
+                    if salaDeCine.getHorarioPeliculaEnPresentacion() + salaDeCine.getPeliculaEnPresentacion().getDuracion() <= SucursalCine._fechaActual:
+                        salaDeCine.actualizarPeliculaEnPresentacion()
+                except AttributeError:
+                    salaDeCine.actualizarPeliculaEnPresntacion()
+    
+    @classmethod
+    def _dropHorariosVencidos(cls):
+        pass
+
+    def _crearHorariosPeliculasPorSala(self):
+        pass
+
+    def _distribuitPeliculasPorSala(self):
+        pass
+
+    @classmethod
+    def logicaSemanalSistemNegocio(cls):
+        pass
+    
+    @classmethod
+    def logicaInicioSIstemaReservarTicket(cls):
+        pass
+
+    @classmethod
+    def logicaDiariaReservarTicket(cls):
+        pass
+
+    #def obtenerSucursalPorId(cls):
+
+    #def obetenerSalaDeCinePorId(self):
+
+    #def obtenerPeliculaPorId(self):
+
+    @classmethod
+    def notificarFechaLimiteMembresia(cls):
+        pass
 
     def eliminar_producto(self, productos_eliminar):
         for producto in productos_eliminar:

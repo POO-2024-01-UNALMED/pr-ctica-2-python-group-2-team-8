@@ -1,3 +1,5 @@
+from metodoPago import MetodoPago
+
 class Ticket:
     
 #Attributes
@@ -21,13 +23,36 @@ class Ticket:
 ################################################
 
     def _clienteSuertudo(self):
-        pass
-
+        
+        if (self._sucursalCompra.getCantidadTicketsGenerados() ** 1/2 ) % 1 == 0:
+            if self._pelicula.getTipoDeFormato() == "4D" or self._pelicula.getTipoDeFormato() == "3D":
+                return self._pelicula.getPrecio() * 0.5
+            else:
+                return self._pelicula.getPrecio() * 0.2
+        else:
+            return self._pelicula.getPrecio()
+            
     def procesarPagoRealizado(self, cliente):
-        pass
+        
+        MetodoPago.asignarMetodosDePago(cliente)
 
-    def factura(self):
-        pass
+        cliente.getTickets().append(self)
+        self._dueno = cliente
+
+        self._sucursalCompra.setCantidadTicketsCreados(self._sucursalCompra.getCantidadTicketsCreados() + 1)
+
+        Ticket._cantidadTicketsCreados += 1
+        self._idTicket = Ticket._cantidadTicketsCreados
+
+        #Añadir ticket a tickets disponibles para calificar en caso de tener problemas con serialización
+
+        #Añadir lógica descuento (Rusbel)
+
+        #Añadir lógica código juegos (Juan)
+
+
+
+    #def factura(self):
 
     #def generarCodigoTicket(self):
 

@@ -91,7 +91,7 @@ class SalaCine:
         return validacionIngresoASala
             
 
-    def actualizarPeliculasEnPresentacion(self):
+    def actualizarPeliculaEnPresentacion(self):
         
         peliculaEnPresentacion = None
         horarioPeliculaEnPresentacion = None
