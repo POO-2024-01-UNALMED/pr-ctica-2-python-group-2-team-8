@@ -236,7 +236,7 @@ class Pelicula:
     def getHorariosPresentacion(self):
         return self._horariosPresentacion
     
-    def setHorarioPresentacion(self, horariosPresentacion):
+    def setHorariosPresentacion(self, horariosPresentacion):
         self._horariosPresentacion = horariosPresentacion
     
     def getAsientosSalasVirtuales(self):

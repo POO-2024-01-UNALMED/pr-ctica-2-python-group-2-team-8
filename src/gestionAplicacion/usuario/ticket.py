@@ -1,3 +1,4 @@
+from sucursalCine import SucursalCine
 from metodoPago import MetodoPago
 
 class Ticket:
@@ -44,7 +45,7 @@ class Ticket:
         Ticket._cantidadTicketsCreados += 1
         self._idTicket = Ticket._cantidadTicketsCreados
 
-        #Añadir ticket a tickets disponibles para calificar en caso de tener problemas con serialización
+        SucursalCine.getTicketsDisponibles().append(self)
 
         #Añadir lógica descuento (Rusbel)
 

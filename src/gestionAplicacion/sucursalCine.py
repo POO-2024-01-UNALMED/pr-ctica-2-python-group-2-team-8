@@ -49,25 +49,156 @@ class SucursalCine:
     
     @classmethod
     def _dropHorariosVencidos(cls):
-        pass
+        
+        for sede in SucursalCine._sucursalesCine:
+
+            for pelicula in sede._cartelera:
+
+                horariosAEliminar = []
+
+                for horario in pelicula.getHorariosPresentacion():
+
+                    if horario.date() < SucursalCine._fechaActual:
+                        horariosAEliminar.append(horario)
+                
+                for horario in horariosAEliminar:
+
+                    pelicula.getAsientosSalasVirtuales().pop(pelicula.getHorariosPresentacion().indexOf(horario))
+                    pelicula.getHorariosPresentacion().remove(horario)
 
     def _crearHorariosPeliculasPorSala(self):
-        pass
+        
+        peliculasDeSalaDeCine = []
 
-    def _distribuitPeliculasPorSala(self):
-        pass
+        LIMITE_CREACION_HORARIOS_PRESENTACION = (SucursalCine._fechaActual + timedelta(weeks = 1)).date()
+
+        for salaDeCine in self._salasDeCine:
+
+            horarioParaPresentar = SucursalCine._fechaActual.replace(minute = 0, second = 0, microsecond = 0)
+
+            for pelicula in self._cartelera:
+
+                if pelicula.getSalaDeCine() is salaDeCine:
+                    peliculasDeSalaDeCine.append(pelicula)
+
+            for i in range (0,20):
+
+                if horarioParaPresentar.date() >= LIMITE_CREACION_HORARIOS_PRESENTACION:
+                    break
+
+                for pelicula in peliculasDeSalaDeCine:
+                    
+                    condicionCreacionEnJornadaLaboral = horarioParaPresentar.time() < SucursalCine._FIN_HORARIO_LABORAL and horarioParaPresentar.time() >= SucursalCine._INICIO_HORARIO_LABORAL
+                    condicionCreacionDuranteJornadaLaboral = (horarioParaPresentar + pelicula._getDuracion()).time() <= SucursalCine._FIN_HORARIO_LABORAL and (horarioParaPresentar + pelicula.getDuracion()).date() == horarioParaPresentar.date()
+                    
+                    if  condicionCreacionEnJornadaLaboral and condicionCreacionDuranteJornadaLaboral:
+                            pelicula.crearSalaVirtual(horarioParaPresentar)
+                            horarioParaPresentar += pelicula.getDuracion() + SucursalCine._TIEMPO_LIMPIEZA_SALA_DE_CINE
+                    else: 
+                        if horarioParaPresentar.time() > SucursalCine._INICIO_HORARIO_LABORAL:
+                            horarioParaPresentar += timedelta(days = 1)
+                        
+                        if horarioParaPresentar.date() >= LIMITE_CREACION_HORARIOS_PRESENTACION:
+                            break
+                    
+                        horarioParaPresentar = horarioParaPresentar.replace(hour = SucursalCine._INICIO_HORARIO_LABORAL.hour, minute = SucursalCine._INICIO_HORARIO_LABORAL.minute)
+                        pelicula.crearSalaVirtual(horarioParaPresentar)
+                        horarioParaPresentar += pelicula.getDuracion() + SucursalCine._TIEMPO_LIMPIEZA_SALA_DE_CINE
+        
+            peliculasDeSalaDeCine.clear()
+
+    def _distribuirPeliculasPorSala(self):
+        
+        formatos = ["2D", "3D", "4D"]
+
+        grupoSalasPorFormato = []
+        grupoPeliculasPorFormato = []
+
+        cantidadMaxPeliculaPorSala = 0
+        indiceSalaDeCine = 0
+        contador = 0
+
+        for formato in formatos:
+
+            for salaDeCine in self._salasDeCine:
+                if salaDeCine.getTipoDeSala() == formato:
+                    grupoSalasPorFormato.append(salaDeCine)
+
+            for pelicula in self._cartelera:
+                if pelicula.getTIpoDeFormato() == formato:
+                    grupoPeliculasPorFormato.append(pelicula)
+            
+            if len(grupoPeliculasPorFormato) > grupoSalasPorFormato:
+
+                cantidadMaxPeliculaPorSala = len(grupoPeliculasPorFormato) % len(grupoSalasPorFormato) == 0 if len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato) else int(len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato)) + 1
+
+                for pelicula in grupoPeliculasPorFormato:
+                    pelicula.setSalaCinePresentacion(grupoSalasPorFormato[indiceSalaDeCine])
+                    contador += 1
+
+                    if contador == cantidadMaxPeliculaPorSala:
+                        contador = 0
+                        indiceSalaDeCine += 1
+
+            else:
+                
+                for pelicula in grupoPeliculasPorFormato:
+
+                    pelicula.setSalaCinePresentacion(grupoSalasPorFormato[indiceSalaDeCine])
+                    indiceSalaDeCine += 1
 
     @classmethod
     def logicaSemanalSistemNegocio(cls):
-        pass
+        
+        #SucursalCine._ticketsDisponibles.clear()
+
+        for sede in SucursalCine._sucursalesCine:
+            
+            sede._distribuirPeliculasPorSala()
+            sede._crearHorariosPeliculasPorSala()
+
+
     
     @classmethod
     def logicaInicioSIstemaReservarTicket(cls):
-        pass
+
+        SucursalCine._fechaActual = datetime.now()
+
+        for sede in SucursalCine._sucursalesCine:
+
+            sede._distribuirPeliculasPorSala()
+            sede._crearHorariosPeliculasPorSala()
+        
+        SucursalCine.actualizarPeliculasSalasDeCine()
+        SucursalCine._fechaValidacionNuevoDiaDeTrabajo = SucursalCine._fechaActual.date() + timedelta(days = 1)
+        SucursalCine._fechaRevisionLogicaDeNegocio = SucursalCine._fechaActual.date() + timedelta(weeks = 1)
+
 
     @classmethod
     def logicaDiariaReservarTicket(cls):
-        pass
+        
+        ticketsAEliminar = []
+
+        for sede in SucursalCine._sucursalesCine:
+
+            #sede.ticketsParaDescuento.clear()
+
+            for ticket in sede._ticketsDisponibles:
+                
+                if ticket.getSucursalCompra() == sede._ubicacion and ticket.getHorario().date() == SucursalCine._fechaActual:
+                    #sede.ticketsParaDescuento.append(ticket)
+                    pass
+
+                if (ticket.getHorario() + ticket.getPelicula().getDuracion) < SucursalCine._fechaActual:
+                    ticketsAEliminar.append(ticket)
+                
+        SucursalCine._dropHorariosVencidos()
+
+        for ticket in ticketsAEliminar:
+            SucursalCine._ticketsDisponibles.remove(ticket)
+        
+        #for cliente in SucursalCine._clientes:
+            #cliente.dropTicketsCaducados()
 
     #def obtenerSucursalPorId(cls):
 
@@ -288,3 +419,11 @@ class SucursalCine:
     @classmethod
     def getTiempoLimiteReservaTicket(cls):
         return SucursalCine._TIEMPO_LIMITE_RESERVA_TICKET
+    
+    @classmethod
+    def getTicketsDisponibles(cls):
+        return SucursalCine._ticketsDisponibles
+    
+    @classmethod
+    def setTicketsDisponibles(cls, ticketsDisponibles):
+        SucursalCine._ticketsDisponibles = ticketsDisponibles
