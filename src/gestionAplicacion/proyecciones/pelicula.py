@@ -160,6 +160,12 @@ class Pelicula:
         elif self._genero in generos3D:
             Pelicula(self._nombre, self._precio + 15000, self._genero, self._duracion, self._clasificacion, "3D", self._sucursalCartelera)
 
+
+#Description: Este método se encarga de filtrar los horarios de la película ejecutando el método
+#que están disponibles durante el día actual, retornando la lista de horarios encontrados, con 
+#el fin de efectuar la actualización y solicitud de actualización de las salas de cine.
+
+
     def seleccionar_horario_mas_lejano(self,horario: datetime):
         horarios_pelicula = None
         is_asientos_disponibles = False
@@ -174,6 +180,11 @@ class Pelicula:
         return horarios_pelicula
         
 
+#Description:Este metodo se encarga de seleccionar un asiento aleatoriamente en la sala de cine, esto se hace
+#con el fin de dar un combo o un regalo al cliente que haya calificado un producto o una pelicula y en modo de
+#obsequio le ofrecemos este bono,el metodo retorna un numAsiento de forma aleatoria y ese asiento es al que se 
+#le va a dar al cliente.
+	 
     def seleccionar_asiento_aleatorio(self, horario_proceso: datetime) -> str:
         validacion = True
         num_asiento = None

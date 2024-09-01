@@ -210,11 +210,23 @@ class SucursalCine:
     def notificarFechaLimiteMembresia(cls):
         pass
 
+#Description: Este metodo se encarga de remover los productos que fueron mal calificadas en dos sucursales, por lo
+#tanto por temas de negocio decidimos eliminar este producto por malas ventas, usando la funcion remove, quitandola
+#de la cartelera principal de peliculas.
+	 
+	 
     def eliminar_producto(self, productos_eliminar):
         for producto in productos_eliminar:
             if producto in self.inventario_cine:
                 self.inventario_cine.remove(producto)
 
+#Description : Este método se encarga de retornar los productos cuyo nombre coincide con el nombre del producto seleccionada por el cliente.
+#@param nombreProducto : Este método recibe como parámetro el nombre del producto (De tipo String) con el cuál se realizará el filtrado.
+#@param Inventario : Este método recibe como parámetro una lista (De tipo ArrayList<Producto>) que contiene 
+#los productos previamente filtrados según los datos del cliente y su disponibilidad horaria.
+#@return <b>ArrayList<Producto></b> : Este método retorna un ArrayList de los productos cuyo nombre coinciden con el nombre seleccionado 
+#por el cliente.
+	 
     def filtrar_por_nombre_de_producto(nombre_producto, inventario):
      productos_encontrados = []
 
@@ -223,6 +235,15 @@ class SucursalCine:
             productos_encontrados.append(producto)
 
      return productos_encontrados 
+    
+#Description: Este metodo se encarga de analizar por semana que productos han sido bien o mal calificadas, evaluando
+#las calificaciones de los clientes, si un producto es calificado por debajo de 3, lo consideramos como mal calificado
+#y lo cambiamos de sede, y si la valoracion del producto esta por encima de 3 esta catalogada como bien, ya en el caso en que el 
+#bono este calificado como mayor a 4.5, lo cambiamos de sede, ya que consideramos que es un muy buen producto, y 
+#nos hara ganar mayor rentabilidad.Tambien se encarga de cambiar productos de sede, ya que en nuestra logica de negocio implementamos
+#el sistema de calificaciones, entonces tenemos que estar constantemente pendientes de que productos han sido
+#bien o mal recibidos por los clientes, y cambiandolos de sede, esperamos que su calificacion mejore, si esto
+#no se da, el producto es eliminado del inventario, ya que se considera como malo.
 
     def logica_calificacion_productos(self, producto):
         productos_calificados = self.filtrar_por_nombre_de_producto(producto.get_nombre())
@@ -253,13 +274,21 @@ class SucursalCine:
                 elif producto2.get_tipo_producto() == "souvenir":
                     new_producto = Producto(producto2.get_nombre(), producto2.get_tamaño(), producto2.get_tipo_producto(), producto2.get_precio() * 1.10, producto2.get_cantidad(), producto2.get_genero(), sucursal1)
                     self.inventario_cine.append(new_producto)         
-    
+
+#Description: Este método se encarga de realizar la distribución de productos en los inventarios de los productos
+#ccada semana luego de haber efectuado el cambio de producto de sucursal propio de la funcionalidad 3. 
+
+
     def logica_semanal_producto(sucursales_cine):
      for sede in sucursales_cine:
         for producto in sede.get_inventario_cine():
             if producto.get_tipo_producto() == "comida" or producto.get_tipo_producto() == "souvenir":
-                sede.logica_calificacion_productos(producto)                 
+                sede.logica_calificacion_productos(producto) 
 
+#Description: Este metodo se encarga de revisar en el arrayList de inventario que producto ha tenido
+#la mejor calificacion, osea, el producto mas eficiente segun los gustos de los clientes, con este producto vamos 
+#a generar combos en recompensa a los clientes que nos dejaron sus reseñas
+	 
     def mejor_producto(self):
         producto_mejor_calificado = None
         primera_comparacion = True
@@ -274,6 +303,10 @@ class SucursalCine:
 
         return producto_mejor_calificado                   
 
+#Description: Este metodo se encarga de revisar en el arrayList de inventario que producto ha tenido
+#la peor calificacion, osea, el producto mas deficiente segun los gustos de los clientes, con este producto vamos 
+#a generar combos en recompensa a los clientes que nos dejaron sus reseñas.
+
     def peor_producto(self):
         producto_peor_calificado = None
         primera_comparacion = True
@@ -287,7 +320,11 @@ class SucursalCine:
                     producto_peor_calificado = producto
 
         return producto_peor_calificado
-
+    
+#Description: Este metodo se encarga de revisar en el arrayList de peliculasDisponibles que pelicula ha tenido
+#la mejor calificacion, osea, la pelicula mas eficiente segun los gustos de los clientes, con esta pelicula vamos 
+#a generar combos en recompensa a los clientes que nos dejaron sus reseñas.
+	 
     def mejor_pelicula(self):
         pelicula_mejor_calificada = None
         primera_comparacion = True
@@ -303,6 +340,10 @@ class SucursalCine:
                 pelicula_mejor_calificada = pelicula
 
         return pelicula_mejor_calificada
+    
+#Description: Este metodo se encarga de revisar en el arrayList de peliculasDisponibles que pelicula ha tenido
+#la peor calificacion, osea, la pelicula mas deficiente segun los gustos de los clientes, con esta pelicula vamos 
+#a generar combos en recompensa a los clientes que nos dejaron sus reseñas.
 
     def peor_pelicula(self):
         pelicula_peor_calificada = None
@@ -319,6 +360,15 @@ class SucursalCine:
                 pelicula_peor_calificada = pelicula
 
         return pelicula_peor_calificada
+    
+#Description: Este metodo se encarga de analizar por semana que peliculas han sido bien o mal calificadas, evaluando
+#las calificaciones de los clientes, si una pelicula es calificada por debajo de 3, la consideramos como mal calificada
+#y la cambiamos de sede, y si la pelicula esta por encima de 3 esta catalogada como bien, ya en el caso en que la 
+#pelicula este calificada como mayor a 4.5, la cambiamos de sede, ya que consideramos que es una muy buena pelicula, y 
+#nos hara ganar mayor rentabilidad.Tambien se encarga de cambiar peliculas de sede, ya que en nuestra logica de negocio implementamos
+#el sistema de calificaciones, entonces tenemos que estar constantemente pendientes de que peliculas han sido
+#buenas o malas recibidas por los clientes, y cambiandolas de sede, esperamos que su calificacion mejore, si esto
+#no se da, la pelicula es eliminada de la cartelera, ya que se considera como mala.
 
     def logica_calificacion_peliculas(self, pelicula):
         peliculas_calificadas = Pelicula.filtrar_por_nombre_de_pelicula(pelicula.get_nombre(), self.cartelera)
@@ -349,6 +399,10 @@ class SucursalCine:
                 if pelicula2.get_tipo_de_formato() == "2D":
                     Pelicula(pelicula2.get_nombre(), int(pelicula2.precio * 1.10), pelicula2.genero, pelicula2.duracion, pelicula2.clasificacion, pelicula2.get_tipo_de_formato(), sucursal)
 
+#Description: Este metodo se encarga de seleccionar las sucursales del arrayList y con el uso de la funcion random de la libreria math,
+#se selecciona una sucursal aleatoriamente, ya que esto nos permetira mas adelante el cambio de sucursal de una
+#pelicula a otra.
+# 	 
     def seleccionar_sucursal_aleatoriamente(self,sucursal_cine):
      if len(sucursales_cine) <= 1:
         raise ValueError("No hay suficientes sucursales para seleccionar una diferente.")
