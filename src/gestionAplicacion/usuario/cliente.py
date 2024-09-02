@@ -1,3 +1,15 @@
+
+class Cliente():
+    
+    def __init__(self, nombre, edad, documento, tipoDocumento, membresia):
+        self._nombre = nombre
+        self._edad = edad
+        self._documento = documento
+        self._tipoDocumento = tipoDocumento
+        self._membresia = membresia
+
+
+
 #Metodos
 
 #Description: Este metodo se encarga de mostrar el historial de peliculas que cada cliente ha visto hasta el momento para poder 
@@ -23,3 +35,17 @@ def mostrar_productos_para_calificar(productos_disponibles_para_calificar):
             pedidos += "\n"
         pedidos += f"{i}. {producto.nombre} {producto.tamaño}"
     return pedidos
+
+
+#Getters and Setters
+def getNombre(self):
+    return self._nombre
+
+def setNombre(self, nombre):
+    self._nombre = nombre
+
+def getMembresia(self):
+    return self._membresia
+
+def setNombre(self, membresia):
+    self._membresia = membresia
