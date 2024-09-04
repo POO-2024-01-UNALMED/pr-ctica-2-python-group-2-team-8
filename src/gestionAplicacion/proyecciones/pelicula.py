@@ -1,4 +1,6 @@
 from sucursalCine import SucursalCine
+import random
+from datetime import datetime
 
 class Pelicula:
 

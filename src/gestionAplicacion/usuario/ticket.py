@@ -49,15 +49,45 @@ class Ticket:
 
         #Añadir lógica descuento (Rusbel)
 
-        #Añadir lógica código juegos (Juan)
+        #Añadir lógica código juegos (Juan) IMPLEMENTADO
+
+
+        #Proceso para funcionalidad 4
+        codigoArkade = self.generarCodigoTicket()
+        self._dueno.getCodigosDescuento().append(codigoArkade)
+		
+		#Lógica id
+        _cantidadTicketsCreados+=1
+        self._idTicket = _cantidadTicketsCreados
 
 
 
     #def factura(self):
 
-    #def generarCodigoTicket(self):
+    def generarCodigoTicket(self):
 
-    #def encontrarGeneroCodigoPelicula(self, codigo):
+        """
+        :Description: Este metodo se encarga de generar un codigo de descuento que se le asocia al usuario dueño del ticket para que pueda redimirlo 
+	    en el Arkade posteriormente.
+
+        :return String: retorna el codigo 
+        """
+
+        return self._pelicula.getTipoDeFormato() + self._dueno.getTipoDocumento()+self._pelicula.getSalaCinePresentacion().getNumeroSala() + "-" + self._pelicula.getGenero()
+
+    def encontrarGeneroCodigoPelicula(self, codigo):
+        """
+        Descripción: Este método se encarga de encontrar el género de la película asociada a un código que está contenido dentro del string del mismo.
+
+        :param codigo: Este método recibe como parámetro el código del cual se sacará un substring con el género de la película.
+        :return: Este método retorna un string que contiene la información del género de la película del código.
+        """
+        indice_guion = codigo.find("-")
+
+        if indice_guion != -1 and indice_guion != len(codigo) - 1:
+            return codigo[indice_guion + 1:]
+        else:
+            return ""
 
 #Getters and Setters
 ################################################

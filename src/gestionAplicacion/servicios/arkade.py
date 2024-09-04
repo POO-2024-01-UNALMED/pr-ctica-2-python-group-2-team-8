@@ -1,3 +1,5 @@
+from gestionAplicacion.sucursalCine import SucursalCine
+
 class Arkade:
 
   PUNTUACION_MAXIMA = 10.0 #Atributo de clase Constante
@@ -88,14 +90,19 @@ class Arkade:
         if juego.getGeneroServicio() == genero:
             juego.setValorServicio(juego.getValorServicio() - (juego.getValorServicio() * 20 / 100))
 
-  @classmethod
-  def reestablecerPrecioJuegos(cls):
+  @staticmethod
+  def reestablecerPrecioJuegos(valores):
     
-    SucursalCine.getJuegos()[0].setValorServicio(15000)
-    SucursalCine.getJuegos()[1].setValorServicio(20000)
-    SucursalCine.getJuegos()[2].setValorServicio(10000)
-    SucursalCine.getJuegos()[3].setValorServicio(30000)
-    SucursalCine.getJuegos()[4].setValorServicio(7500)
+    """
+    Description: Este metodo se encarga de restablecer el valor del precio de todos los juegos
+
+    :param valores: Se pasa como parámetro una lista con los valores del cada juego.
+    :return Void: No hay retorno.
+    """ 
+
+    for i in range(0, len(SucursalCine.getJuegos())):
+      SucursalCine.getJuegos()[i].setValorServicio(valores[i])
+
 
   # Metodos get
   def getNombreServicio(self):

@@ -1,4 +1,6 @@
 from datetime import datetime, time, timedelta
+from gestionAplicacion.servicios.producto import Producto
+from gestionAplicacion.proyecciones.pelicula import Pelicula
 
 class SucursalCine:
 
@@ -12,6 +14,8 @@ class SucursalCine:
     _fechaRevisionLogicaDeNegocio = None
     _sucursalesCine = []
     _ticketsDisponibles = []
+    _juegos = []
+    _clientes = []
 
     #Constants
     _INICIO_HORARIO_LABORAL = time(10,00)
@@ -481,3 +485,20 @@ class SucursalCine:
     @classmethod
     def setTicketsDisponibles(cls, ticketsDisponibles):
         SucursalCine._ticketsDisponibles = ticketsDisponibles
+
+    @classmethod
+    def getJuegos(cls):
+        return SucursalCine._juegos
+
+    @classmethod
+    def setJuegos(cls, juegos):
+        SucursalCine._juegos = juegos
+    
+    @classmethod
+    def getClientes(cls):
+        return SucursalCine._clientes
+
+    @classmethod
+    def setClientes(cls, clientes):
+        SucursalCine._clientes = clientes
+    
