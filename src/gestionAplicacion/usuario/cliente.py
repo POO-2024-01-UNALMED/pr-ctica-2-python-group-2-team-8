@@ -8,13 +8,25 @@ class Cliente():
         self._edad = edad
         self._documento = documento
         self._tipoDocumento = tipoDocumento
-        self._membresia = membresia
+        self._cineUbicacionActual = None
+
+        #Atributos Funcionalidad 1
+        self._tickets = []
+        self._historialDePeliculas = []
+
+        #Atributos Funcionalidad 2
+
+        #Atributos Funcionalidad 3
 
         #Atributos Funcionalidad 4
         self._cuenta = cuenta
         self._codigosDescuento = codigosDescuento
         self._codigosBonos = codigosBonos
         self._bonos = bonos
+
+        #Atributos Funcionalidad 5
+        self._membresia = membresia
+
 
         SucursalCine.getClientes.append(self)
 
@@ -74,9 +86,85 @@ class Cliente():
 
         cadena+= (len(self._codigosDescuento)+1) + ". Ninguno\n" + (len(self._codigosDescuento)+2) + ". Salir y Guardar\n"
  
+    #def mostrarTicketsParaUsar(self, ticketsParaUsar):
+
+    def dropTicketsCaducados(self):
+
+        """
+        :Description: Este método se encarga de eliminar los tickets cuyo horario, más la duración de la película para la cuál fue adquirido 
+	    es menor a la fecha actual.
+        """
+        
+        ticketsAEliminar = []
+
+        for ticket in self._tickets:
+            if ticket.getHorario().date() < SucursalCine.getFechaActual().date():
+                ticketsAEliminar.append(ticket)
+        
+        for ticket in ticketsAEliminar:
+            self._tickets.remove(ticket)
+
+    def filtrarTicketsParaSede(self):
+
+        """
+        :Description: Este método se encarga de retornar los tickets correspondientes a la sucursal de cine en la que se encuentra el cliente.
+	    
+        :return ArrayList(Ticket): Este método retorna el resultado de la verifcación, con el fin de que el cliente solo pueda acceder a las salas de cine
+	    o a la sala de espera si este posee al menos un ticket de esta sucursal.
+        """
+
+        ticketsParaUsar = []
+
+        for ticket in self._tickets:
+            if ticket.getSucursalCompra() is self._cineUbicacionActual:
+                ticketsParaUsar.append(ticket)
+        
+        return ticketsParaUsar
+
+    def generoMasVisto(self):
+
+        """
+        :Description: Este método se encarga de encontrar el género más visto por un cliente, para realizar este proceso, iteramos sobre su historial
+	    de películas, luego, obtenemos el género de cada una y alamacenamos las veces que se repite este género en arraylists distintos, conservando
+	    el mismo índice, por último, evaluamos cuál género tiene más visualizaciones y se retorna este, en caso de coincidir en visualizaciones con 
+	    otro género, retornamos el género más reciente.
+
+	    :return String: Este método retorna el género (De tipo String) con más visualizaciones.  
+        """
+
+        generosVistos = []
+        cantidadVisualizaciones = []
+
+        for pelicula in self._historialDePeliculas:
+
+            if generosVistos.__contains__(pelicula.getGenero()):
+                
+                indiceGenero = generosVistos.index(pelicula.getGenero())
+
+                cantidadVisualizaciones[indiceGenero] += 1
+
+            else:
+                generosVistos.append(pelicula.getGenero())
+
+                cantidadVisualizaciones.append(1)
+        
+        primeraComparacion = True
+        generoMasVisto = ""
+        visualizacionesGeneroMasVisto = 0
+
+        for genero in generosVistos:
+
+            if primeraComparacion:
+                generoMasVisto = genero
+                visualizacionesGeneroMasVisto = cantidadVisualizaciones[generosVistos.index(genero)]
+
+            if cantidadVisualizaciones[generosVistos.index(genero)] >= visualizacionesGeneroMasVisto:
+                generoMasVIsto = genero
+                visualizacionesGeneroMasVisto = cantidadVisualizaciones[generosVistos.index(genero)]
+
+        
+        return generoMasVisto
     
- 
- 
     #Getters and Setters
     def getNombre(self):
         return self._nombre
@@ -125,3 +213,21 @@ class Cliente():
 
     def setTipoDocumento(self, tipoDocumento):
         self._tipoDocumento = tipoDocumento
+
+    def getTickets(self):
+        return self._tickets
+    
+    def setTickets(self, tickets):
+        self._tickets = tickets
+
+    def getHistorialDePeliculas(self):
+        return self._historialDePeliculas
+    
+    def setHistorialDePeliculas(self, historialDePeliculas):
+        self._historialDePeliculas = historialDePeliculas
+
+    def getCineUbicacionActual(self):
+        return self._cineUbicacionActual
+
+    def setCineUbicacionActual(self, cineUbicacionActual):
+        self._cineUbicacionActual = cineUbicacionActual
