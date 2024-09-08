@@ -6,11 +6,11 @@ import sucursalCine
 class Servicio (ABC):
     cliente  = None
     def __init__(self, nombre):
-        self.nombre = nombre
-        self.inventario = []
-        self.orden = []
-        self.bonosCliente = []
-        self.valorPedido = 0.0
+        self._nombre = nombre
+        self._inventario = []
+        self._orden = []
+        self._bonosCliente = []
+        self._valorPedido = 0.0
         
     @abstractmethod
     def descuentarPorCompra(self, metodo):
@@ -115,37 +115,37 @@ class Servicio (ABC):
 
     # Getters and setters
     def getNombre(self):
-        return self.nombre
+        return self._nombre
 
     def setNombre(self, nombre):
-        self.nombre = nombre
+        self._nombre = nombre
 
     def getCliente(self):
-        return self.cliente
+        return self._cliente
 
     def setCliente(self, cliente):
-        self.cliente = cliente
+        self._cliente = cliente
 
     def getInventario(self):
-        return self.inventario
+        return self._inventario
 
     def setInventario(self, inventario):
-        self.inventario = inventario
+        self._inventario = inventario
 
     def getOrden(self):
-        return self.orden
+        return self._orden
 
     def setOrden(self, orden):
-        self.orden = orden
+        self._orden = orden
 
     def getValorPedido(self):
-        return self.valor_pedido
+        return self._valorPedido
 
     def setValorPedido(self, valorPedido):
-        self.valorPedido = valorPedido
+        self._valorPedido = valorPedido
 
     def getBonosCliente(self):
-        return self.bonos_cliente
+        return self._bonosCliente
 
     def setBonosCliente(self, bonosCliente):
-        self.bonosCliente = bonosCliente
+        self._bonosCliente = bonosCliente
