@@ -4,7 +4,6 @@ from gestionAplicacion.usuario.cliente import Cliente
 #from gestionAplicacion.usuario.metodo_pago import MetodoPago
 from gestionAplicacion.servicios.herencia.servicio import Servicio
 
-
 class ServicioComida(Servicio):
     
     def __init__(self, nombre=""):
