@@ -74,7 +74,7 @@ imagenLabel = tk.Label(frameInferiorIzquierdoP4, image= imagenes[indice_imagen])
 imagenLabel.place(relx = 0.05, y = 5, relheight= 0.8, relwidth=0.9)
 
 # Asignar evento al Label
-imagenLabel.bind("<Enter>", cambiar_imagen)
+imagenLabel.bind("<Leave>", cambiar_imagen)
 
 
 
