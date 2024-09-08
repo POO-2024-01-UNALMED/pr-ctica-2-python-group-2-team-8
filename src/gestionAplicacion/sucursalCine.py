@@ -1,6 +1,6 @@
 from datetime import datetime, time, timedelta
-from gestionAplicacion.servicios.producto import Producto
-from gestionAplicacion.proyecciones.pelicula import Pelicula
+from servicios.producto import Producto
+from proyecciones.pelicula import Pelicula
 
 class SucursalCine:
 
@@ -42,6 +42,13 @@ class SucursalCine:
 
     @classmethod
     def actualizarPeliculasSalasDeCine(cls):
+
+        """
+        :Description: Este método se encarga de actualizar las salas de todas las sedes, para esto, 
+        iteramos sobre el ArrayList de las sedes, luego iteramos sobre el ArrayList de las salas de 
+        cine de cada sede y ejecutamos su método de actualizar peliculas en presentación.
+        """
+
         for sede in SucursalCine._sucursalesCine:
             for salaDeCine in sede._salasDeCine:
 
@@ -53,6 +60,12 @@ class SucursalCine:
     
     @classmethod
     def _dropHorariosVencidos(cls):
+
+        """
+        :Description: Este método se encarga de eliminar los horarios que ya no pueden ser presentados al pasar de día
+	    o luego de la deserialización, de todas las películas de cada sucursal, eliminando los horarios anteriores al día 
+	    de la fecha actual. 
+        """
         
         for sede in SucursalCine._sucursalesCine:
 
@@ -62,7 +75,7 @@ class SucursalCine:
 
                 for horario in pelicula.getHorariosPresentacion():
 
-                    if horario.date() < SucursalCine._fechaActual:
+                    if horario.date() < SucursalCine._fechaActual.date():
                         horariosAEliminar.append(horario)
                 
                 for horario in horariosAEliminar:
@@ -71,6 +84,19 @@ class SucursalCine:
                     pelicula.getHorariosPresentacion().remove(horario)
 
     def _crearHorariosPeliculasPorSala(self):
+
+        """
+        :Description: Este método se encarga de crear máximo 20 horarios por cada película en cartelera de la sucursal de cine, 
+	    teniendo en cuenta los siguientes criterios: 
+	    <ol>
+	    <li>El horario en el que se presentará la película se encuentra entre el horario de apertura y cierre de nuestras 
+	    instalaciones.</li>
+	    <li>La hora a la que termina la película es menor a la hora de cierre. </li>
+	    <li>Al finalizar una película se tiene en cuenta el tiempo de limpieza de la sala de cine.</li>
+	    <li>La creación de horarios no exceda una semana (Para ejecutar correctamente la lógica semanal de nuestro cine).</li>
+	    <li>Si varias películas serán presentadas en una sala se presentarán de forma intercalada evitando colisiones.</li>
+	    </ol>
+        """
         
         peliculasDeSalaDeCine = []
 
@@ -112,6 +138,17 @@ class SucursalCine:
             peliculasDeSalaDeCine.clear()
 
     def _distribuirPeliculasPorSala(self):
+
+        """
+        :Description: Este método se encarga de distribuir las películas en cartelera en las distintas salas de cine 
+	    de la sucursal de cine que ejecuta este método, para esta distribución se tienen encuenta 3 casos posibles:
+	    <ol>
+	    <li>Hay menos películas que salas de cine o igual cantidad de ambas.</li>
+	    <li>Hay más películas que salas de cine, pero caben exactamente la misma cantidad de películas en cada sala.</li>
+	    <li>Hay más películas que salas de cine, pero al menos una sala de cine debe tener 1 película más que todas 
+	    las otras (Principio de Dirichlet o del palomar).</li>
+	    </ol>
+        """
         
         formatos = ["2D", "3D", "4D"]
 
@@ -153,18 +190,37 @@ class SucursalCine:
 
     @classmethod
     def logicaSemanalSistemNegocio(cls):
+
+        """
+        :Description: Este método se encarga de realizar los preparativos para ejecutar la lógica de la funcionalidad #3:
+	    <ol>
+	    <li>Renueva las cantidades disponibles de los productos en inventario</li>
+	    <li>Eliminar los horarios de la semana anterior.</li>
+	    <li>Distribución de películas en las salas de cine y la creación de sus horarios.</li>
+	    <li>Eliminar los tickets comprados de películas de la semana anterior.</li>
+	    </ol>
+        """
         
-        #SucursalCine._ticketsDisponibles.clear()
+        SucursalCine._ticketsDisponibles.clear()
 
         for sede in SucursalCine._sucursalesCine:
             
             sede._distribuirPeliculasPorSala()
             sede._crearHorariosPeliculasPorSala()
 
-
-    
     @classmethod
     def logicaInicioSIstemaReservarTicket(cls):
+
+        """
+        :Description: Este método se encarga de ejecutar toda la lógica para realizar reservas de ticket por primera vez,
+	    se compone de 3 puntos principales:
+	    <ol>
+	    <li>Distribuir las películas en cartelera de cada sucursal de forma equitativa respecto a sus salas de cine.</li>
+	    <li>Una vez realizada la distribución, crear los horarios en los que se presentará cada película.</li>
+	    <li>Actualizar las películas cuyo horario se esta presentando en estos momentos.</li>
+	    <li>Establecer las fechas cuando se ejecutarán la lógica diaria y semanal del negocio.</li>
+	    </ol>
+        """
 
         SucursalCine._fechaActual = datetime.now()
 
@@ -185,12 +241,12 @@ class SucursalCine:
 
         for sede in SucursalCine._sucursalesCine:
 
-            #sede.ticketsParaDescuento.clear()
+            #sede._ticketsParaDescuento.clear()
 
             for ticket in sede._ticketsDisponibles:
                 
                 if ticket.getSucursalCompra() == sede._ubicacion and ticket.getHorario().date() == SucursalCine._fechaActual:
-                    #sede.ticketsParaDescuento.append(ticket)
+                    #sede._ticketsParaDescuento.append(ticket)
                     pass
 
                 if (ticket.getHorario() + ticket.getPelicula().getDuracion) < SucursalCine._fechaActual:
@@ -201,8 +257,8 @@ class SucursalCine:
         for ticket in ticketsAEliminar:
             SucursalCine._ticketsDisponibles.remove(ticket)
         
-        #for cliente in SucursalCine._clientes:
-            #cliente.dropTicketsCaducados()
+        for cliente in SucursalCine._clientes:
+            cliente.dropTicketsCaducados() 
 
     #def obtenerSucursalPorId(cls):
 
@@ -462,12 +518,10 @@ class SucursalCine:
     def setCantidadTicketsCreados(self, cantidadTicketsCreados):
         self._cantidadTicketsCreados = cantidadTicketsCreados
     
-    @classmethod
     def getFechaActual(self):
         return SucursalCine._fechaActual
     
-    @classmethod
-    def setFechaActual(cls, fechaActual):
+    def setFechaActual(self, fechaActual):
         SucursalCine._fechaActual = fechaActual
     
     @classmethod
@@ -478,8 +532,7 @@ class SucursalCine:
     def getTiempoLimiteReservaTicket(cls):
         return SucursalCine._TIEMPO_LIMITE_RESERVA_TICKET
     
-    @classmethod
-    def getTicketsDisponibles(cls):
+    def getTicketsDisponibles(self):
         return SucursalCine._ticketsDisponibles
     
     @classmethod
@@ -501,4 +554,10 @@ class SucursalCine:
     @classmethod
     def setClientes(cls, clientes):
         SucursalCine._clientes = clientes
+
+if __name__ == '__main__':
+    sucursalBucaros = SucursalCine('Bucaramanga')
+
+
+    
     

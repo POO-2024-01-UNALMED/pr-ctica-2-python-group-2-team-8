@@ -1,4 +1,3 @@
-from sucursalCine import SucursalCine
 import random
 from datetime import datetime
 
@@ -213,7 +212,7 @@ class Pelicula:
         filtroHorariosProxPresentaciones = []
 
         for horario in self._horariosPresentacion:
-            if horario > SucursalCine.getFechaActual():
+            if horario > self._sucursalCartelera.getFechaActual():
                 if self.isDisponibilidadAlgunAsientoSalaVirtual(horario):
                     filtroHorariosProxPresentaciones.append(horario)
             
@@ -234,9 +233,9 @@ class Pelicula:
         filtrarHorariosPresentacionesHoy = []
 
         for horario in self._horariosPresentacion:
-            if horario.date() == SucursalCine.getFechaActual().date():
+            if horario.date() == self._sucursalCartelera.getFechaActual().date():
                 filtrarHorariosPresentacionesHoy.append(horario)
-            elif horario.date() > SucursalCine.getFechaActual.date():
+            elif horario.date() > self._sucursalCartelera.getFechaActual.date():
                 break
         
         return filtrarHorariosPresentacionesHoy
@@ -263,7 +262,7 @@ class Pelicula:
 
         for salaDeCine in sucursalCine.getSalasDeCine():
             try:
-                if salaDeCine.getPeliculaEnPresntacion() is self and salaDeCine.getHorarioPeliculaEnPresentacion() + SucursalCine.getTiempoLimiteReservaTicket() < SucursalCine.getFechaActual():
+                if salaDeCine.getPeliculaEnPresntacion() is self and salaDeCine.getHorarioPeliculaEnPresentacion() + self._sucursalCartelera.getTiempoLimiteReservaTicket() < self._sucursalCartelera.getFechaActual():
                     if salaDeCine.isDisponibilidadAlgunAsientoReserva(): return True
             except AttributeError:
                 pass

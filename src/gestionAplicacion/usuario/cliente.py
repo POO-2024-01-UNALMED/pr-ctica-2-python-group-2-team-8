@@ -98,7 +98,7 @@ class Cliente():
         ticketsAEliminar = []
 
         for ticket in self._tickets:
-            if ticket.getHorario().date() < SucursalCine.getFechaActual().date():
+            if ticket.getHorario() + ticket.getPelicula().getDuracion() < SucursalCine.getFechaActual():
                 ticketsAEliminar.append(ticket)
         
         for ticket in ticketsAEliminar:
