@@ -112,6 +112,20 @@ class Servicio (ABC):
             producto.setGenero(producto_inventario.getGenero())
             return producto
         return None
+    
+#Description: Este metodo se encarga de seleccionar las sucursales del arrayList y con el uso de la funcion random de la libreria math,
+#se selecciona una sucursal aleatoriamente, ya que esto nos permetira mas adelante el cambio de sucursal de una
+#pelicula a otra.
+# 	 
+    def seleccionar_sucursal_aleatoriamente(self,sucursal_cine):
+     if len(sucursales_cine) <= 1:
+        raise ValueError("No hay suficientes sucursales para seleccionar una diferente.")
+    
+     while True:
+        numero_aleatorio = random.randint(0, len(sucursales_cine) - 1)
+        sucursal_seleccionada = sucursales_cine[numero_aleatorio]
+        if sucursal_cine != sucursal_seleccionada:
+            return sucursal_seleccionada
 
     # Getters and setters
     def getNombre(self):
