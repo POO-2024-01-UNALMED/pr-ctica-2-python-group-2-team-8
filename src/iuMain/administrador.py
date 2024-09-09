@@ -110,6 +110,4 @@ def CerrarVentana():
 menuOpciones.add_command(label = "Descripción del programa", command= mostrarDescripcion)
 menuOpciones.add_command(label = "Salir y Guardar", command= CerrarVentana)
 
-
-
 ventanaInicio.mainloop()

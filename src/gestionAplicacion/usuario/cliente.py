@@ -26,6 +26,7 @@ class Cliente():
 
         #Atributos Funcionalidad 5
         self._membresia = membresia
+        self._metodosDePago = []
 
 
         SucursalCine.getClientes.append(self)
@@ -231,3 +232,10 @@ class Cliente():
 
     def setCineUbicacionActual(self, cineUbicacionActual):
         self._cineUbicacionActual = cineUbicacionActual
+
+    def getMetodosDePago(self):
+        return self._metodosDePago
+    
+    def setMetodosdePago(self, metodosDePago):
+        self._metodosDePago = metodosDePago
+    
