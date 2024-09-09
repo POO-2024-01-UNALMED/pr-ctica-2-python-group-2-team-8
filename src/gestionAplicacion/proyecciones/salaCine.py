@@ -1,4 +1,4 @@
-from asiento import Asiento
+from .asiento import Asiento
 
 class SalaCine:
 
@@ -18,6 +18,8 @@ class SalaCine:
 
         SalaCine._cantidadSalasDeCineCreadas += 1
         self._salaCineId = SalaCine._cantidadSalasDeCineCreadas
+
+        sucursalUbicacion.getSalasDeCine().append(self)
 
 #Methods
 ################################################
@@ -177,14 +179,14 @@ class SalaCine:
 
             horarioMasCercanoAlActual = None
 
-            if pelicula.getSalaDeCine() is self:
+            if pelicula.getSalaCinePresentacion() is self:
 
                 horariosDiaDeHoy = pelicula.filtrarHorariosPeliculaParaSalaCine()
 
                 if len(horariosDiaDeHoy) == 0: continue
 
                 for horario in horariosDiaDeHoy:
-                    if horariosDiaDeHoy.indexOf(horario) == 0:
+                    if horariosDiaDeHoy.index(horario) == 0:
                         horarioMasCercanoAlActual = horario
                     
                     if horario > horarioMasCercanoAlActual and horario <= self._sucursalUbicacion.getFechaActual():
@@ -287,7 +289,7 @@ class SalaCine:
     def setNumeroSala(self, numeroSala):
         self._numeroSala = numeroSala
     
-    def  getTipoSala(self):
+    def getTipoSala(self):
         return self._tipoSala
     
     def setTipoSala(self, tipoSala):

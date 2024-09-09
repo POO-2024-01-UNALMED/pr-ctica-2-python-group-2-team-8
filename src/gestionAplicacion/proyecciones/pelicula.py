@@ -21,7 +21,7 @@ class Pelicula:
         self._horariosPresentacion = []
         self._asientosSalasVirtuales = []
         self._salaCinePresentacion = None
-        sucursalCine.getCartelera().add(self)
+        sucursalCine.getCartelera().append(self)
         
         self._valoracion = 4.0
         self._totalEncuestasRealizadas = 25
@@ -166,7 +166,7 @@ class Pelicula:
 	    :param columna: Recibe el número de la columna seleccionada por el cliente (De tipo int).
         """
 
-        self._asientosSalasVirtuales[self._horariosPresentacion.indexOf(horario)][fila - 1][columna - 1] = 1
+        self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)][fila - 1][columna - 1] = 1
 
     def isDisponibilidadAsientoSalaVirtual(self, horario, fila, columna):
 
@@ -181,7 +181,7 @@ class Pelicula:
         :return boolean: Este método retorna un boolean que representa la disponibilidad del asiento selccionado por el cliente.
         """
         
-        return self._asientosSalasVirtuales[self._horariosPresentacion.indexOf(horario)][fila - 1][columna - 1] == 0
+        return self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)][fila - 1][columna - 1] == 0
 
     def isDisponibilidadAlgunAsientoSalaVirtual(self, horario):
 
@@ -193,7 +193,7 @@ class Pelicula:
         :return boolean: Este método retorna un boolean que representa si tiene asientos disponibles en ese horario.
         """
 
-        for filaAsientos in self._asientosSalasVirtuales[self._horariosPresentacion.indexOf(horario)]:
+        for filaAsientos in self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)]:
             for asiento in filaAsientos:
                 if asiento == 0: return True
         
@@ -235,7 +235,7 @@ class Pelicula:
         for horario in self._horariosPresentacion:
             if horario.date() == self._sucursalCartelera.getFechaActual().date():
                 filtrarHorariosPresentacionesHoy.append(horario)
-            elif horario.date() > self._sucursalCartelera.getFechaActual.date():
+            elif horario.date() > self._sucursalCartelera.getFechaActual().date():
                 break
         
         return filtrarHorariosPresentacionesHoy
@@ -372,7 +372,7 @@ class Pelicula:
         self._genero = genero
 
     def getDuracion(self):
-        return self._genero
+        return self._duracion
     
     def setDuracion(self, duracion):
         self._duracion = duracion

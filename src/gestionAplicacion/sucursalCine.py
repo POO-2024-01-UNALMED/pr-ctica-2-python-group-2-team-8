@@ -1,6 +1,7 @@
 from datetime import datetime, time, timedelta
 from servicios.producto import Producto
 from proyecciones.pelicula import Pelicula
+from proyecciones.salaCine import SalaCine
 
 class SucursalCine:
 
@@ -30,6 +31,7 @@ class SucursalCine:
         
         SucursalCine._cantidadSucursales += 1
         self._idSucursal = SucursalCine._cantidadSucursales
+        SucursalCine._sucursalesCine.append(self)
 
         self._salasDeCine = []
         self._cartelera = []
@@ -56,7 +58,7 @@ class SucursalCine:
                     if salaDeCine.getHorarioPeliculaEnPresentacion() + salaDeCine.getPeliculaEnPresentacion().getDuracion() <= SucursalCine._fechaActual:
                         salaDeCine.actualizarPeliculaEnPresentacion()
                 except AttributeError:
-                    salaDeCine.actualizarPeliculaEnPresntacion()
+                    salaDeCine.actualizarPeliculaEnPresentacion()
     
     @classmethod
     def _dropHorariosVencidos(cls):
@@ -108,7 +110,7 @@ class SucursalCine:
 
             for pelicula in self._cartelera:
 
-                if pelicula.getSalaDeCine() is salaDeCine:
+                if pelicula.getSalaCinePresentacion() is salaDeCine:
                     peliculasDeSalaDeCine.append(pelicula)
 
             for i in range (0,20):
@@ -119,7 +121,7 @@ class SucursalCine:
                 for pelicula in peliculasDeSalaDeCine:
                     
                     condicionCreacionEnJornadaLaboral = horarioParaPresentar.time() < SucursalCine._FIN_HORARIO_LABORAL and horarioParaPresentar.time() >= SucursalCine._INICIO_HORARIO_LABORAL
-                    condicionCreacionDuranteJornadaLaboral = (horarioParaPresentar + pelicula._getDuracion()).time() <= SucursalCine._FIN_HORARIO_LABORAL and (horarioParaPresentar + pelicula.getDuracion()).date() == horarioParaPresentar.date()
+                    condicionCreacionDuranteJornadaLaboral = (horarioParaPresentar + pelicula.getDuracion()).time() <= SucursalCine._FIN_HORARIO_LABORAL and (horarioParaPresentar + pelicula.getDuracion()).date() == horarioParaPresentar.date()
                     
                     if  condicionCreacionEnJornadaLaboral and condicionCreacionDuranteJornadaLaboral:
                             pelicula.crearSalaVirtual(horarioParaPresentar)
@@ -132,7 +134,6 @@ class SucursalCine:
                             break
                     
                         horarioParaPresentar = horarioParaPresentar.replace(hour = SucursalCine._INICIO_HORARIO_LABORAL.hour, minute = SucursalCine._INICIO_HORARIO_LABORAL.minute)
-                        pelicula.crearSalaVirtual(horarioParaPresentar)
                         horarioParaPresentar += pelicula.getDuracion() + SucursalCine._TIEMPO_LIMPIEZA_SALA_DE_CINE
         
             peliculasDeSalaDeCine.clear()
@@ -152,26 +153,27 @@ class SucursalCine:
         
         formatos = ["2D", "3D", "4D"]
 
-        grupoSalasPorFormato = []
-        grupoPeliculasPorFormato = []
-
-        cantidadMaxPeliculaPorSala = 0
-        indiceSalaDeCine = 0
-        contador = 0
-
         for formato in formatos:
 
+            grupoSalasPorFormato = []
+            grupoPeliculasPorFormato = []
+
+            cantidadMaxPeliculaPorSala = 0
+            contador = 0
+
+            indiceSalaDeCine = 0
+
             for salaDeCine in self._salasDeCine:
-                if salaDeCine.getTipoDeSala() == formato:
+                if salaDeCine.getTipoSala() == formato:
                     grupoSalasPorFormato.append(salaDeCine)
 
             for pelicula in self._cartelera:
-                if pelicula.getTIpoDeFormato() == formato:
+                if pelicula.getTipoDeFormato() == formato:
                     grupoPeliculasPorFormato.append(pelicula)
             
-            if len(grupoPeliculasPorFormato) > grupoSalasPorFormato:
+            if len(grupoPeliculasPorFormato) > len(grupoSalasPorFormato):
 
-                cantidadMaxPeliculaPorSala = len(grupoPeliculasPorFormato) % len(grupoSalasPorFormato) == 0 if len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato) else int(len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato)) + 1
+                cantidadMaxPeliculaPorSala = int(len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato)) if len(grupoPeliculasPorFormato) % len(grupoSalasPorFormato) == 0 else int(len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato)) + 1
 
                 for pelicula in grupoPeliculasPorFormato:
                     pelicula.setSalaCinePresentacion(grupoSalasPorFormato[indiceSalaDeCine])
@@ -555,8 +557,78 @@ class SucursalCine:
     def setClientes(cls, clientes):
         SucursalCine._clientes = clientes
 
+    @classmethod
+    def getSucursalesCine(cls):
+        return SucursalCine._sucursalesCine
+
 if __name__ == '__main__':
-    sucursalBucaros = SucursalCine('Bucaramanga')
+    sucursalCine1 = SucursalCine("Bucaramanga")
+    sucursalCine2 = SucursalCine("Marinilla")
+    sucursalCine3 = SucursalCine("Medellín")
+
+    salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
+    salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)
+    salaDeCine1_3 = SalaCine(3, "4D", sucursalCine1)
+    salaDeCine1_4 = SalaCine(4, "2D", sucursalCine1)
+    salaDeCine1_5 = SalaCine(5, "3D", sucursalCine1)
+    salaDeCine1_6 = SalaCine(6, "4D", sucursalCine1)
+
+    pelicula1_1 = Pelicula("Deadpool 3", 18000, "Comedia", timedelta( minutes=110 ), "+18", "2D", sucursalCine1)
+    pelicula1_1.crearPeliculas()
+    pelicula1_2 = Pelicula("Misión Imposible 4", 13000, "Acción", timedelta( minutes=155 ), "+16", "2D", sucursalCine1)
+    pelicula1_2.crearPeliculas()
+    pelicula1_3 = Pelicula("El conjuro 3", 18000, "Terror", timedelta( minutes=140 ), "+16", "2D", sucursalCine1)
+    pelicula1_3.crearPeliculas()
+    pelicula1_4 = Pelicula("Your name", 18000, "Romance", timedelta( minutes=110 ), "+8", "2D", sucursalCine1)
+    pelicula1_4.crearPeliculas()
+    pelicula1_5 = Pelicula("Furiosa: A Mad Max Saga", 17000, "Ciencia ficción", timedelta( minutes=148 ), "+18", "2D", sucursalCine1)
+    pelicula1_5.crearPeliculas()
+    pelicula1_6 = Pelicula("Spy x Familiy Código: Blanco", 19000, "Infantil", timedelta( minutes=90 ), "+5", "2D", sucursalCine1)
+    pelicula1_6.crearPeliculas()
+
+    salaDeCine2_1 = SalaCine(1, "2D", sucursalCine2)
+    salaDeCine2_2 = SalaCine(2, "3D", sucursalCine2)
+    salaDeCine2_3 = SalaCine(3, "4D", sucursalCine2)
+    salaDeCine2_4 = SalaCine(4, "2D", sucursalCine2)
+    salaDeCine2_5 = SalaCine(5, "3D", sucursalCine2)
+    salaDeCine2_6 = SalaCine(6, "4D", sucursalCine2)
+
+    pelicula2_1 = Pelicula("Jujutsu Kaisen Cero", 17000, "Acción", timedelta( minutes=90), "+12", "2D", sucursalCine2) 
+    pelicula2_1.crearPeliculas()
+    pelicula2_2 = Pelicula("The Strangers: Chapter 1", 20000, "Terror", timedelta( minutes=114 ), "+18", "2D", sucursalCine2)
+    pelicula2_2.crearPeliculas()
+    pelicula2_3 = Pelicula("El pájaro loco", 15000, "Infantil", timedelta( minutes=120 ), "+5", "2D", sucursalCine2)
+    pelicula2_3.crearPeliculas()
+    pelicula2_4 = Pelicula("One Life", 19000, "Historia", timedelta( minutes=110 ), "+8", "2D", sucursalCine2)
+    pelicula2_4.crearPeliculas()
+    pelicula2_5 = Pelicula("IP Man", 16000, "Acción", timedelta( minutes=132 ), "+16", "2D", sucursalCine2)
+    pelicula2_5.crearPeliculas()
+    pelicula2_6 = Pelicula("Bad Boys: Hasta la muerte", 17000, "Comedia", timedelta( minutes=109 ), "+18", "2D", sucursalCine2)
+    pelicula2_6.crearPeliculas()
+
+    salaDeCine3_1 = SalaCine(1, "2D", sucursalCine3)
+    salaDeCine3_2 = SalaCine(2, "3D", sucursalCine3)
+    salaDeCine3_3 = SalaCine(3, "4D", sucursalCine3)
+    salaDeCine3_4 = SalaCine(4, "2D", sucursalCine3)
+    salaDeCine3_5 = SalaCine(5, "3D", sucursalCine3)
+    salaDeCine3_6 = SalaCine(6, "4D", sucursalCine3)
+
+    pelicula3_1 = Pelicula("El Paseo 9", 15000, "Comedia", timedelta( minutes=60 ), "+12", "2D", sucursalCine3) 
+    pelicula3_1.crearPeliculas()
+    pelicula3_2 = Pelicula("Scream 8", 18000, "Terror", timedelta( minutes=180 ), "+16", "2D", sucursalCine3)
+    pelicula3_2.crearPeliculas()
+    pelicula3_3 = Pelicula("Oppenheimer", 15000, "Historia", timedelta( minutes=120 ), "+18", "2D", sucursalCine3)
+    pelicula3_3.crearPeliculas()
+    pelicula3_4 = Pelicula("Jhon Wick 4", 17000, "Acción", timedelta( minutes=180 ), "+18", "2D", sucursalCine3)
+    pelicula3_4.crearPeliculas()
+    pelicula3_5 = Pelicula("Intensamente 2", 15000, "Infantil", timedelta( minutes=105 ), "+5", "2D", sucursalCine3)
+    pelicula3_5.crearPeliculas()
+    pelicula3_6 = Pelicula("BNHA temporada 7 movie", 12000, "Acción", timedelta( minutes=60 ), "+12", "2D", sucursalCine3)
+    pelicula3_6.crearPeliculas()
+
+    SucursalCine.logicaInicioSIstemaReservarTicket()
+
+
 
 
     
