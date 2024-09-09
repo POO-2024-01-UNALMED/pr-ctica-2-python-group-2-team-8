@@ -16,6 +16,7 @@ class SucursalCine:
     _ticketsDisponibles = []
     _juegos = []
     _clientes = []
+    _metodosDePagoDisponibles = []
 
     #Constants
     _INICIO_HORARIO_LABORAL = time(10,00)
@@ -523,6 +524,14 @@ class SucursalCine:
     
     def setFechaActual(self, fechaActual):
         SucursalCine._fechaActual = fechaActual
+
+    @classmethod
+    def getMetodosDePagoDisponibles(cls):
+        return SucursalCine._metodosDePagoDisponibles
+    
+    @classmethod
+    def setMetodosDePagoDisponibles(cls, metodosDePagoDisponibles):
+        SucursalCine._metodosDePagoDisponibles = metodosDePagoDisponibles
     
     @classmethod
     def getTiempoLimpiezaSalaDeCine(cls):
@@ -557,6 +566,7 @@ class SucursalCine:
 
 if __name__ == '__main__':
     sucursalBucaros = SucursalCine('Bucaramanga')
+
 
 
     
