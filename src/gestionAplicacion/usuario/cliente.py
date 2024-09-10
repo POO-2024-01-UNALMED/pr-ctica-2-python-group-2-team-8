@@ -30,7 +30,7 @@ class Cliente():
         self._metodosDePago = []
 
 
-        self._cineUbicacionActual.getClientes.append(self)
+        self._cineUbicacionActual.getClientes().append(self)
 
 
 

@@ -2,10 +2,6 @@ from datetime import datetime, time, timedelta
 import random
 from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.proyecciones.pelicula import Pelicula
-from gestionAplicacion.proyecciones.salaCine import SalaCine
-from gestionAplicacion.servicios.herencia.servicioComida import ServicioComida
-from gestionAplicacion.servicios.herencia.servicioSouvenirs import ServicioSouvenir
-from gestionAplicacion.usuario.cliente import Cliente
 
 class SucursalCine:
 
