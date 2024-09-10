@@ -1,6 +1,3 @@
-from sucursalCine import SucursalCine
-from metodoPago import MetodoPago
-
 class Ticket:
     
 #Attributes
@@ -18,7 +15,7 @@ class Ticket:
 
         self._idTicket = 0
         self._dueno = None
-        #self._descuento = True
+        self._descuento = True
 
 #Methods
 ################################################
@@ -56,7 +53,8 @@ class Ticket:
 	    :param cliente: Se pide como parámetro el cliente (De tipo Cliente) que realizó exitosamente el pago.
         """
         
-        MetodoPago.asignarMetodosDePago(cliente)
+        #Implementar solución para las importaciones circulares
+        #cliente.getMetodosDePagoDisponibles[0].asignarMetodosDePago(cliente)
 
         cliente.getTickets().append(self)
         self._dueno = cliente
@@ -66,7 +64,7 @@ class Ticket:
         Ticket._cantidadTicketsCreados += 1
         self._idTicket = Ticket._cantidadTicketsCreados
 
-        SucursalCine.getTicketsDisponibles().append(self)
+        self._sucursalCompra.getTicketsDisponibles().append(self)
 
         #Proceso para funcionalidad 2
         #Añadir lógica descuento (Rusbel)
@@ -86,7 +84,7 @@ class Ticket:
 	    luego de realizar una compra.
         """
 
-        return	f"========= Factura Ticket =========\nNombre dueño : {self._dueno.getNombre()}\nDocumento : {self._dueno.getDocumento()}\nPelicula : {self._pelicula.getNombre()}\nNúmero de sala : {self._salaDeCine.getNumeroSala()}\nNúmero de asiento : {self._numeroAsiento}\nFecha Presentación: {self._horario.date()}\nHora Presentación: {self._horario.time()}\nValor ticket (IVA incluido): {self._precio}\nFecha de compra: {SucursalCine.getFechaActual().date()} {SucursalCine.getFechaActual().time()}\nSucursal : {self._sucursalCompra.getLugar()}"
+        return	f"========= Factura Ticket =========\nNombre dueño : {self._dueno.getNombre()}\nDocumento : {self._dueno.getDocumento()}\nPelicula : {self._pelicula.getNombre()}\nNúmero de sala : {self._salaDeCine.getNumeroSala()}\nNúmero de asiento : {self._numeroAsiento}\nFecha Presentación: {self._horario.date()}\nHora Presentación: {self._horario.time()}\nValor ticket (IVA incluido): {self._precio}\nFecha de compra: {self._sucursalCompra.getFechaActual().date()} {self._sucursalCompra.getFechaActual().time()}\nSucursal : {self._sucursalCompra.getLugar()}"
 
     def generarCodigoTicket(self):
 
@@ -171,4 +169,9 @@ class Ticket:
     
     def setSucursalCompra(self, sucursalCompra):
         self._sucursalCompra = sucursalCompra
-        
+    
+    def isDescuentos(self):
+        return self._descuento
+    
+    def setDescuentos(self, descuento):
+        self._descuento = descuento     

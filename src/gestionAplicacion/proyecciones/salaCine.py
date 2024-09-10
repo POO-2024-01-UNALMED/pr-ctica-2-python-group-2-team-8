@@ -1,5 +1,4 @@
-from asiento import Asiento
-from sucursalCine import SucursalCine
+from .asiento import Asiento
 
 class SalaCine:
 
@@ -19,6 +18,8 @@ class SalaCine:
 
         SalaCine._cantidadSalasDeCineCreadas += 1
         self._salaCineId = SalaCine._cantidadSalasDeCineCreadas
+
+        sucursalUbicacion.getSalasDeCine().append(self)
 
 #Methods
 ################################################
@@ -106,7 +107,7 @@ class SalaCine:
 
         for salaDeCine in sucursalCine.getSalasDeCine():
             try:
-                if salaDeCine._horarioPeliculaEnPresentacion + salaDeCine._peliculaEnPresentacion.getDuracion() > SucursalCine.getFechaActual():
+                if salaDeCine._horarioPeliculaEnPresentacion + salaDeCine._peliculaEnPresentacion.getDuracion() > self._sucursalUbicacion.getFechaActual():
                     salasConPeliculasEnPresentacion.append(salaDeCine)
             except AttributeError:
                 pass
@@ -135,7 +136,7 @@ class SalaCine:
 
         for ticket in cliente.getTickets():
 
-            validacionIngresoASala = ( ticket.getSalaCine() is self ) and ( ticket.getPelicula() is self._peliculaEnPresentacion ) and ( self._horarioPeliculaEnPresentacion + self._peliculaEnPresentacion.getDuracion() > SucursalCine.getFechaActual )
+            validacionIngresoASala = ( ticket.getSalaCine() is self ) and ( ticket.getPelicula() is self._peliculaEnPresentacion ) and ( self._horarioPeliculaEnPresentacion + self._peliculaEnPresentacion.getDuracion() > self._sucursalUbicacion.getFechaActual )
             
             if validacionIngresoASala : 
 
@@ -178,28 +179,28 @@ class SalaCine:
 
             horarioMasCercanoAlActual = None
 
-            if pelicula.getSalaDeCine() is self:
+            if pelicula.getSalaCinePresentacion() is self:
 
                 horariosDiaDeHoy = pelicula.filtrarHorariosPeliculaParaSalaCine()
 
                 if len(horariosDiaDeHoy) == 0: continue
 
                 for horario in horariosDiaDeHoy:
-                    if horariosDiaDeHoy.indexOf(horario) == 0:
+                    if horariosDiaDeHoy.index(horario) == 0:
                         horarioMasCercanoAlActual = horario
                     
-                    if horario > horarioMasCercanoAlActual and horario <= SucursalCine.getFechaActual():
+                    if horario > horarioMasCercanoAlActual and horario <= self._sucursalUbicacion.getFechaActual():
                         horarioMasCercanoAlActual = horario
                 
                 if horarioMasCercanoAlActual is None: continue
 
                 #Añadir lógica try catch AttrributeError a este bloque (Puede no ser necesario)
-                if horarioMasCercanoAlActual <= SucursalCine.getFechaActual() and primeraComparacionPeliculaEnPresentacion:
+                if horarioMasCercanoAlActual <= self._sucursalUbicacion.getFechaActual() and primeraComparacionPeliculaEnPresentacion:
                     horarioPeliculaEnPresentacion = horarioMasCercanoAlActual
                     peliculaEnPresentacion = pelicula
                     primeraComparacionPeliculaEnPresentacion = False
 
-                elif horarioMasCercanoAlActual <= SucursalCine.getFechaActual() and horarioMasCercanoAlActual > horarioPeliculaEnPresentacion:
+                elif horarioMasCercanoAlActual <= self._sucursalUbicacion.getFechaActual() and horarioMasCercanoAlActual > horarioPeliculaEnPresentacion:
                     horarioPeliculaEnPresentacion = horarioMasCercanoAlActual
                     peliculaEnPresentacion = pelicula
 
@@ -259,7 +260,7 @@ class SalaCine:
 
                 for horario in pelicula.filtrarHorariosPeliculaParaSalaCine():
 
-                    if horario + pelicula.getDuracion() > SucursalCine.getFechaActual:
+                    if horario + pelicula.getDuracion() > self._sucursalUbicacion.getFechaActual():
                         return True
                     
         return False
@@ -288,7 +289,7 @@ class SalaCine:
     def setNumeroSala(self, numeroSala):
         self._numeroSala = numeroSala
     
-    def  getTipoSala(self):
+    def getTipoSala(self):
         return self._tipoSala
     
     def setTipoSala(self, tipoSala):

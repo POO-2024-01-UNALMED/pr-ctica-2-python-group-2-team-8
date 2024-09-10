@@ -1,6 +1,11 @@
 from datetime import datetime, time, timedelta
-from gestionAplicacion.servicios.producto import Producto
-from gestionAplicacion.proyecciones.pelicula import Pelicula
+import random
+from servicios.producto import Producto
+from proyecciones.pelicula import Pelicula
+from proyecciones.salaCine import SalaCine
+from gestionAplicacion.servicios.herencia.servicioComida import ServicioComida
+from gestionAplicacion.servicios.herencia.servicioSouvenirs import ServicioSouvenir
+from src.gestionAplicacion.usuario.cliente import Cliente
 
 class SucursalCine:
 
@@ -16,6 +21,7 @@ class SucursalCine:
     _ticketsDisponibles = []
     _juegos = []
     _clientes = []
+    _metodosDePagoDisponibles = []
 
     #Constants
     _INICIO_HORARIO_LABORAL = time(10,00)
@@ -30,7 +36,12 @@ class SucursalCine:
         
         SucursalCine._cantidadSucursales += 1
         self._idSucursal = SucursalCine._cantidadSucursales
+        SucursalCine._sucursalesCine.append(self)
 
+        self._inventarioCine = []
+        self._ticketsParaDescuento = []
+        self._servicios = []
+        self._bonosCreados = []
         self._salasDeCine = []
         self._cartelera = []
         self._cantidadTicketsCreados = 1
@@ -42,6 +53,13 @@ class SucursalCine:
 
     @classmethod
     def actualizarPeliculasSalasDeCine(cls):
+
+        """
+        :Description: Este método se encarga de actualizar las salas de todas las sedes, para esto, 
+        iteramos sobre el ArrayList de las sedes, luego iteramos sobre el ArrayList de las salas de 
+        cine de cada sede y ejecutamos su método de actualizar peliculas en presentación.
+        """
+
         for sede in SucursalCine._sucursalesCine:
             for salaDeCine in sede._salasDeCine:
 
@@ -49,10 +67,16 @@ class SucursalCine:
                     if salaDeCine.getHorarioPeliculaEnPresentacion() + salaDeCine.getPeliculaEnPresentacion().getDuracion() <= SucursalCine._fechaActual:
                         salaDeCine.actualizarPeliculaEnPresentacion()
                 except AttributeError:
-                    salaDeCine.actualizarPeliculaEnPresntacion()
+                    salaDeCine.actualizarPeliculaEnPresentacion()
     
     @classmethod
     def _dropHorariosVencidos(cls):
+
+        """
+        :Description: Este método se encarga de eliminar los horarios que ya no pueden ser presentados al pasar de día
+	    o luego de la deserialización, de todas las películas de cada sucursal, eliminando los horarios anteriores al día 
+	    de la fecha actual. 
+        """
         
         for sede in SucursalCine._sucursalesCine:
 
@@ -62,7 +86,7 @@ class SucursalCine:
 
                 for horario in pelicula.getHorariosPresentacion():
 
-                    if horario.date() < SucursalCine._fechaActual:
+                    if horario.date() < SucursalCine._fechaActual.date():
                         horariosAEliminar.append(horario)
                 
                 for horario in horariosAEliminar:
@@ -71,6 +95,19 @@ class SucursalCine:
                     pelicula.getHorariosPresentacion().remove(horario)
 
     def _crearHorariosPeliculasPorSala(self):
+
+        """
+        :Description: Este método se encarga de crear máximo 20 horarios por cada película en cartelera de la sucursal de cine, 
+	    teniendo en cuenta los siguientes criterios: 
+	    <ol>
+	    <li>El horario en el que se presentará la película se encuentra entre el horario de apertura y cierre de nuestras 
+	    instalaciones.</li>
+	    <li>La hora a la que termina la película es menor a la hora de cierre. </li>
+	    <li>Al finalizar una película se tiene en cuenta el tiempo de limpieza de la sala de cine.</li>
+	    <li>La creación de horarios no exceda una semana (Para ejecutar correctamente la lógica semanal de nuestro cine).</li>
+	    <li>Si varias películas serán presentadas en una sala se presentarán de forma intercalada evitando colisiones.</li>
+	    </ol>
+        """
         
         peliculasDeSalaDeCine = []
 
@@ -82,7 +119,7 @@ class SucursalCine:
 
             for pelicula in self._cartelera:
 
-                if pelicula.getSalaDeCine() is salaDeCine:
+                if pelicula.getSalaCinePresentacion() is salaDeCine:
                     peliculasDeSalaDeCine.append(pelicula)
 
             for i in range (0,20):
@@ -93,7 +130,7 @@ class SucursalCine:
                 for pelicula in peliculasDeSalaDeCine:
                     
                     condicionCreacionEnJornadaLaboral = horarioParaPresentar.time() < SucursalCine._FIN_HORARIO_LABORAL and horarioParaPresentar.time() >= SucursalCine._INICIO_HORARIO_LABORAL
-                    condicionCreacionDuranteJornadaLaboral = (horarioParaPresentar + pelicula._getDuracion()).time() <= SucursalCine._FIN_HORARIO_LABORAL and (horarioParaPresentar + pelicula.getDuracion()).date() == horarioParaPresentar.date()
+                    condicionCreacionDuranteJornadaLaboral = (horarioParaPresentar + pelicula.getDuracion()).time() <= SucursalCine._FIN_HORARIO_LABORAL and (horarioParaPresentar + pelicula.getDuracion()).date() == horarioParaPresentar.date()
                     
                     if  condicionCreacionEnJornadaLaboral and condicionCreacionDuranteJornadaLaboral:
                             pelicula.crearSalaVirtual(horarioParaPresentar)
@@ -106,35 +143,46 @@ class SucursalCine:
                             break
                     
                         horarioParaPresentar = horarioParaPresentar.replace(hour = SucursalCine._INICIO_HORARIO_LABORAL.hour, minute = SucursalCine._INICIO_HORARIO_LABORAL.minute)
-                        pelicula.crearSalaVirtual(horarioParaPresentar)
                         horarioParaPresentar += pelicula.getDuracion() + SucursalCine._TIEMPO_LIMPIEZA_SALA_DE_CINE
         
             peliculasDeSalaDeCine.clear()
 
     def _distribuirPeliculasPorSala(self):
+
+        """
+        :Description: Este método se encarga de distribuir las películas en cartelera en las distintas salas de cine 
+	    de la sucursal de cine que ejecuta este método, para esta distribución se tienen encuenta 3 casos posibles:
+	    <ol>
+	    <li>Hay menos películas que salas de cine o igual cantidad de ambas.</li>
+	    <li>Hay más películas que salas de cine, pero caben exactamente la misma cantidad de películas en cada sala.</li>
+	    <li>Hay más películas que salas de cine, pero al menos una sala de cine debe tener 1 película más que todas 
+	    las otras (Principio de Dirichlet o del palomar).</li>
+	    </ol>
+        """
         
         formatos = ["2D", "3D", "4D"]
 
-        grupoSalasPorFormato = []
-        grupoPeliculasPorFormato = []
-
-        cantidadMaxPeliculaPorSala = 0
-        indiceSalaDeCine = 0
-        contador = 0
-
         for formato in formatos:
 
+            grupoSalasPorFormato = []
+            grupoPeliculasPorFormato = []
+
+            cantidadMaxPeliculaPorSala = 0
+            contador = 0
+
+            indiceSalaDeCine = 0
+
             for salaDeCine in self._salasDeCine:
-                if salaDeCine.getTipoDeSala() == formato:
+                if salaDeCine.getTipoSala() == formato:
                     grupoSalasPorFormato.append(salaDeCine)
 
             for pelicula in self._cartelera:
-                if pelicula.getTIpoDeFormato() == formato:
+                if pelicula.getTipoDeFormato() == formato:
                     grupoPeliculasPorFormato.append(pelicula)
             
-            if len(grupoPeliculasPorFormato) > grupoSalasPorFormato:
+            if len(grupoPeliculasPorFormato) > len(grupoSalasPorFormato):
 
-                cantidadMaxPeliculaPorSala = len(grupoPeliculasPorFormato) % len(grupoSalasPorFormato) == 0 if len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato) else int(len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato)) + 1
+                cantidadMaxPeliculaPorSala = int(len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato)) if len(grupoPeliculasPorFormato) % len(grupoSalasPorFormato) == 0 else int(len(grupoPeliculasPorFormato) / len(grupoSalasPorFormato)) + 1
 
                 for pelicula in grupoPeliculasPorFormato:
                     pelicula.setSalaCinePresentacion(grupoSalasPorFormato[indiceSalaDeCine])
@@ -153,18 +201,37 @@ class SucursalCine:
 
     @classmethod
     def logicaSemanalSistemNegocio(cls):
+
+        """
+        :Description: Este método se encarga de realizar los preparativos para ejecutar la lógica de la funcionalidad #3:
+	    <ol>
+	    <li>Renueva las cantidades disponibles de los productos en inventario</li>
+	    <li>Eliminar los horarios de la semana anterior.</li>
+	    <li>Distribución de películas en las salas de cine y la creación de sus horarios.</li>
+	    <li>Eliminar los tickets comprados de películas de la semana anterior.</li>
+	    </ol>
+        """
         
-        #SucursalCine._ticketsDisponibles.clear()
+        SucursalCine._ticketsDisponibles.clear()
 
         for sede in SucursalCine._sucursalesCine:
             
             sede._distribuirPeliculasPorSala()
             sede._crearHorariosPeliculasPorSala()
 
-
-    
     @classmethod
     def logicaInicioSIstemaReservarTicket(cls):
+
+        """
+        :Description: Este método se encarga de ejecutar toda la lógica para realizar reservas de ticket por primera vez,
+	    se compone de 3 puntos principales:
+	    <ol>
+	    <li>Distribuir las películas en cartelera de cada sucursal de forma equitativa respecto a sus salas de cine.</li>
+	    <li>Una vez realizada la distribución, crear los horarios en los que se presentará cada película.</li>
+	    <li>Actualizar las películas cuyo horario se esta presentando en estos momentos.</li>
+	    <li>Establecer las fechas cuando se ejecutarán la lógica diaria y semanal del negocio.</li>
+	    </ol>
+        """
 
         SucursalCine._fechaActual = datetime.now()
 
@@ -185,12 +252,12 @@ class SucursalCine:
 
         for sede in SucursalCine._sucursalesCine:
 
-            #sede.ticketsParaDescuento.clear()
+            #sede._ticketsParaDescuento.clear()
 
             for ticket in sede._ticketsDisponibles:
                 
                 if ticket.getSucursalCompra() == sede._ubicacion and ticket.getHorario().date() == SucursalCine._fechaActual:
-                    #sede.ticketsParaDescuento.append(ticket)
+                    #sede._ticketsParaDescuento.append(ticket)
                     pass
 
                 if (ticket.getHorario() + ticket.getPelicula().getDuracion) < SucursalCine._fechaActual:
@@ -201,8 +268,8 @@ class SucursalCine:
         for ticket in ticketsAEliminar:
             SucursalCine._ticketsDisponibles.remove(ticket)
         
-        #for cliente in SucursalCine._clientes:
-            #cliente.dropTicketsCaducados()
+        for cliente in SucursalCine._clientes:
+            cliente.dropTicketsCaducados() 
 
     #def obtenerSucursalPorId(cls):
 
@@ -403,17 +470,21 @@ class SucursalCine:
                 if pelicula2.get_tipo_de_formato() == "2D":
                     Pelicula(pelicula2.get_nombre(), int(pelicula2.precio * 1.10), pelicula2.genero, pelicula2.duracion, pelicula2.clasificacion, pelicula2.get_tipo_de_formato(), sucursal)
 
+
+#################### PORQUE ESTA ESTE METODO AQUI Y EN SERVICIO?????????????????????
+#                    LE CORREGI LOS ERRORES QUE CHAT GPT LE HABIA HECHOPARA PODER EJECUTARLO
+
 #Description: Este metodo se encarga de seleccionar las sucursales del arrayList y con el uso de la funcion random de la libreria math,
 #se selecciona una sucursal aleatoriamente, ya que esto nos permetira mas adelante el cambio de sucursal de una
 #pelicula a otra.
 # 	 
     def seleccionar_sucursal_aleatoriamente(self,sucursal_cine):
-     if len(sucursales_cine) <= 1:
+     if len(sucursal_cine) <= 1:
         raise ValueError("No hay suficientes sucursales para seleccionar una diferente.")
     
      while True:
-        numero_aleatorio = random.randint(0, len(sucursales_cine) - 1)
-        sucursal_seleccionada = sucursales_cine[numero_aleatorio]
+        numero_aleatorio = random.randint(0, len(sucursal_cine) - 1)
+        sucursal_seleccionada = sucursal_cine[numero_aleatorio]
         if sucursal_cine != sucursal_seleccionada:
             return sucursal_seleccionada
 
@@ -462,13 +533,19 @@ class SucursalCine:
     def setCantidadTicketsCreados(self, cantidadTicketsCreados):
         self._cantidadTicketsCreados = cantidadTicketsCreados
     
-    @classmethod
     def getFechaActual(self):
         return SucursalCine._fechaActual
     
-    @classmethod
-    def setFechaActual(cls, fechaActual):
+    def setFechaActual(self, fechaActual):
         SucursalCine._fechaActual = fechaActual
+
+    @classmethod
+    def getMetodosDePagoDisponibles(cls):
+        return SucursalCine._metodosDePagoDisponibles
+    
+    @classmethod
+    def setMetodosDePagoDisponibles(cls, metodosDePagoDisponibles):
+        SucursalCine._metodosDePagoDisponibles = metodosDePagoDisponibles
     
     @classmethod
     def getTiempoLimpiezaSalaDeCine(cls):
@@ -478,8 +555,7 @@ class SucursalCine:
     def getTiempoLimiteReservaTicket(cls):
         return SucursalCine._TIEMPO_LIMITE_RESERVA_TICKET
     
-    @classmethod
-    def getTicketsDisponibles(cls):
+    def getTicketsDisponibles(self):
         return SucursalCine._ticketsDisponibles
     
     @classmethod
@@ -501,4 +577,133 @@ class SucursalCine:
     @classmethod
     def setClientes(cls, clientes):
         SucursalCine._clientes = clientes
+
+    @classmethod
+    def getSucursalesCine(cls):
+        return SucursalCine._sucursalesCine
+    
+    def getInventarioCine(self):
+        return self._inventarioCine
+
+    def setInventarioCine(self, inventarioCine):
+        self._inventarioCine = inventarioCine
+
+    def getTicketsParaDescuento(self):
+        return self._ticketsParaDescuento
+
+    def setTicketsParaDescuento(self, ticketsParaDescuento):
+        self._ticketsParaDescuento = ticketsParaDescuento
+
+    def getServicios(self):
+        return self._servicios
+
+    def setServicios(self, servicios):
+        self._servicios = servicios
+
+    def getBonosCreados(self):
+        return self._bonosCreados
+
+    def setBonosCreados(self, bonosCreados):
+        self._bonosCreados = bonosCreados
+
+if __name__ == '__main__':
+
+    servicioComida = ServicioComida("comida")
+    servicioSouvenirs = ServicioSouvenir("souvenir")
+
+    sucursalCine1 = SucursalCine("Bucaramanga")
+    sucursalCine2 = SucursalCine("Marinilla")
+    sucursalCine3 = SucursalCine("Medellín")
+
+    # Productos de la sucursal de Marinilla
+
+    producto1 = Producto("Hamburguesa","Grande","comida",20000,200,"Normal",sucursalCine2)
+    producto2 = Producto("Hamburguesa","Cangreburger","comida",25000,200,"Comedia",sucursalCine2)
+    producto3 = Producto("Perro caliente","Grande","comida",15000,200,"Normal",sucursalCine2)
+    producto4 = Producto("Perro caliente","Don salchicha","comida",20000,200,"Comedia",sucursalCine2)
+    producto5 = Producto("Crispetas","cazador de Demonios","comida",14000,200,"Acción",sucursalCine2)
+    producto6 = Producto("Crispetas","Grandes","comida",13000,200,"Normal",sucursalCine2)
+    producto7 = Producto("Gaseosa","Grande","comida",4000,200,"Normal",sucursalCine2)
+    producto8 = Producto("Gaseosa","Pequeña","comida",2000,200,"Normal",sucursalCine2)
+
+    producto1S = Producto("Camisa","XL","souvenir",16000,200,"Normal",sucursalCine2)
+    producto2S = Producto("Camisa","Bob Esponja","souvenir",27000,200,"Comedia",sucursalCine2)
+    producto3S = Producto("Gorra","L","souvenir",11000,200,"Normal",sucursalCine2)
+    producto4S = Producto("Llavero","Katana","souvenir",22000,200,"Acción",sucursalCine2)
+    producto5S = Producto("Peluche","Pajaro loco","souvenir",29000,200,"Comedia",sucursalCine2)
+
+    sucursalCine2.getServicios().add(servicioComida)
+    sucursalCine2.getServicios().add(servicioSouvenirs)
+
+    cliente1 = Cliente("Rusbel", 18, 13434, "CC");
+
+    salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
+    salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)
+    salaDeCine1_3 = SalaCine(3, "4D", sucursalCine1)
+    salaDeCine1_4 = SalaCine(4, "2D", sucursalCine1)
+    salaDeCine1_5 = SalaCine(5, "3D", sucursalCine1)
+    salaDeCine1_6 = SalaCine(6, "4D", sucursalCine1)
+
+    pelicula1_1 = Pelicula("Deadpool 3", 18000, "Comedia", timedelta( minutes=110 ), "+18", "2D", sucursalCine1)
+    pelicula1_1.crearPeliculas()
+    pelicula1_2 = Pelicula("Misión Imposible 4", 13000, "Acción", timedelta( minutes=155 ), "+16", "2D", sucursalCine1)
+    pelicula1_2.crearPeliculas()
+    pelicula1_3 = Pelicula("El conjuro 3", 18000, "Terror", timedelta( minutes=140 ), "+16", "2D", sucursalCine1)
+    pelicula1_3.crearPeliculas()
+    pelicula1_4 = Pelicula("Your name", 18000, "Romance", timedelta( minutes=110 ), "+8", "2D", sucursalCine1)
+    pelicula1_4.crearPeliculas()
+    pelicula1_5 = Pelicula("Furiosa: A Mad Max Saga", 17000, "Ciencia ficción", timedelta( minutes=148 ), "+18", "2D", sucursalCine1)
+    pelicula1_5.crearPeliculas()
+    pelicula1_6 = Pelicula("Spy x Familiy Código: Blanco", 19000, "Infantil", timedelta( minutes=90 ), "+5", "2D", sucursalCine1)
+    pelicula1_6.crearPeliculas()
+
+    salaDeCine2_1 = SalaCine(1, "2D", sucursalCine2)
+    salaDeCine2_2 = SalaCine(2, "3D", sucursalCine2)
+    salaDeCine2_3 = SalaCine(3, "4D", sucursalCine2)
+    salaDeCine2_4 = SalaCine(4, "2D", sucursalCine2)
+    salaDeCine2_5 = SalaCine(5, "3D", sucursalCine2)
+    salaDeCine2_6 = SalaCine(6, "4D", sucursalCine2)
+
+    pelicula2_1 = Pelicula("Jujutsu Kaisen Cero", 17000, "Acción", timedelta( minutes=90), "+12", "2D", sucursalCine2) 
+    pelicula2_1.crearPeliculas()
+    pelicula2_2 = Pelicula("The Strangers: Chapter 1", 20000, "Terror", timedelta( minutes=114 ), "+18", "2D", sucursalCine2)
+    pelicula2_2.crearPeliculas()
+    pelicula2_3 = Pelicula("El pájaro loco", 15000, "Infantil", timedelta( minutes=120 ), "+5", "2D", sucursalCine2)
+    pelicula2_3.crearPeliculas()
+    pelicula2_4 = Pelicula("One Life", 19000, "Historia", timedelta( minutes=110 ), "+8", "2D", sucursalCine2)
+    pelicula2_4.crearPeliculas()
+    pelicula2_5 = Pelicula("IP Man", 16000, "Acción", timedelta( minutes=132 ), "+16", "2D", sucursalCine2)
+    pelicula2_5.crearPeliculas()
+    pelicula2_6 = Pelicula("Bad Boys: Hasta la muerte", 17000, "Comedia", timedelta( minutes=109 ), "+18", "2D", sucursalCine2)
+    pelicula2_6.crearPeliculas()
+
+    salaDeCine3_1 = SalaCine(1, "2D", sucursalCine3)
+    salaDeCine3_2 = SalaCine(2, "3D", sucursalCine3)
+    salaDeCine3_3 = SalaCine(3, "4D", sucursalCine3)
+    salaDeCine3_4 = SalaCine(4, "2D", sucursalCine3)
+    salaDeCine3_5 = SalaCine(5, "3D", sucursalCine3)
+    salaDeCine3_6 = SalaCine(6, "4D", sucursalCine3)
+
+    pelicula3_1 = Pelicula("El Paseo 9", 15000, "Comedia", timedelta( minutes=60 ), "+12", "2D", sucursalCine3) 
+    pelicula3_1.crearPeliculas()
+    pelicula3_2 = Pelicula("Scream 8", 18000, "Terror", timedelta( minutes=180 ), "+16", "2D", sucursalCine3)
+    pelicula3_2.crearPeliculas()
+    pelicula3_3 = Pelicula("Oppenheimer", 15000, "Historia", timedelta( minutes=120 ), "+18", "2D", sucursalCine3)
+    pelicula3_3.crearPeliculas()
+    pelicula3_4 = Pelicula("Jhon Wick 4", 17000, "Acción", timedelta( minutes=180 ), "+18", "2D", sucursalCine3)
+    pelicula3_4.crearPeliculas()
+    pelicula3_5 = Pelicula("Intensamente 2", 15000, "Infantil", timedelta( minutes=105 ), "+5", "2D", sucursalCine3)
+    pelicula3_5.crearPeliculas()
+    pelicula3_6 = Pelicula("BNHA temporada 7 movie", 12000, "Acción", timedelta( minutes=60 ), "+12", "2D", sucursalCine3)
+    pelicula3_6.crearPeliculas()
+    
+
+
+    SucursalCine.logicaInicioSIstemaReservarTicket()
+
+
+
+
+
+    
     

@@ -1,7 +1,7 @@
 import tkinter as tk
 
 if __name__ == '__main__':
-    
+
     #Creacion de la ventana de inicio 
     ventanaInicio = tk.Tk()
     ventanaInicio.title("Ventana de Incio Cinemar")
@@ -115,3 +115,4 @@ if __name__ == '__main__':
 
 
     ventanaInicio.mainloop()
+
