@@ -1,4 +1,4 @@
-from gestionAplicacion.sucursalCine import SucursalCine
+#from gestionAplicacion.sucursalCine import SucursalCine
 
 class Cliente():
     

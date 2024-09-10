@@ -1,7 +1,11 @@
 from datetime import datetime, time, timedelta
-from gestionAplicacion.servicios.producto import Producto
+import random
+#from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
+from gestionAplicacion.servicios.herencia.servicioComida import ServicioComida
+from gestionAplicacion.servicios.herencia.servicioSouvenirs import ServicioSouvenir
+from gestionAplicacion.usuario.cliente import Cliente
 
 class SucursalCine:
 
@@ -34,6 +38,10 @@ class SucursalCine:
         self._idSucursal = SucursalCine._cantidadSucursales
         SucursalCine._sucursalesCine.append(self)
 
+        self._inventarioCine = []
+        self._ticketsParaDescuento = []
+        self._servicios = []
+        self._bonosCreados = []
         self._salasDeCine = []
         self._cartelera = []
         self._cantidadTicketsCreados = 1
@@ -462,17 +470,21 @@ class SucursalCine:
                 if pelicula2.get_tipo_de_formato() == "2D":
                     Pelicula(pelicula2.get_nombre(), int(pelicula2.precio * 1.10), pelicula2.genero, pelicula2.duracion, pelicula2.clasificacion, pelicula2.get_tipo_de_formato(), sucursal)
 
+
+#################### PORQUE ESTA ESTE METODO AQUI Y EN SERVICIO?????????????????????
+#                    LE CORREGI LOS ERRORES QUE CHAT GPT LE HABIA HECHOPARA PODER EJECUTARLO
+
 #Description: Este metodo se encarga de seleccionar las sucursales del arrayList y con el uso de la funcion random de la libreria math,
 #se selecciona una sucursal aleatoriamente, ya que esto nos permetira mas adelante el cambio de sucursal de una
 #pelicula a otra.
 # 	 
     def seleccionar_sucursal_aleatoriamente(self,sucursal_cine):
-     if len(sucursales_cine) <= 1:
+     if len(sucursal_cine) <= 1:
         raise ValueError("No hay suficientes sucursales para seleccionar una diferente.")
     
      while True:
-        numero_aleatorio = random.randint(0, len(sucursales_cine) - 1)
-        sucursal_seleccionada = sucursales_cine[numero_aleatorio]
+        numero_aleatorio = random.randint(0, len(sucursal_cine) - 1)
+        sucursal_seleccionada = sucursal_cine[numero_aleatorio]
         if sucursal_cine != sucursal_seleccionada:
             return sucursal_seleccionada
 
@@ -569,11 +581,61 @@ class SucursalCine:
     @classmethod
     def getSucursalesCine(cls):
         return SucursalCine._sucursalesCine
+    
+    def getInventarioCine(self):
+        return self._inventarioCine
+
+    def setInventarioCine(self, inventarioCine):
+        self._inventarioCine = inventarioCine
+
+    def getTicketsParaDescuento(self):
+        return self._ticketsParaDescuento
+
+    def setTicketsParaDescuento(self, ticketsParaDescuento):
+        self._ticketsParaDescuento = ticketsParaDescuento
+
+    def getServicios(self):
+        return self._servicios
+
+    def setServicios(self, servicios):
+        self._servicios = servicios
+
+    def getBonosCreados(self):
+        return self._bonosCreados
+
+    def setBonosCreados(self, bonosCreados):
+        self._bonosCreados = bonosCreados
 
 if __name__ == '__main__':
+
+    servicioComida = ServicioComida("comida")
+    servicioSouvenirs = ServicioSouvenir("souvenir")
+
     sucursalCine1 = SucursalCine("Bucaramanga")
     sucursalCine2 = SucursalCine("Marinilla")
     sucursalCine3 = SucursalCine("Medellín")
+
+    # Productos de la sucursal de Marinilla
+
+    producto1 = Producto("Hamburguesa","Grande","comida",20000,200,"Normal",sucursalCine2)
+    producto2 = Producto("Hamburguesa","Cangreburger","comida",25000,200,"Comedia",sucursalCine2)
+    producto3 = Producto("Perro caliente","Grande","comida",15000,200,"Normal",sucursalCine2)
+    producto4 = Producto("Perro caliente","Don salchicha","comida",20000,200,"Comedia",sucursalCine2)
+    producto5 = Producto("Crispetas","cazador de Demonios","comida",14000,200,"Acción",sucursalCine2)
+    producto6 = Producto("Crispetas","Grandes","comida",13000,200,"Normal",sucursalCine2)
+    producto7 = Producto("Gaseosa","Grande","comida",4000,200,"Normal",sucursalCine2)
+    producto8 = Producto("Gaseosa","Pequeña","comida",2000,200,"Normal",sucursalCine2)
+
+    producto1S = Producto("Camisa","XL","souvenir",16000,200,"Normal",sucursalCine2)
+    producto2S = Producto("Camisa","Bob Esponja","souvenir",27000,200,"Comedia",sucursalCine2)
+    producto3S = Producto("Gorra","L","souvenir",11000,200,"Normal",sucursalCine2)
+    producto4S = Producto("Llavero","Katana","souvenir",22000,200,"Acción",sucursalCine2)
+    producto5S = Producto("Peluche","Pajaro loco","souvenir",29000,200,"Comedia",sucursalCine2)
+
+    sucursalCine2.getServicios().add(servicioComida)
+    sucursalCine2.getServicios().add(servicioSouvenirs)
+
+    cliente1 = Cliente("Rusbel", 18, 13434, "CC");
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
     salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)
@@ -634,6 +696,8 @@ if __name__ == '__main__':
     pelicula3_5.crearPeliculas()
     pelicula3_6 = Pelicula("BNHA temporada 7 movie", 12000, "Acción", timedelta( minutes=60 ), "+12", "2D", sucursalCine3)
     pelicula3_6.crearPeliculas()
+    
+
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 

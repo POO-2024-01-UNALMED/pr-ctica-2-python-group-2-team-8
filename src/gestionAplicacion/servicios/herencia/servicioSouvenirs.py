@@ -1,7 +1,7 @@
 import datetime
 from gestionAplicacion.servicios.herencia.servicio import Servicio
 
-class ServicioComida(Servicio):
+class ServicioSouvenir(Servicio):
     
     def __init__(self, nombre=""):
         super().__init__(nombre)
