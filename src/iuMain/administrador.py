@@ -1,4 +1,110 @@
+import sys
+import os
+
+# Añadir el directorio raíz del proyecto al PYTHONPATH
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 import tkinter as tk
+from tkinter import ttk
+from gestionAplicacion.usuario.tipoDocumento import TipoDocumento
+from gestionAplicacion.sucursalCine import SucursalCine
+
+class FieldFrame(tk.Frame):
+
+    def __init__(self, tituloCriterios = "", textEtiquetas = None, tituloValores = "", elementosInteractuables = None, habilitado = None):
+        super().__init__(ventanaLogicaProyecto)
+        self._tituloCriterios = tituloCriterios
+        self._infoEtiquetas = textEtiquetas
+        self._tituloValores = tituloValores
+        self._infoElementosAñadidos = elementosInteractuables
+        self._habilitado = habilitado
+
+        self._elementosInteractivos = []
+        
+        tituloCrit = tk.Label(self, text = tituloCriterios, font= ("Verdana bold",20), anchor="center")
+        tituloCrit.grid(column=0, row=1, padx = (10,10), pady = (10,10))
+
+        tituloVal = tk.Label(self, text = tituloValores, font= ("Verdana bold",20), anchor="center")
+        tituloVal.grid(column=1, row=1,columnspan=3, padx = (10,10), pady = (10,10))
+
+        for i in range(len(textEtiquetas)):
+
+            labelCriterio = tk.Label(self, text = textEtiquetas[i], font= ("Verdana",12), anchor="center")
+            labelCriterio.grid(column=0, row=i+2, padx = (10,10), pady = (10,10))
+
+            elementoInteractivo = None
+
+            if elementosInteractuables[i] is None:
+                elementoInteractivo = tk.Entry(self)
+            
+            elif len(elementosInteractuables[i]) == 1:
+                elementoInteractivo = tk.Entry(self, textvariable=tk.StringVar(str(elementosInteractuables[i][0])))
+            else:
+                elementoInteractivo = ttk.Combobox(self, values=elementosInteractuables[i][0])
+                elementoInteractivo.set(elementosInteractuables[i][1])
+
+
+            elementoInteractivo.grid(column=1, row=i+2,columnspan=3, padx = (10,10), pady = (10,10))
+
+            if habilitado is not None and not habilitado[i]:
+
+                if isinstance(elementoInteractivo, ttk.Combobox):
+                    elementoInteractivo.configure(state='readonly')
+                else:
+                    elementoInteractivo.configure(state='disabled')
+
+            self._elementosInteractivos.append(elementoInteractivo)
+
+        tk.Button(self, text="Borrar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funBorrar,
+        width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = len(self._infoEtiquetas)+2, columnspan=3)
+        tk.Button(self, text="Aceptar", font = ("Verdana", 12), fg = "white", bg = "gray", command=self.funAceptar,
+        width=12,height=2).grid(pady = (10,10),
+        padx=(10,10), column = 0, row = len(self._infoEtiquetas)+2)
+
+    def getValue(self, criterio):
+        indice = self._infoEtiquetas.index(criterio)
+        return self._elementosInteractivos[indice].get()
+
+    def setValueEntry(self, criterio, valor):
+        indice = self._infoEtiquetas.index(criterio)
+        self._elementosInteractivos[indice].delete("0","end")
+        self._elementosInteractivos[indice].insert(0, valor)
+    
+    def setValueComoboBox(self, criterio):
+        indice = self._elementosInteractivos.index(criterio)
+        criterio.set(self._infoElementosAñadidos[indice][1])
+
+    def funBorrar(self):
+        for elementoInteractivo in self._elementosInteractivos:
+            if isinstance(elementoInteractivo, ttk.Combobox):
+                self.setValueComoboBox(elementoInteractivo)
+            else:
+                elementoInteractivo.delete("0","end")
+    
+    def mostrarFrame(self):
+        self.pack(expand=True)
+                
+class FrameInicioSesion(FieldFrame):
+
+    def __init__(self, tituloProceso = '', descripcionProceso = ''):
+        super().__init__(
+            tituloCriterios = "Criterios Ingreso", 
+            textEtiquetas = ['Seleccionar Tipo D.I. :', 'Número D.I. :', 'Sucursal visita'], 
+            tituloValores = "Datos Ingreso", 
+            elementosInteractuables = [[TipoDocumento.listadoTiposDeDocumentos(), 'Seleccionar D.I.'], None, [SucursalCine.getSucursalesCine(), 'Seleccionar Sucursal']], 
+            habilitado = [False, True, False]
+        )
+        
+        tituloFrame = tk.Label(self, text=tituloProceso, font= ("Verdana bold",30), anchor="center")
+        tituloFrame.grid(row=0, column=0, columnspan=4, sticky='we')
+
+        descripcionFrame = tk.Label(self, text=descripcionProceso, font= ("Verdana",10), anchor="center", wraplength=300)
+        descripcionFrame.grid(row=1, column=0, columnspan=4, sticky='we')
+    
+    def funAceptar(self):
+        pass
 
 if __name__ == '__main__':
 
@@ -7,6 +113,14 @@ if __name__ == '__main__':
     ventanaInicio.title("Ventana de Incio Cinemar")
     ventanaInicio.geometry("500x450")
     ventanaInicio.config(bg = "light gray")
+
+    #Ventana Funcionalidad
+    ventanaLogicaProyecto = tk.Toplevel(ventanaInicio)
+    ventanaLogicaProyecto.title("Ventana Principal Cinemar")
+    ventanaLogicaProyecto.geometry("640x480")
+
+    #Frames de lógica proyecto
+    frameIniciarSesion = FrameInicioSesion('Iniciar Sesión', 'En este apartado gestionamos la lógica de inicio de sesión')
 
     #Nota: Si desean usar pack(No recomendado, se buguea con el uso de texto dentro del frame) 
     # en vez de place ponganle a los frames el fill = "both" pa que se vea melo
@@ -36,12 +150,12 @@ if __name__ == '__main__':
 
     #Metodo boton ingresar
     def ingresarVentanaPrincipal():
-        ventanaInicio.destroy()
-        #Creacion de la ventana Principal
-        ventanaPrincipal = tk.Tk()
-        ventanaPrincipal.title("Ventana Principal Cinemar")
-        ventanaPrincipal.geometry("500x450")
-        ventanaPrincipal.mainloop
+        #Escondemos la ventana de inicio
+        ventanaInicio.withdraw()
+        ventanaLogicaProyecto.deiconify()
+
+        #Mostramos el frame correspondiente
+        frameIniciarSesion.mostrarFrame()
 
     botonIngreso = tk.Button(frameInferiorIzquierdoP4, text = "Ingresar", font = ("Courier", 10, "bold"), bg= "#FFD700", command= ingresarVentanaPrincipal)
     botonIngreso.place(relx = 0.3, rely = 0.8462962963, relwidth=0.4, relheight = 0.1305555556)
@@ -78,10 +192,6 @@ if __name__ == '__main__':
     # Asignar evento al Label
     imagenLabel.bind("<Leave>", cambiar_imagen)
 
-
-
-
-
     #Creacion y posicionamineto de P5
     frameSuperiorDerechoP5 = tk.Frame(frameGrandeDerechoP2, bd = 2, relief= "solid")
     frameSuperiorDerechoP5.place(relx= 0.02, rely= 0.011, relwidth= 0.96, relheight = 0.37)
@@ -99,7 +209,6 @@ if __name__ == '__main__':
     menuOpciones = tk.Menu(barraMenu, tearoff= 0, font=("Courier", 9), activebackground= "#87CEEB", activeforeground= "black")
     barraMenu.add_cascade(label= "Inicio", menu= menuOpciones, font=("Courier", 9) )
 
-
     #Metodos para la barra de opciones
     def mostrarDescripcion(): 
         mensaje = tk.Message(frameSuperiorIzquierdoP3, text=  "En este programa puedes:\n•Comprar Tickets\n•Comprar comida y regalos\n•Usar la zona de juegos\n•Adquirir membresias\n•Calificar nuestros servicios" , font= ("Times New Roman",11))
@@ -112,7 +221,6 @@ if __name__ == '__main__':
     menuOpciones.add_command(label = "Descripción del programa", command= mostrarDescripcion)
     menuOpciones.add_command(label = "Salir y Guardar", command= CerrarVentana)
 
-
-
+    ventanaLogicaProyecto.withdraw()
     ventanaInicio.mainloop()
 

@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
 import random
-#from producto import Producto
-#import sucursalCine
-
+from gestionAplicacion.servicios.producto import Producto
 
 class Servicio (ABC):
     cliente  = None
-    def __init__(self, nombre):
+    def __init__(self, nombre, sucursalUbicacion):
         self._nombre = nombre
         self._inventario = []
         self._orden = []
         self._bonosCliente = []
         self._valorPedido = 0.0
+        self._sucursalUbicacion = sucursalUbicacion
+
         
     @abstractmethod
     def descuentarPorCompra(self, metodo):
@@ -40,7 +40,7 @@ class Servicio (ABC):
         for producto in self.orden:
             for ticket in cine.getTicketsParaDescuento():
                 if producto.getGenero() == ticket.getPelicula().getGenero() and self.cliente == ticket.getDueno():
-                    fecha = sucursalCine.getFechaActual().date()
+                    fecha = self._sucursalUbicacion.getFechaActual().date()
                     if fecha == ticket.getHorario().date() and ticket.isDescuento():
                         ticket.setDescuento(False)
                         return producto

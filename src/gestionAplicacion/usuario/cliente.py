@@ -2,13 +2,14 @@
 
 class Cliente():
     
-    def __init__(self, nombre = "", edad = 0 , documento = 0, tipoDocumento = None, membresia = None,
-                  cuenta = None, codigosDescuento =[], codigosBonos= [], bonos= []):
+    def __init__(self, nombre = "", edad = 0 , documento = 0, tipoDocumento = None, cineUbicacionActual = None, membresia = None,
+        cuenta = None, codigosDescuento =[], codigosBonos= [], bonos= []):
+
         self._nombre = nombre
         self._edad = edad
         self._documento = documento
         self._tipoDocumento = tipoDocumento
-        self._cineUbicacionActual = None
+        self._cineUbicacionActual = cineUbicacionActual
 
         #Atributos Funcionalidad 1
         self._tickets = []
@@ -29,7 +30,7 @@ class Cliente():
         self._metodosDePago = []
 
 
-        SucursalCine.getClientes.append(self)
+        self._cineUbicacionActual.getClientes.append(self)
 
 
 
@@ -99,7 +100,7 @@ class Cliente():
         ticketsAEliminar = []
 
         for ticket in self._tickets:
-            if ticket.getHorario() + ticket.getPelicula().getDuracion() < SucursalCine.getFechaActual():
+            if ticket.getHorario() + ticket.getPelicula().getDuracion() < self._cineUbicacionActual.getFechaActual():
                 ticketsAEliminar.append(ticket)
         
         for ticket in ticketsAEliminar:

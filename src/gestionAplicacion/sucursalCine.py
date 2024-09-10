@@ -1,6 +1,6 @@
 from datetime import datetime, time, timedelta
 import random
-#from gestionAplicacion.servicios.producto import Producto
+from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
 from gestionAplicacion.servicios.herencia.servicioComida import ServicioComida
@@ -570,8 +570,7 @@ class SucursalCine:
     def setJuegos(cls, juegos):
         SucursalCine._juegos = juegos
     
-    @classmethod
-    def getClientes(cls):
+    def getClientes(self):
         return SucursalCine._clientes
 
     @classmethod
