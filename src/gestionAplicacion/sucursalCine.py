@@ -1,7 +1,7 @@
 from datetime import datetime, time, timedelta
-from servicios.producto import Producto
-from proyecciones.pelicula import Pelicula
-from proyecciones.salaCine import SalaCine
+from gestionAplicacion.servicios.producto import Producto
+from gestionAplicacion.proyecciones.pelicula import Pelicula
+from gestionAplicacion.proyecciones.salaCine import SalaCine
 
 class SucursalCine:
 
