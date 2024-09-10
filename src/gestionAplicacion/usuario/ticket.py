@@ -15,7 +15,7 @@ class Ticket:
 
         self._idTicket = 0
         self._dueno = None
-        #self._descuento = True
+        self._descuento = True
 
 #Methods
 ################################################
@@ -169,4 +169,9 @@ class Ticket:
     
     def setSucursalCompra(self, sucursalCompra):
         self._sucursalCompra = sucursalCompra
-        
+    
+    def isDescuentos(self):
+        return self._descuento
+    
+    def setDescuentos(self, descuento):
+        self._descuento = descuento     

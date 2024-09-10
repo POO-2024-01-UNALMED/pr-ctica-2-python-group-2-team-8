@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import random
 from producto import Producto
 import sucursalCine
 
@@ -113,17 +114,22 @@ class Servicio (ABC):
             return producto
         return None
     
+
+#################### PORQUE ESTA ESTE METODO AQUI Y EN SUCURSALCINE?????????????????????
+#                    LE CORREGI LOS ERRORES QUE CHAT GPT LE HABIA HECHOPARA PODER EJECUTARLO
+
+
 #Description: Este metodo se encarga de seleccionar las sucursales del arrayList y con el uso de la funcion random de la libreria math,
 #se selecciona una sucursal aleatoriamente, ya que esto nos permetira mas adelante el cambio de sucursal de una
 #pelicula a otra.
 # 	 
     def seleccionar_sucursal_aleatoriamente(self,sucursal_cine):
-     if len(sucursales_cine) <= 1:
+     if len(sucursal_cine) <= 1:
         raise ValueError("No hay suficientes sucursales para seleccionar una diferente.")
     
      while True:
-        numero_aleatorio = random.randint(0, len(sucursales_cine) - 1)
-        sucursal_seleccionada = sucursales_cine[numero_aleatorio]
+        numero_aleatorio = random.randint(0, len(sucursal_cine) - 1)
+        sucursal_seleccionada = sucursal_cine[numero_aleatorio]
         if sucursal_cine != sucursal_seleccionada:
             return sucursal_seleccionada
 
