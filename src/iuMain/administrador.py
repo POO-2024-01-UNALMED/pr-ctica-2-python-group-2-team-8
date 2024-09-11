@@ -17,6 +17,8 @@ from gestionAplicacion.servicios.herencia.servicioSouvenirs import ServicioSouve
 from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
+from gestionAplicacion.usuario.membresia import Membresia
+from gestionAplicacion.usuario.metodoPago import MetodoPago
 
 class FieldFrame(tk.Frame):
 
@@ -101,6 +103,7 @@ class FieldFrame(tk.Frame):
     
     def mostrarFrame(self):
         self.pack(expand=True)
+
                 
 class FrameInicioSesion(FieldFrame):
 
@@ -118,6 +121,34 @@ class FrameInicioSesion(FieldFrame):
     def funAceptar(self):
         
         pass
+
+class FrameVentanaPrincipal(FieldFrame):
+
+    def __init__(self):
+        super().__init__(
+            tituloProceso="",
+            descripcionProceso="",
+            tituloCriterios="",
+            textEtiquetas="",
+            tituloValores="",
+            elementosInteractuables="",
+            habilitado=""
+        )
+        #Se buscan los widget que tenga FieldFrame y se eliminan para este frame.
+        for widget in self.winfo_children():
+            if isinstance(widget, tk.Button):
+                widget.destroy()
+
+        barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Courier", 9))
+        ventanaLogicaProyecto.config(menu=barraMenuPrincipal)
+        menuOpcionesPrincipal = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Courier", 9), activebackground= "grey", activeforeground="black")
+        barraMenuPrincipal.add_cascade(label="Funcionalidades", menu= menuOpcionesPrincipal, font=("Courier", 9))
+
+        menuOpcionesPrincipal.add_command(label="Reserva de tiquetes", command = "")
+        menuOpcionesPrincipal.add_command(label="Zona de juegos", command="")
+        menuOpcionesPrincipal.add_command(label="Calificaciones", command="")
+        menuOpcionesPrincipal.add_command(label="Servicio de comida/souvenir", command="")
+        menuOpcionesPrincipal.add_command(label="Sistema de membresías", command="")    
 
 def objetosBasePractica2():
 
@@ -213,6 +244,17 @@ def objetosBasePractica2():
     pelicula3_6 = Pelicula("BNHA temporada 7 movie", 12000, "Acción", timedelta( minutes=60 ), "+12", "2D", sucursalCine3)
     pelicula3_6.crearPeliculas()
 
+    membresia1 = Membresia("Básico", 1, 5000, 10)
+    membresia2 = Membresia("Heróico", 2, 10000, 15)
+    membresia3 = Membresia("Global", 3, 15000, 20)
+    membresia4 = Membresia("Challenger", 4, 25000, 25)
+    membresia5 = Membresia("Radiante", 5, 30000, 30)
+
+    metodoPago1 = MetodoPago("Bancolombia", 0.10, 200000)
+    metodoPago2 = MetodoPago("AV Villas", 0.05, 120000)
+    metodoPago3 = MetodoPago("Banco Agrario", 0.15, 300000)
+    metodoPago4 = MetodoPago("Efectivo", 0, 5000000)
+
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
 
@@ -234,6 +276,7 @@ if __name__ == '__main__':
 
     #Frames de lógica proyecto
     frameIniciarSesion = FrameInicioSesion()
+    frameVentanaPrincipal = FrameVentanaPrincipal()
 
     #Nota: Si desean usar pack(No recomendado, se buguea con el uso de texto dentro del frame) 
     # en vez de place ponganle a los frames el fill = "both" pa que se vea melo
@@ -268,6 +311,7 @@ if __name__ == '__main__':
         ventanaLogicaProyecto.deiconify()
 
         #Mostramos el frame correspondiente
+        #frameVentanaPrincipal.mostrarFrame()
         frameIniciarSesion.mostrarFrame()
 
     botonIngreso = tk.Button(frameInferiorIzquierdoP4, text = "Ingresar", font = ("Courier", 10, "bold"), bg= "#FFD700", command= ingresarVentanaPrincipal)

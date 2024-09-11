@@ -1,13 +1,13 @@
-from src.gestionAplicacion.sucursalCine import SucursalCine
+from gestionAplicacion.sucursalCine import SucursalCine
 
 class MetodoPago():
 
     #Inicializador
-    def __init__(self, nombre, descuentoAsociado, limiteMaximoPago, tipo):
+    def __init__(self, nombre, descuentoAsociado, limiteMaximoPago):
         self._nombre = nombre
         self._descuentoAsociado = descuentoAsociado
         self._limiteMaximoPago = limiteMaximoPago
-        self._tipo = tipo
+        self._tipo = 0
 
 
     #Metodos
