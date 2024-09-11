@@ -18,6 +18,7 @@ class SucursalCine:
     _juegos = []
     _clientes = []
     _metodosDePagoDisponibles = []
+    _tiposDeMembresia = []
 
     #Constants
     _INICIO_HORARIO_LABORAL = time(10,00)
@@ -517,6 +518,7 @@ class SucursalCine:
 #################### PORQUE ESTA ESTE METODO AQUI Y EN SERVICIO?????????????????????
 #                    LE CORREGI LOS ERRORES QUE CHAT GPT LE HABIA HECHOPARA PODER EJECUTARLO
 # porque los quise poner en los dos hermano, y si, use chat gpt con esos metodos,
+# cual es la wachafita ps?
 #Description: Este metodo se encarga de seleccionar las sucursales del arrayList y con el uso de la funcion random de la libreria math,
 #se selecciona una sucursal aleatoriamente, ya que esto nos permetira mas adelante el cambio de sucursal de una
 #pelicula a otra.
@@ -589,6 +591,14 @@ class SucursalCine:
     @classmethod
     def setMetodosDePagoDisponibles(cls, metodosDePagoDisponibles):
         SucursalCine._metodosDePagoDisponibles = metodosDePagoDisponibles
+
+    @classmethod
+    def getTiposDeMembresia(cls):
+        return SucursalCine._tiposDeMembresia
+    
+    @classmethod
+    def setTiposDeMembresia(cls, tiposDeMembresia):
+        SucursalCine._tiposDeMembresia = tiposDeMembresia
     
     @classmethod
     def getTiempoLimpiezaSalaDeCine(cls):
