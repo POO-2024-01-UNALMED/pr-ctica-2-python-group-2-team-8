@@ -243,18 +243,26 @@ class SucursalCine:
 
     @classmethod
     def logicaDiariaReservarTicket(cls):
+
+        """
+        :Description : Este método se encarga de evaluar la lógica diaria de la reserva de tickets, para esto evalua los siguientes criterios:
+	    <ol>
+	    <li>Añade los tickets de películas que serán presentadas el día de hoy al array de tickets para descuento y elimina los tickets
+	    caducados de los clientes y del array de tickets disponibles.</li>
+	    <li>Elimina los horarios de películas que ya no serán presentados.</li>
+	    </ol>
+        """
         
         ticketsAEliminar = []
 
         for sede in SucursalCine._sucursalesCine:
 
-            #sede._ticketsParaDescuento.clear()
+            sede._ticketsParaDescuento.clear()
 
             for ticket in sede._ticketsDisponibles:
                 
-                if ticket.getSucursalCompra() == sede._ubicacion and ticket.getHorario().date() == SucursalCine._fechaActual:
-                    #sede._ticketsParaDescuento.append(ticket)
-                    pass
+                if ticket.getSucursalCompra() == sede._ubicacion and ticket.getHorario().date() == SucursalCine._fechaActual.date():
+                    sede._ticketsParaDescuento.append(ticket)
 
                 if (ticket.getHorario() + ticket.getPelicula().getDuracion) < SucursalCine._fechaActual:
                     ticketsAEliminar.append(ticket)
@@ -267,6 +275,45 @@ class SucursalCine:
         for cliente in SucursalCine._clientes:
             cliente.dropTicketsCaducados() 
 
+    
+    @classmethod
+    def buscarCliente(cls, numeroDocumento, tipoDocumento):
+
+        """
+        <b>Description</b>: Este método se encarga de buscar un cliente en la lista de clientes de la clase SucursalCine cuyo
+        número de documento y tipo de documento coincida con los pasados como parámetros
+
+        :param numeroDocumento: Corresponde al número de documento del usuario que estamos buscando
+        :type numeroDocumento: int
+
+        :param tipoDocumento: Corresponde al tipo de documento del usuario que estamos buscando
+        :type tipoDocumento: String -> TipoDocumento.value
+
+        :return cliente: Este método retorna el cliente en caso de encontrarlo, sino, retorna None
+        """
+
+        for cliente in SucursalCine._clientes:
+            if cliente.getDocumento() == numeroDocumento and cliente.getTipoDocumento().value == tipoDocumento:
+                return cliente
+        
+        return None
+    
+    @classmethod
+    def obtenerSucursalPorUbicacion(cls, ubicacion):
+
+        """
+        <b>Description</b>: Este método se encarga de buscar la sucursal de cine cuya ubicación coincida con la pasada
+        como prámetro
+
+        :param ubicacion: Corresponde a la ubicacion de la sucursal que estamos buscando
+
+        :returns sede: Este método retorna la sede encontrada 
+        """
+        
+        for sede in SucursalCine._sucursalesCine:
+            if sede._ubicacion == ubicacion:
+                return sede
+    
     #def obtenerSucursalPorId(cls):
 
     #def obetenerSalaDeCinePorId(self):

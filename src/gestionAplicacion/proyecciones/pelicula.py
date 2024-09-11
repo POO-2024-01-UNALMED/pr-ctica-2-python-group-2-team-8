@@ -56,7 +56,7 @@ class Pelicula:
     def filtrarCarteleraPorCliente(cls, cliente, sucursalCine):
 
         """
-        Description : Este método se encarga de filtar las películas en cartelera con los siguientes criterios:
+        :Description : Este método se encarga de filtar las películas en cartelera con los siguientes criterios:
 	    <ol>  
 	    <li>Su categoría es menor o igual a la edad del cliente.</li>
 	    <li>La película tiene al menos 1 horario en el cuál será presentada o se encuentra en presentación y no supera el
@@ -64,7 +64,7 @@ class Pelicula:
 	    </ol>
 	    Todo esto con el fin de mostrar en pantalla, posteriormente, el array de las películas que cumplan estos criterios.
 
-	    :param clienteProceso : Este método recibe como parámetro un cliente (De tipo cliente), que realizará el proceso de 
+	    :param clienteProceso: Este método recibe como parámetro un cliente (De tipo cliente), que realizará el proceso de 
         reserva de ticket.
 	    :param sucursalCine : Este método recibe como parámetro la sede (De tipo SucursalCine), para acceder a su cartelera.
 	    
@@ -108,8 +108,8 @@ class Pelicula:
         determinado género, sin repetición.
 
 	    :param filtroPeliculasPorCliente: Este método recibe como parámetro las peliculas ( De tipo list(Pelicula) ) 
-        resultantes de realizar el filtro por cliente (Edad y disponibilidad horaria).
-	    :param genero: Este método recibe como parámetro el género (De tipo String) más visualizado por el cliente.
+        resultantes de realizar el filtro por cliente (Edad y disponibilidad horaria). 
+	    :param genero : Este método recibe como parámetro el género (De tipo String) más visualizado por el cliente.
 
 	    :return list(String): Retorna una lista de nombres de las películas distintos entre sí, cuyo género es igual.
 	

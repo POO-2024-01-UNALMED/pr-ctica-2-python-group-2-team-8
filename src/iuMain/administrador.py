@@ -7,7 +7,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from datetime import datetime, time, timedelta
 from gestionAplicacion.usuario.tipoDocumento import TipoDocumento
 from gestionAplicacion.sucursalCine import SucursalCine
@@ -20,15 +20,16 @@ from gestionAplicacion.proyecciones.salaCine import SalaCine
 
 class FieldFrame(tk.Frame):
 
-    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = None, tituloValores = "", elementosInteractuables = None, habilitado = None):
+    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = None, tituloValores = "", infoElementosInteractuables = None, habilitado = None):
         super().__init__(ventanaLogicaProyecto)
         self._tituloCriterios = tituloCriterios
         self._infoEtiquetas = textEtiquetas
         self._tituloValores = tituloValores
-        self._infoElementosAñadidos = elementosInteractuables
+        self._infoElementosInteractuables = infoElementosInteractuables
         self._habilitado = habilitado
 
         self._elementosInteractivos = []
+        self._clienteProceso = None
         
         tituloFrame = tk.Label(self, text=tituloProceso, font= ("Verdana bold",30), anchor="center")
         tituloFrame.grid(row=0, column=0, columnspan=4, sticky='we')
@@ -49,15 +50,15 @@ class FieldFrame(tk.Frame):
 
             elementoInteractivo = None
 
-            if elementosInteractuables[i] is None:
+            if infoElementosInteractuables[i] is None:
                 elementoInteractivo = tk.Entry(self)
             
-            elif len(elementosInteractuables[i]) == 1:
-                elementoInteractivo = tk.Entry(self, textvariable=tk.StringVar(str(elementosInteractuables[i][0])))
+            elif len(infoElementosInteractuables[i]) == 1:
+                elementoInteractivo = tk.Entry(self, textvariable=tk.StringVar(str(infoElementosInteractuables[i][0])))
 
             else:
-                elementoInteractivo = ttk.Combobox(self, values=elementosInteractuables[i][0])
-                elementoInteractivo.set(elementosInteractuables[i][1])
+                elementoInteractivo = ttk.Combobox(self, values=infoElementosInteractuables[i][0])
+                elementoInteractivo.set(infoElementosInteractuables[i][1])
 
 
             elementoInteractivo.grid(column=1, row=i+3,columnspan=3, padx = (10,10), pady = (10,10))
@@ -87,7 +88,7 @@ class FieldFrame(tk.Frame):
     
     def setValueComoboBox(self, criterio):
         indice = self._elementosInteractivos.index(criterio)
-        criterio.set(self._infoElementosAñadidos[indice][1])
+        criterio.set(self._infoElementosInteractuables[indice][1])
 
     def funBorrar(self):
         for elementoInteractivo in self._elementosInteractivos:
@@ -99,8 +100,23 @@ class FieldFrame(tk.Frame):
     def funAceptar(self):
         pass
     
-    def mostrarFrame(self):
+    def mostrarFrame(self, frameAnterior = None):
+        if frameAnterior is not None:
+            frameAnterior.pack_forget()
         self.pack(expand=True)
+    
+    def getClienteProceso(self):
+        return self._clienteProceso
+    
+    def tieneValoresPorDefecto(self):
+        for i in range(0, len(self._infoElementosInteractuables)):
+
+            valorPorDefecto = '' if self._infoElementosInteractuables[i] == None else self._infoElementosInteractuables[i][0] if len(self._infoElementosInteractuables[i]) == 1 else self._infoElementosInteractuables[i][1]
+
+            if self.getValue(self._infoEtiquetas[i]) == valorPorDefecto:
+                return True
+        
+        return False
                 
 class FrameInicioSesion(FieldFrame):
 
@@ -111,13 +127,74 @@ class FrameInicioSesion(FieldFrame):
             tituloCriterios = "Criterios Ingreso", 
             textEtiquetas = ['Seleccionar Tipo D.I. :', 'Número D.I. :', 'Seleccionar Sucursal :'], 
             tituloValores = "Datos Ingreso", 
-            elementosInteractuables = [[TipoDocumento.listadoTiposDeDocumentos(), 'Seleccionar D.I.'], None, [SucursalCine.getSucursalesCine(), 'Seleccionar Sucursal']], 
+            infoElementosInteractuables = [[TipoDocumento.listadoTiposDeDocumentos(), 'Seleccionar D.I.'], None, [[sede.getUbicacion() for sede in SucursalCine.getSucursalesCine()], 'Seleccionar Sucursal']], 
             habilitado = [False, True, False]
         )
     
     def funAceptar(self):
+
+        if not self.tieneValoresPorDefecto():
+            tipoDocumentoSeleccionado = self.getValue('Seleccionar Tipo D.I. :')
+
+            try:
+                numDocumentoSeleccionado = int(self.getValue('Número D.I. :'))
+            except ValueError:
+                messagebox.showerror('Error', f'El campo {self._infoEtiquetas[1].strip(':')}debe ser numérico')
+                return
+
+            sucursalSeleccionada = self.getValue('Seleccionar Sucursal :')
+            
+            confirmacionUsuario = messagebox.askokcancel('Confirmación de datos', f'Los datos ingresados son:\nTipo de documento: {tipoDocumentoSeleccionado}\nNúmero de documento: {numDocumentoSeleccionado}\nSucursal seleccionada: {sucursalSeleccionada}')
+            
+            if confirmacionUsuario:
+                clienteProceso = SucursalCine.buscarCliente(numDocumentoSeleccionado, tipoDocumentoSeleccionado)
+
+                if self._clienteProceso is None:
+                    FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada).mostrarFrame(self)
+
+                else:
+                    self._clienteProceso = clienteProceso
+                    messagebox.showinfo('Encontrado -> Llamar a field principal')
+        else:
+            messagebox.showerror('Error', 'No pueden haber campos vacíos o con valores por defecto')
+
+class FrameCrearUsuario(FieldFrame):
+
+    def __init__(self, tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada):
+        super().__init__(
+            tituloProceso = 'Crear Usuario', 
+            descripcionProceso = 'Hemos detectado que es la primera vez que visitas nuestras sucursales, te invitamos a diligenciar el siguiente formulario de registro',
+            tituloCriterios = 'Criterios registro',
+            textEtiquetas = ['Nombre :', 'Edad :'],
+            tituloValores = 'Datos registro',
+            infoElementosInteractuables = [None, None],
+            habilitado = [True, True]
+            )
         
-        pass
+        self._tipoDocumentoCliente = tipoDocumentoSeleccionado
+        self._numDocumentoCliente = numDocumentoSeleccionado
+        self._ubicacionSucursalActual = sucursalSeleccionada
+        
+    def funAceptar(self):
+
+        if not self.tieneValoresPorDefecto():
+            nombreCliente = self.getValue('Nombre :')
+
+            try:
+                edadCliente = int(self.getValue('Edad :'))
+            except ValueError:
+                messagebox.showerror('Error', f'El campo {self._infoEtiquetas[1].strip(':')}debe ser numérico')
+                return
+            
+            confirmacionCliente = messagebox.askokcancel('Confirmación datos', f'Los datos ingresados son:\nNombre: {nombreCliente}\nEdad: {edadCliente}')
+
+            if confirmacionCliente:
+                self._clienteProceso = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual))
+                #Ir a frameVentanaPrincipal 
+        
+        else:
+            messagebox.showerror('Error', 'No pueden haber campos vacíos o con valores por defecto')
+        
 
 def objetosBasePractica2():
 
@@ -148,10 +225,10 @@ def objetosBasePractica2():
     #sucursalCine2.getServicios().add(servicioComida)
     #sucursalCine2.getServicios().add(servicioSouvenirs)
 
-    cliente1 = Cliente("Rusbel", 18, 13434, "CC", sucursalCine2)
-    cliente2 = Cliente("Andy", 18, 14343, 'CC', sucursalCine1)
-    cliente3 = Cliente('Gerson', 24, 98765, 'CC', sucursalCine3)
-    cliente4 = Cliente('Juanjo', 18, 987, 'CC', sucursalCine1)
+    cliente1 = Cliente("Rusbel", 18, 13434, TipoDocumento.CC, sucursalCine2)
+    cliente2 = Cliente("Andy", 18, 14343, TipoDocumento.CC, sucursalCine1)
+    cliente3 = Cliente('Gerson', 24, 98765, TipoDocumento.CC, sucursalCine3)
+    cliente4 = Cliente('Juanjo', 18, 987, TipoDocumento.CC, sucursalCine1)
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
     salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)

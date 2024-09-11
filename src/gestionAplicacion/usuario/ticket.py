@@ -40,7 +40,7 @@ class Ticket:
     def procesarPagoRealizado(self, cliente):
 
         """
-        :Description: Este método se encarga de generar el último paso del proceso de pago y será ejecutado por un ticket luego de ser verificado el pago: 
+        Description: Este método se encarga de generar el último paso del proceso de pago y será ejecutado por un ticket luego de ser verificado el pago: 
 	    <ol>
 	    <li> Se vuelven a settear los metodos de pago que el cliente tendrá disponibles.</li>
 	    <li> Se pasa la referencia del ticket al array de tickets del usuario.</li>
@@ -50,7 +50,9 @@ class Ticket:
 	    <li> Se crea el código de descuento para los juegos y se asocian al cliente y a los códigos de descuentos generados en la clase Arkade.</li>
 	    <li> Creamos el id del ticket y aumentamos la cantidad de tickets creados (Lógica id).</li>
 	    </ol>
+
 	    :param cliente: Se pide como parámetro el cliente (De tipo Cliente) que realizó exitosamente el pago.
+        :type cliente: Cliente
         """
         
         #Implementar solución para las importaciones circulares
