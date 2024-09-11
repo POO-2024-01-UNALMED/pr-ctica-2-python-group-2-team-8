@@ -207,7 +207,7 @@ class FrameVentanaPrincipal(FieldFrame):
             tituloCriterios="",
             textEtiquetas="",
             tituloValores="",
-            elementosInteractuables="",
+            infoElementosInteractuables="",
             habilitado=""
         )
         #Se buscan los widget que tenga FieldFrame y se eliminan para este frame.
