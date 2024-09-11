@@ -313,14 +313,14 @@ class SucursalCine:
 #no se da, el producto es eliminado del inventario, ya que se considera como malo.
 
     def logica_calificacion_productos(self, producto):
-        productos_calificados = self.filtrar_por_nombre_de_producto(producto.get_nombre())
+        productosCalificados = self.filtrar_por_nombre_de_producto(producto.get_nombre())
         
         verificacion_cambio = True
 
         if producto.get_valoracion_comida() < 3:
             if verificacion_cambio:
                 sucursal = self.seleccionar_sucursal_aleatoriamente(producto.get_sucursal_sede())
-                for producto1 in productos_calificados:
+                for producto1 in productosCalificados:
                     if producto1 in self.inventario_cine:
                         self.inventario_cine.remove(producto1)
                     if producto1.get_tipo_producto() == "comida":
@@ -330,11 +330,11 @@ class SucursalCine:
                         new_producto = Producto(producto1.get_nombre(), producto1.get_tamaño(), producto1.get_tipo_producto(), producto1.get_precio() * 0.9, producto1.get_cantidad(), producto1.get_genero(), sucursal)
                         self.inventario_cine.append(new_producto)
             else:
-                self.eliminar_producto(productos_calificados)
+                self.eliminar_producto(productosCalificados)
 
         elif producto.get_valoracion_comida() > 4.5:
             sucursal1 = self.seleccionar_sucursal_aleatoriamente(producto.get_sucursal_sede())
-            for producto2 in productos_calificados:
+            for producto2 in productosCalificados:
                 if producto2.get_tipo_producto() == "comida":
                     new_producto = Producto(producto2.get_nombre(), producto2.get_tamaño(), producto2.get_tipo_producto(), producto2.get_precio() * 1.10, producto2.get_cantidad(), producto2.get_genero(), sucursal1)
                     self.inventario_cine.append(new_producto)
@@ -469,7 +469,7 @@ class SucursalCine:
 
 #################### PORQUE ESTA ESTE METODO AQUI Y EN SERVICIO?????????????????????
 #                    LE CORREGI LOS ERRORES QUE CHAT GPT LE HABIA HECHOPARA PODER EJECUTARLO
-
+# porque los quise poner en los dos hermano, y si, use chat gpt con esos metodos,
 #Description: Este metodo se encarga de seleccionar las sucursales del arrayList y con el uso de la funcion random de la libreria math,
 #se selecciona una sucursal aleatoriamente, ya que esto nos permetira mas adelante el cambio de sucursal de una
 #pelicula a otra.

@@ -337,3 +337,38 @@ if __name__ == '__main__':
     ventanaLogicaProyecto.withdraw()
     ventanaInicio.mainloop()
 
+def calificacion ():
+    
+    #Description: Esta funcionalidad 3 se va a encargar de hacer la respectiva calificacion de peliculas y productos dependiendo
+	#de los gustos del cliente, ya que con estas calificaciones vamos a hacer un proceso interno de logica de negocio 
+	#dentro del cine, para poder saber que peliculas o productos estan funcionando bien o por consecuencia, cuales 
+	#estan funcionando mal
+    
+    #Le damos la bienvenida al cliente
+    print("********Bienvenido a la calificacion de productos*********")
+    
+	
+	
+    while verificar:
+        try:
+            eleccion = int(input("\n1. Calificar Comida.\n2. Calificar Pelicula\n3. Volver al menu.\nSeleccione una opcion: "))
+        except ValueError:
+            print("\nError, debes ingresar un dato numérico\n")
+            continue
+        
+        if eleccion == 3:
+            #volveralmenu()
+            break
+        elif eleccion == 1 and eleccion==2:
+            verificar = False
+            continue
+        
+        else:
+            print("\nOpción no válida, por favor ingrese una opción correcta.\n")
+
+    if eleccion == 1:        
+             print (("\n********Bienvenido al apartado de calificacion de comida********"))
+             #if clienteProceso.get
+
+
+                 
