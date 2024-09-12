@@ -14,6 +14,7 @@ from gestionAplicacion.sucursalCine import SucursalCine
 from gestionAplicacion.usuario.cliente import Cliente
 from gestionAplicacion.servicios.herencia.servicioComida import ServicioComida
 from gestionAplicacion.servicios.herencia.servicioSouvenirs import ServicioSouvenir
+from gestionAplicacion.servicios.herencia.servicio import Servicio 
 from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
@@ -234,8 +235,8 @@ def objetosBasePractica2():
     sucursalCine2 = SucursalCine("Marinilla")
     sucursalCine3 = SucursalCine("Medellín")
 
-    #servicioComida = ServicioComida("comida", sucursalCine2)
-    #servicioSouvenirs = ServicioSouvenir("souvenir", sucursalCine2)
+    servicioComida = ServicioComida("comida", sucursalCine2)
+    servicioSouvenirs = ServicioSouvenir("souvenir", sucursalCine2)
 
     # Productos de la sucursal de Marinilla
 
@@ -254,8 +255,8 @@ def objetosBasePractica2():
     producto4S = Producto("Llavero","Katana","souvenir",22000,200,"Acción",sucursalCine2)
     producto5S = Producto("Peluche","Pajaro loco","souvenir",29000,200,"Comedia",sucursalCine2)
 
-    #sucursalCine2.getServicios().add(servicioComida)
-    #sucursalCine2.getServicios().add(servicioSouvenirs)
+    sucursalCine2.getServicios().append(servicioComida)
+    sucursalCine2.getServicios().append(servicioSouvenirs)
 
     cliente1 = Cliente("Rusbel", 18, 13434, TipoDocumento.CC, sucursalCine2)
     cliente2 = Cliente("Andy", 18, 14343, TipoDocumento.CC, sucursalCine1)
@@ -333,6 +334,11 @@ def objetosBasePractica2():
     metodoPago3 = MetodoPago("Banco Agrario", 0.15, 300000)
     metodoPago4 = MetodoPago("Efectivo", 0, 5000000)
 
+    sucursalCine2.getServicios()[0].setCliente(cliente1)
+
+    sucursalCine2.getServicios()[0].setInventario(sucursalCine2.getServicios()[0].actualizarInventario())
+    print(sucursalCine2.getServicios()[0].mostrarInventario())
+
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
 
@@ -340,6 +346,9 @@ if __name__ == '__main__':
 
     #Creamos los objetos de la lógica del proyecto
     objetosBasePractica2()
+
+    #Prueba de filtrado de objetos
+
 
     #Creacion de la ventana de inicio 
     ventanaInicio = tk.Tk()
