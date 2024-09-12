@@ -119,7 +119,7 @@ class FieldFrame(tk.Frame):
                 return True
         
         return False
-                
+               
 class FrameInicioSesion(FieldFrame):
 
     def __init__(self):
@@ -151,12 +151,14 @@ class FrameInicioSesion(FieldFrame):
             if confirmacionUsuario:
                 clienteProceso = SucursalCine.buscarCliente(numDocumentoSeleccionado, tipoDocumentoSeleccionado)
 
-                if self._clienteProceso is None:
+                if clienteProceso is None:
                     FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada).mostrarFrame(self)
 
                 else:
                     self._clienteProceso = clienteProceso
-                    messagebox.showinfo('Encontrado -> Llamar a field principal')
+                    frameVentanaPrincipal.construirMenu()
+                    frameVentanaPrincipal.mostrarFrame(self)
+
         else:
             messagebox.showerror('Error', 'No pueden haber campos vacíos o con valores por defecto')
 
@@ -192,7 +194,8 @@ class FrameCrearUsuario(FieldFrame):
 
             if confirmacionCliente:
                 self._clienteProceso = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual))
-                #Ir a frameVentanaPrincipal 
+                frameVentanaPrincipal.construirMenu()
+                frameVentanaPrincipal.mostrarFrame(self)
         
         else:
             messagebox.showerror('Error', 'No pueden haber campos vacíos o con valores por defecto')
@@ -201,20 +204,19 @@ class FrameCrearUsuario(FieldFrame):
 class FrameVentanaPrincipal(FieldFrame):
 
     def __init__(self):
-        super().__init__(
-            tituloProceso="",
-            descripcionProceso="",
-            tituloCriterios="",
-            textEtiquetas="",
-            tituloValores="",
-            infoElementosInteractuables="",
-            habilitado=""
-        )
+        super().__init__( textEtiquetas = [])
+
+        self._imagenFramePrincipal = tk.PhotoImage(file = 'src/iuMain/imagenes/fachadaCine.png')
+        
+        self._labelImagen = tk.Label(self, image = self._imagenFramePrincipal)
+        self._labelImagen.grid(row=0, column=0)
+
         #Se buscan los widget que tenga FieldFrame y se eliminan para este frame.
         for widget in self.winfo_children():
             if isinstance(widget, tk.Button):
                 widget.destroy()
 
+    def construirMenu(self):
         barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Courier", 9))
         ventanaLogicaProyecto.config(menu=barraMenuPrincipal)
         menuOpcionesPrincipal = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Courier", 9), activebackground= "grey", activeforeground="black")
