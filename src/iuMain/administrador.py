@@ -145,6 +145,9 @@ class FieldFrame(tk.Frame):
                 return True
         
         return False
+    
+    def getElementosInteractivos(self):
+        return self._elementosInteractivos
 
     def logicaInicioProcesosFuncionalidades(self, clienteProceso):
 
@@ -246,7 +249,7 @@ class FrameCrearUsuario(FieldFrame):
 class FrameVentanaPrincipal(FieldFrame):
 
     def __init__(self):
-        super().__init__( textEtiquetas = [])
+        super().__init__( textEtiquetas = [] )
 
         self._imagenFramePrincipal = tk.PhotoImage(file = 'src/iuMain/imagenes/fachadaCine.png')
         
@@ -278,19 +281,66 @@ class FrameVentanaPrincipal(FieldFrame):
 class FrameReservarTicket(FieldFrame):
 
     def __init__(self):
+
+        clienteProceso = FieldFrame.getClienteProceso()
+
+        self._carteleraCliente = Pelicula.filtrarCarteleraPorCliente(clienteProceso)
+        self._formatosPeliSeleccionada = None
+        self._horariosPeliSeleccionada = None
+        self._peliculaProceso = None
+        self._horarioProceso = None
+
+        filtroNombresCartelera = Pelicula.filtrarCarteleraPorNombre(self._carteleraCliente)
+        filtroPelisRecomendadas = Pelicula.filtarCarteleraPorGenero(self._carteleraCliente, clienteProceso.generoMasVisto())
+
         super().__init__(
             tituloProceso = 'Reservar ticket',
             descripcionProceso = f'En este espacio solicitamos los datos necesarios para reservar un ticket, debe ingresar los datos de forma secuencial, es decir, en el orden en que se encuentran (Fecha Actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})',
             tituloCriterios = 'Criterios reserva',
             textEtiquetas = ['Seleccionar película : ', 'Seleccionar formato : ', 'Seleccionar horario : '], 
             tituloValores = 'Valores ingresados',
-            infoElementosInteractuables = [[[], 'Selecionar película'], [[], 'Seleccionar formato'], [[], 'Seleccionar horario']],
+            infoElementosInteractuables = [
+                [Pelicula.mostrarNombrePeliculas(
+                    filtroNombrePeliculas = filtroNombresCartelera, 
+                    clienteProceso = clienteProceso, 
+                    nombrePeliculasRecomendadas = filtroPelisRecomendadas), 'Selecionar película'], 
+                [[], 'Seleccionar formato'], 
+                [[], 'Seleccionar horario']
+            ],
             habilitado = [False, False, False]
         )
 
-        self._peliculaProceso = None
-        self._horarioProceso = None
+        for elemento in self.getElementosInteractivos():
+            elemento.grid_configure(sticky='we')
+
+        self._comboBoxPeliculas = self.getElementosInteractivos()[0]
+        self._comboBoxFormatos = self.getElementosInteractivos()[1]
+        self._comboBoxHorarios = self.getElementosInteractivos()[2]
+
+        self._comboBoxPeliculas.bind('<<ComboboxSelected>>', self.setFormatos)
+        self._comboBoxFormatos.bind('<<ComboboxSelected>>', self.setHorarios)
+        
+    def setFormatos(self, event):
+        nombrePeliculaSeleccionada = self.getValue('Seleccionar película : ')
+
+        self._formatosPeliSeleccionada = Pelicula.obtenerPeliculasPorNombre(nombrePeliculaSeleccionada, self._carteleraCliente)
+
+        self._comboBoxFormatos.configure(values = [peli.getTipoDeFormato() for peli in self._formatosPeliSeleccionada])
     
+    def setHorarios(self, event):
+        
+        for pelicula in self._formatosPeliSeleccionada:
+            if pelicula.getTipoDeFormato() == self.getValue('Seleccionar formato : '):
+                self._peliculaProceso = pelicula 
+
+
+        self._horariosPeliSeleccionada = self._peliculaProceso.filtrarHorariosPelicula()
+
+        self._comboBoxHorarios.configure(values = self._horariosPeliSeleccionada)
+    
+    #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
+    #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
+    #Crear botón de volver en el FieldFrame (Crear un frame que almacene tres o dos botones según cierto parámetro, ese parámetro dará por defecto 2)
 
 def objetosBasePractica2():
 

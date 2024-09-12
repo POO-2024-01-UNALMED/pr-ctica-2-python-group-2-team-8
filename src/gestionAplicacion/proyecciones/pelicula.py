@@ -53,7 +53,7 @@ class Pelicula:
         self._asientosSalasVirtuales.append(asientosSalaVirtual)
     
     @classmethod
-    def filtrarCarteleraPorCliente(cls, cliente, sucursalCine):
+    def filtrarCarteleraPorCliente(cls, cliente):
 
         """
         :Description : Este método se encarga de filtar las películas en cartelera con los siguientes criterios:
@@ -66,15 +66,13 @@ class Pelicula:
 
 	    :param clienteProceso: Este método recibe como parámetro un cliente (De tipo cliente), que realizará el proceso de reserva de ticket.
 	    
-        :param sucursalCine: Este método recibe como parámetro la sede (De tipo SucursalCine) para acceder a su cartelera.
-	    
         :return list(String): Retorna una lista con las peliculas filtradas por el criterio anterior.
         """
 
         carteleraPersonalizadaCliente = []
 
-        for pelicula in sucursalCine.getCartelera():
-            if len(pelicula.filtrarHorarios()) > 0 or pelicula.isPeliculaEnPresentacion(sucursalCine):
+        for pelicula in cliente.getCineUbicacionActual().getCartelera():
+            if len(pelicula.filtrarHorariosPelicula()) > 0 or pelicula.isPeliculaEnPresentacion(cliente.getCineUbicacionActual()):
                 if int(pelicula._clasificacion) <= cliente.getEdad():
                     carteleraPersonalizadaCliente.append(pelicula)
         
@@ -125,7 +123,21 @@ class Pelicula:
         
         return filtroNombrePeliculasPorGenero
 
-    #def showNombrePeliculas(cls, filtroNombrePeliculas, clienteProceso, nombrePeliculasRecomendadas):
+    def mostrarNombrePeliculas(filtroNombrePeliculas, clienteProceso, nombrePeliculasRecomendadas):
+        
+        listadoPeliculas = []
+
+        if clienteProceso.getMembresia() != None:
+            for nombrePelicula in filtroNombrePeliculas:
+                if nombrePelicula in nombrePeliculasRecomendadas:
+                    listadoPeliculas.append(f'HOT: {nombrePelicula}')
+                else:
+                    listadoPeliculas.append(nombrePelicula)
+        
+        else:
+            return filtroNombrePeliculas
+        
+        return listadoPeliculas
 
     @classmethod
     def obtenerPeliculasPorNombre(cls, nombrePelicula, peliculasDisponiblesCliente):
