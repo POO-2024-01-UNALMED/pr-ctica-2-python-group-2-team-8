@@ -89,7 +89,7 @@ class Membresia ():
 
                 #Si el cliente ya tiene esta membresia y además, le faltan más de 5 dias para que expire, no se muestra en el menu.
                 elif(nombreMembresiaActual == productoMembresia.getNombre() and 
-                     (clienteProceso.getFechaLimiteMembresia() - timedelta(6)) > SucursalCine.getFechaActual() and
+                     (clienteProceso.getFechaLimiteMembresia() - datetime(6)) > SucursalCine.getFechaActual() and
                      clienteProceso.getFechaLimiteMembresia() > SucursalCine.getFechaActual()):
                     i+=1
                     continue
@@ -104,7 +104,7 @@ class Membresia ():
 
                 #Si el cliente ya tiene esta membresia y además, le faltan más de 5 dias para que expire, no se muestra en el menu.
                 elif(nombreMembresiaActual == productoMembresia.getNombre() and 
-                     (clienteProceso.getFechaLimiteMembresia() - timedelta(6)) > SucursalCine.getFechaActual() and
+                     (clienteProceso.getFechaLimiteMembresia() - datetime(6)) > SucursalCine.getFechaActual() and
                      clienteProceso.getFechaLimiteMembresia() > SucursalCine.getFechaActual()):
                     i+=1
                     continue
@@ -166,7 +166,7 @@ class Membresia ():
 
         #En caso de realizar la renovación de la misma membresia.
         elif (clienteProceso.getMembresia() != None and
-              (clienteProceso.getFechaLimiteMembresia() - timedelta(6))> SucursalCine.getFechaActual and
+              (clienteProceso.getFechaLimiteMembresia() - datetime(6))> SucursalCine.getFechaActual and
               clienteProceso.getMembresia().getCategoria() == categoriaSeleccionada):
             if (categoriaSeleccionada == 1):
                 esValido = True

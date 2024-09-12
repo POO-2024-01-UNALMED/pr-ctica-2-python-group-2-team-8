@@ -159,7 +159,7 @@ class FieldFrame(tk.Frame):
             FrameReservarTicket(), # <- Funcionalidad 2
             FrameReservarTicket(), # <- Funcionalidad 3
             FrameReservarTicket(), # <- funcionalidad 4
-            FrameReservarTicket() # <- Funcionalidad 5
+            FrameFuncionalidad5() # <- Funcionalidad 5
         ]
 
         #Setteamos los frames de las funcionalidades al atributo de clase
@@ -273,10 +273,14 @@ class FrameVentanaPrincipal(FieldFrame):
         menuOpcionesPrincipal.add_command(label="Zona de juegos", command="")
         menuOpcionesPrincipal.add_command(label="Calificaciones", command="")
         menuOpcionesPrincipal.add_command(label="Servicio de comida/souvenir", command="")
-        menuOpcionesPrincipal.add_command(label="Sistema de membresías", command="")
+        menuOpcionesPrincipal.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
     
     def ingresarFuncionalidad1(evento):
         FieldFrame.getFramesFuncionalidades()[0].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+
+    def ingresarFuncionalidad5(evento):
+        FieldFrame.getFramesFuncionalidades()[4].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+        FieldFrame.getFramesFuncionalidades()[4].crearBotonesMembresia()
 
 class FrameReservarTicket(FieldFrame):
 
@@ -326,7 +330,7 @@ class FrameReservarTicket(FieldFrame):
         self._formatosPeliSeleccionada = Pelicula.obtenerPeliculasPorNombre(nombrePeliculaSeleccionada, self._carteleraCliente)
 
         self._comboBoxFormatos.configure(values = [peli.getTipoDeFormato() for peli in self._formatosPeliSeleccionada])
-    
+
     def setHorarios(self, event):
         
         for pelicula in self._formatosPeliSeleccionada:
@@ -341,6 +345,23 @@ class FrameReservarTicket(FieldFrame):
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
     #Crear botón de volver en el FieldFrame (Crear un frame que almacene tres o dos botones según cierto parámetro, ese parámetro dará por defecto 2)
+
+class FrameFuncionalidad5(FieldFrame):
+
+    def __init__(self):
+        super().__init__(
+            tituloProceso="Membresías",
+            descripcionProceso= f"Bienvenido a nuestro sistema de membresías. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
+            textEtiquetas= []
+        )
+    
+
+    def crearBotonesMembresia(self):
+        botonBasico = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text="Básico").grid(padx=10, pady=10, row= 2, column=0)
+        botonHeroico = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text = "Heroico").grid(padx=10, pady=10, row= 2, column=1)
+        botonGlobal = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Global").grid(padx=10, pady=10, row= 2, column=2)
+        botonChallenger = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Challenger").grid(padx=10, pady=10, row= 2, column=3)
+        botonRadiante = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Radiante").grid(padx=10, pady=10, row= 2, column=4)
 
 def objetosBasePractica2():
 
