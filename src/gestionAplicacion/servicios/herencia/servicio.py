@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import random
 from gestionAplicacion.servicios.producto import Producto
+from gestionAplicacion.servicios.producto import Producto
 
 class Servicio (ABC):
     cliente  = None
@@ -96,12 +97,14 @@ class Servicio (ABC):
     def mostrarInventario(self):
         productos = "\n----------Productos disponibles----------\n\n0. Ningún producto"
         i = 0
-        if len(self.inventario) == 0:
+        if len(self._inventario) == 0:
             return "\nNO HAY PRODUCTOS DISPONIBLES :(\n"
-        for producto in self.inventario:
+        for producto in self._inventario:
+            i= i+1
+            disponibilidad = ""
             if producto.getCantidad() == 0:
                 disponibilidad = " --> NO HAY EN EL MOMENTO DE ESTE PRODUCTO"
-            productos += f"\n{i + 1}. {producto.getNombre()} {producto.getTamaño()} ${producto.getPrecio()}{disponibilidad}"
+            productos += f"\n{i}. {producto.getNombre()} {producto.getTamaño()} ${producto.getPrecio()}{disponibilidad}"
         return productos
 
     def hacerPedido(self, indice, cantidad):
@@ -141,10 +144,10 @@ class Servicio (ABC):
         self._nombre = nombre
 
     def getCliente(self):
-        return self._cliente
+        return self.cliente
 
     def setCliente(self, cliente):
-        self._cliente = cliente
+        self.cliente = cliente
 
     def getInventario(self):
         return self._inventario
