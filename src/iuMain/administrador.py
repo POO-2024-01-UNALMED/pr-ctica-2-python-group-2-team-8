@@ -333,52 +333,28 @@ def objetosBasePractica2():
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
+def ventanaDeInicio(): 
 
-if __name__ == '__main__':
+    #Tamaño ventana Inicio = (640 x 480)
 
-    #Creamos los objetos de la lógica del proyecto
-    objetosBasePractica2()
-
-    #Creacion de la ventana de inicio 
-    ventanaInicio = tk.Tk()
-    ventanaInicio.title("Ventana de Incio Cinemar")
-    ventanaInicio.geometry("500x450")
-    ventanaInicio.config(bg = "light gray")
-
-    #Ventana Funcionalidad
-    ventanaLogicaProyecto = tk.Toplevel(ventanaInicio)
-    ventanaLogicaProyecto.title("Ventana Principal Cinemar")
-    ventanaLogicaProyecto.geometry("640x480")
-
-    #Frames de lógica proyecto
-    frameIniciarSesion = FrameInicioSesion()
-    frameVentanaPrincipal = FrameVentanaPrincipal()
-
-    #Nota: Si desean usar pack(No recomendado, se buguea con el uso de texto dentro del frame) 
-    # en vez de place ponganle a los frames el fill = "both" pa que se vea melo
-
-    #Creacion y posicionamiento de P1 (237.5x432)
-    frameGrandeIzquierdoP1 = tk.Frame(ventanaInicio, bd = 2, relief= "solid", cursor="heart")
+    #Creacion y posicionamiento de P1 (304 x 460.8)
+    frameGrandeIzquierdoP1 = tk.Frame(ventanaInicio, bd = 2, relief= "solid", cursor="heart", bg = "black")
     frameGrandeIzquierdoP1.place(relx= 0.015, rely= 0.02, relwidth= 0.475, relheight = 0.96)
-    #frameGrandeIzquierdoP1.pack(side = "left", padx = 5, pady = 5, expand = True,)
 
-    #Creacion y posicionamiento de P2
-    frameGrandeDerechoP2 = tk.Frame(ventanaInicio, bd = 2, relief= "solid", cursor="heart")
+    #Creacion y posicionamiento de P2 (304 x 460.8)
+    frameGrandeDerechoP2 = tk.Frame(ventanaInicio, bd = 2, relief= "solid", cursor="heart",  bg = "black")
     frameGrandeDerechoP2.place(relx= 0.51, rely= 0.02, relwidth= 0.475, relheight = 0.96)
-    #frameGrandeDerechoP2.pack(side = "right", padx = 5, pady = 5, expand = True, fill= "both")
 
-    #Creacion y posicionamiento de P3
-    frameSuperiorIzquierdoP3 = tk.Frame(frameGrandeIzquierdoP1, bd = 2, relief= "solid")
+    #Creacion y posicionamiento de P3 (291.84 x 170.496)
+    frameSuperiorIzquierdoP3 = tk.Frame(frameGrandeIzquierdoP1, bd = 2, relief= "solid", bg = "#ADD8E6")
     frameSuperiorIzquierdoP3.place(relx= 0.02, rely= 0.011, relwidth= 0.96, relheight = 0.37)
-    #frameSuperiorIzquierdoP3.pack(side = "top", padx = 5, pady = 5, expand = True, fill= "both")
 
-    mensajeBienvenida = tk.Label(frameSuperiorIzquierdoP3, text= "☻Bienvenido a \nnuestro Cine☻", bd= 1, font= ("Courier", 12, "bold"), fg= "#FFD700", relief= "solid")
+    mensajeBienvenida = tk.Label(frameSuperiorIzquierdoP3, text= "☻Bienvenido a \nnuestro Cine☻", font= ("Courier", 23, "bold"), fg= "#6495ED", bg =  "#ADD8E6")
     mensajeBienvenida.pack(anchor= "c", expand=True)
 
-    #Creacion y posicionamiento de P4
-    frameInferiorIzquierdoP4 = tk.Frame(frameGrandeIzquierdoP1, bd = 2, relief= "solid", height= 100)
+    #Creacion y posicionamiento de P4 (291.84 x 275.0976)
+    frameInferiorIzquierdoP4 = tk.Frame(frameGrandeIzquierdoP1, bd = 2, relief= "solid", height= 100, bg = "#ADD8E6")
     frameInferiorIzquierdoP4.place(relx= 0.02, rely= 0.392, relwidth= 0.96, relheight = 0.597)
-    #frameInferiorIZquierdoP4.pack(side = "bottom", padx = 5, pady = 5, expand = True, fill= "both")
 
     #Metodo boton ingresar
     def ingresarVentanaPrincipal():
@@ -390,12 +366,9 @@ if __name__ == '__main__':
         #frameVentanaPrincipal.mostrarFrame()
         frameIniciarSesion.mostrarFrame()
 
-    botonIngreso = tk.Button(frameInferiorIzquierdoP4, text = "Ingresar", font = ("Courier", 10, "bold"), bg= "#FFD700", command= ingresarVentanaPrincipal)
-    botonIngreso.place(relx = 0.3, rely = 0.8462962963, relwidth=0.4, relheight = 0.1305555556)
+    #botonIngreso = tk.Button(frameInferiorIzquierdoP4, text = "Ingresar", font = ("Courier", 10, "bold"), bg= "#FFD700", command= ingresarVentanaPrincipal)
+    #botonIngreso.place(relx = 0.3, rely = 0.8462962963, relwidth=0.4, relheight = 0.1305555556)
 
-
-    # Inicializar índice de la imagen actual
-    indice_imagen = 0
 
     # Función para cambiar la imagen cuando el mouse entra
     def cambiar_imagen(event):
@@ -411,29 +384,105 @@ if __name__ == '__main__':
         indice_imagen+=1
 
     imagenes = [
-
-        tk.PhotoImage(file="src/iuMain/imagenes/Rusbel.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/Andy.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/Eduardo1.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/Gerson.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/Luismi.png"),
+        
+        tk.PhotoImage(file="src/iuMain/imagenes/P41.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/P42.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/P43.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/P44.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/P45.png"),
 
     ]
-    imagenLabel = tk.Label(frameInferiorIzquierdoP4, image= imagenes[indice_imagen])
-    imagenLabel.place(relx = 0.05, y = 5, relheight= 0.8, relwidth=0.9)
+    imagenLabel = tk.Button(frameInferiorIzquierdoP4, image= imagenes[indice_imagen], command = ingresarVentanaPrincipal, bd = 1, relief = "solid")
+    imagenLabel.place(relheight = 1, relwidth = 1)
+    #imagenLabel.place(relx = 0.05, y = 5, relheight= 0.8, relwidth=0.9)
 
     # Asignar evento al Label
     imagenLabel.bind("<Leave>", cambiar_imagen)
 
-    #Creacion y posicionamineto de P5
-    frameSuperiorDerechoP5 = tk.Frame(frameGrandeDerechoP2, bd = 2, relief= "solid")
+    #Creacion y posicionamineto de P5 (291.84 x 170.496)
+    frameSuperiorDerechoP5 = tk.Frame(frameGrandeDerechoP2, bd = 2, relief= "solid", bg = "#ADD8E6")
     frameSuperiorDerechoP5.place(relx= 0.02, rely= 0.011, relwidth= 0.96, relheight = 0.37)
-    #frameSuperiorDerechoP5.pack(side = "top", padx = 5, pady = 5, expand = True, fill= "both")
 
-    #Creacion y posicionamiento de P6
-    frameInferiorDerechoP6 = tk.Frame(frameGrandeDerechoP2, bd = 2, relief= "solid", height= 100)
+    nombres = ["Rusbel Danilo Jaramillo", "Edinson Andres Ariza", "Juan José González", "Gerson Bedoya", "Santiago Castro"]
+    edades =  ["19", "18", "18", "23", "18"]
+    estudios = ["Ingeniero de Sistemas"]*5
+    instituciones = ["Universidad Nacional Colombia"]*5
+    residencias = ["Marinilla", "Medellín", "Bello", "Medellín", "Rionegro"]
+    emails = ["rjaramilloh@unal.edu.co", "edarizam@unal.edu.co","juagonzalezmo@unal.edu.co","gbedoyah@unal.edu.co", "sancastrohe@unal.edu.co"]
+
+    nombre = tk.Label(frameSuperiorDerechoP5, text = nombres[0], font=("Times New Roman", 18, "bold"), bg= "#ADD8E6", fg = "#6495ED")
+    nombre.pack(anchor="c")
+    hojaDeVida = tk.Message(frameSuperiorDerechoP5, text = "\n•Edad: " + edades[0]  + "\n•Estudios: " + estudios[0] +"\n•Institución: "+ instituciones[0] +"\n•Residencia: " + residencias[0]+ "\n•Email: " + emails[0], font=("Times New Roman", 12), bg= "#ADD8E6", width = 300 )
+    hojaDeVida.pack(anchor= "c")
+
+    def cambiarHojaDeVida(event):
+        global indice_hojaDeVida
+
+        if indice_hojaDeVida==4:
+            indice_hojaDeVida = -1
+            
+        nombre.config(text = nombres[indice_hojaDeVida + 1])
+        hojaDeVida.config(text= "\n•Edad: " + edades[indice_hojaDeVida+1]  + "\n•Estudios: " + estudios[indice_hojaDeVida+1] +"\n•Institución: "+ instituciones[indice_hojaDeVida+1] +"\n•Residencia: " + residencias[indice_hojaDeVida+1]+ "\n•Email: " + emails[indice_hojaDeVida+1])
+        cambioDeImagenes(event)
+        indice_hojaDeVida+=1
+
+    hojaDeVida.bind("<Button-1>", cambiarHojaDeVida)
+    nombre.bind("<Button-1>", cambiarHojaDeVida)
+
+    #Creacion y posicionamiento de P6 (291.84 x 275.0976)
+    frameInferiorDerechoP6 = tk.Frame(frameGrandeDerechoP2, bd = 2, relief= "solid", height= 100, bg = "#ADD8E6")
     frameInferiorDerechoP6.place(relx= 0.02, rely= 0.392, relwidth= 0.96, relheight = 0.597)
-    #frameInferiorDerechoP6.pack(side = "bottom", padx = 5, pady = 5, expand = True, fill= "both")
+
+
+    imagenes1 = [
+        tk.PhotoImage(file="src/iuMain/imagenes/a1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/a2.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/a3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/a4.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/a5.png"),
+    ]
+
+    imagenes2 = [
+        tk.PhotoImage(file="src/iuMain/imagenes/b1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/b2.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/b3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/b4.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/b5.png"),
+    ]
+
+    imagenes3 = [
+        tk.PhotoImage(file="src/iuMain/imagenes/c1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/c2.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/c3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/c4.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/c5.png"),
+    ]
+
+    imagenes4 = [
+        tk.PhotoImage(file="src/iuMain/imagenes/d1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/d2.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/d3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/d4.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/d5.png"),
+    ]
+
+    label1 = tk.Label(frameInferiorDerechoP6, image=imagenes1[0], bd = 3, relief="solid")
+    label1.grid(row=0, column=0, sticky="nsew")
+
+    label2 = tk.Label(frameInferiorDerechoP6, image=imagenes2[0], bd = 3, relief="solid")
+    label2.grid(row=0, column=1, sticky="nsew")
+
+    label3 = tk.Label(frameInferiorDerechoP6, image=imagenes3[0], bd = 3, relief="solid")
+    label3.grid(row=1, column=0, sticky="nsew")
+
+    label4 = tk.Label(frameInferiorDerechoP6, image=imagenes4[0], bd = 3, relief="solid")
+    label4.grid(row=1, column=1, sticky="nsew")
+
+    def cambioDeImagenes(event):
+        label1.config(image = imagenes1[indice_hojaDeVida + 1])
+        label2.config(image = imagenes2[indice_hojaDeVida + 1])
+        label3.config(image = imagenes3[indice_hojaDeVida + 1])
+        label4.config(image = imagenes4[indice_hojaDeVida + 1])
 
     #Creacion de la barra de menu
     barraMenu = tk.Menu(ventanaInicio, font=("Courier", 9))
@@ -442,10 +491,16 @@ if __name__ == '__main__':
     menuOpciones = tk.Menu(barraMenu, tearoff= 0, font=("Courier", 9), activebackground= "#87CEEB", activeforeground= "black")
     barraMenu.add_cascade(label= "Inicio", menu= menuOpciones, font=("Courier", 9) )
 
+    mensaje = tk.Message(frameSuperiorIzquierdoP3, text=  "En este programa puedes:\n•Comprar Tickets\n•Comprar comida y regalos\n•Usar la zona de juegos\n•Adquirir membresias\n•Calificar nuestros servicios" , font= ("Times New Roman",11), bg="#ADD8E6")
     #Metodos para la barra de opciones
-    def mostrarDescripcion(): 
-        mensaje = tk.Message(frameSuperiorIzquierdoP3, text=  "En este programa puedes:\n•Comprar Tickets\n•Comprar comida y regalos\n•Usar la zona de juegos\n•Adquirir membresias\n•Calificar nuestros servicios" , font= ("Times New Roman",11))
-        mensaje.pack(anchor= "s", expand= True)
+    def mostrarDescripcion():
+        #mensaje = tk.Message()
+        if int(mensajeBienvenida.cget("font").split()[1]) == 15:
+            mensaje.pack_forget()
+            mensajeBienvenida.config(font= ("Courier", 23, "bold")) 
+        else:
+            mensajeBienvenida.config(font= ("Courier", 15, "bold")) 
+            mensaje.pack(anchor= "s", expand= True)
 
     def CerrarVentana():
         ventanaInicio.destroy()
@@ -453,6 +508,33 @@ if __name__ == '__main__':
     #Opciones de el menu de inicio
     menuOpciones.add_command(label = "Descripción del programa", command= mostrarDescripcion)
     menuOpciones.add_command(label = "Salir y Guardar", command= CerrarVentana)
+
+
+if __name__ == '__main__':
+
+    #Creamos los objetos de la lógica del proyecto
+    objetosBasePractica2()
+
+    #Creacion de la ventana de inicio 
+    ventanaInicio = tk.Tk()
+    ventanaInicio.title("Ventana de Incio Cinemar")
+    ventanaInicio.geometry("640x480")
+    ventanaInicio.config(bg = "#ADD8E6")
+
+    # Inicializar índice de la imagen para p4 y p5
+    indice_imagen = 0
+    indice_hojaDeVida = 0
+    ventanaDeInicio()
+
+    #Ventana Funcionalidad
+    ventanaLogicaProyecto = tk.Toplevel(ventanaInicio)
+    ventanaLogicaProyecto.title("Ventana Principal Cinemar")
+    ventanaLogicaProyecto.geometry("640x480")
+
+    #Frames de lógica proyecto
+    frameIniciarSesion = FrameInicioSesion()
+    frameVentanaPrincipal = FrameVentanaPrincipal()
+
 
     ventanaLogicaProyecto.withdraw()
     ventanaInicio.mainloop()
