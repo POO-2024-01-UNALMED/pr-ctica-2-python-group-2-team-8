@@ -64,9 +64,9 @@ class Pelicula:
 	    </ol>
 	    Todo esto con el fin de mostrar en pantalla, posteriormente, el array de las películas que cumplan estos criterios.
 
-	    :param clienteProceso: Este método recibe como parámetro un cliente (De tipo cliente), que realizará el proceso de 
-        reserva de ticket.
-	    :param sucursalCine : Este método recibe como parámetro la sede (De tipo SucursalCine), para acceder a su cartelera.
+	    :param clienteProceso: Este método recibe como parámetro un cliente (De tipo cliente), que realizará el proceso de reserva de ticket.
+	    
+        :param sucursalCine: Este método recibe como parámetro la sede (De tipo SucursalCine) para acceder a su cartelera.
 	    
         :return list(String): Retorna una lista con las peliculas filtradas por el criterio anterior.
         """
@@ -109,7 +109,8 @@ class Pelicula:
 
 	    :param filtroPeliculasPorCliente: Este método recibe como parámetro las peliculas ( De tipo list(Pelicula) ) 
         resultantes de realizar el filtro por cliente (Edad y disponibilidad horaria). 
-	    :param genero : Este método recibe como parámetro el género (De tipo String) más visualizado por el cliente.
+	    
+        :param genero : Este método recibe como parámetro el género (De tipo String) más visualizado por el cliente.
 
 	    :return list(String): Retorna una lista de nombres de las películas distintos entre sí, cuyo género es igual.
 	
@@ -135,7 +136,8 @@ class Pelicula:
 	    
         :param nombrePelicula: Este método recibe como parámetro el nombre de la película ( De tipo String ) con el cuál 
         se realizará el filtrado.
-	    :param peliculasDisponiblesCliente: Este método recibe como parámetro una lista ( De tipo list(Pelicula) ) que contiene 
+	    
+        :param peliculasDisponiblesCliente: Este método recibe como parámetro una lista ( De tipo list(Pelicula) ) que contiene 
 	    las películas previamente filtradas según los datos del cliente y su disponibilidad horaria.
 	    
         :return list(Pelicula): Este método retorna un ArrayList de las películas cuyo nombre coinciden con el nombre seleccionado 
@@ -162,8 +164,10 @@ class Pelicula:
 	    
         :param horario: Recibe la fecha seleccionada por el cliente para obtener su índice de sala virtual y así acceder a sus 
         asientos ( De tipo datetime ).
-	    :param fila: Recibe el número de la fila seleccionada por el cliente (De tipo int).
-	    :param columna: Recibe el número de la columna seleccionada por el cliente (De tipo int).
+	    
+        :param fila: Recibe el número de la fila seleccionada por el cliente (De tipo int).
+	    
+        :param columna: Recibe el número de la columna seleccionada por el cliente (De tipo int).
         """
 
         self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)][fila - 1][columna - 1] = 1
@@ -173,10 +177,11 @@ class Pelicula:
         """
         :Description : Este método se encarga revisar la desponibilidad de un asiento determinado de la sala de cine virtual.
 	    
-        :param horario: Recibe la fecha seleccionada por el cliente para obtener su índice de sala virtual y así acceder a sus 
-        asientos ( De tipo datetime ).
-	    :param fila: Recibe el número de la fila seleccionada por el cliente (De tipo int).
-	    :param columna: Recibe el número de la columna seleccionada por el cliente (De tipo int).
+        :param horario: Recibe la fecha seleccionada por el cliente para obtener su índice de sala virtual y así acceder a sus asientos ( De tipo datetime ).
+	    
+        :param fila: Recibe el número de la fila seleccionada por el cliente (De tipo int).
+	    
+        :param columna: Recibe el número de la columna seleccionada por el cliente (De tipo int).
 	    
         :return boolean: Este método retorna un boolean que representa la disponibilidad del asiento selccionado por el cliente.
         """

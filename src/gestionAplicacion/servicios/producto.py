@@ -1,6 +1,6 @@
 import random
 class Producto():
-    def __init__(self, nombre = "", tamaño = "", cantidad = 0, tipoProducto = "", genero = "", precio = 0.0, sucursalSede = None) :
+    def __init__(self, nombre = "", tamaño = "", tipoProducto = "", precio = 0.0, cantidad = 0, genero = "", sucursalSede = None) :
         self._genero=genero
         self._nombre=nombre
         self._precio=precio

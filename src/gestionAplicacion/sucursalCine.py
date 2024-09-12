@@ -278,23 +278,20 @@ class SucursalCine:
 
     
     @classmethod
-    def buscarCliente(cls, numeroDocumento, tipoDocumento):
+    def buscarCliente(cls, numeroDocumento):
 
         """
         <b>Description</b>: Este método se encarga de buscar un cliente en la lista de clientes de la clase SucursalCine cuyo
-        número de documento y tipo de documento coincida con los pasados como parámetros
+        número de documento coincida con el número pasado como parámetro
 
         :param numeroDocumento: Corresponde al número de documento del usuario que estamos buscando
         :type numeroDocumento: int
-
-        :param tipoDocumento: Corresponde al tipo de documento del usuario que estamos buscando
-        :type tipoDocumento: String -> TipoDocumento.value
 
         :return cliente: Este método retorna el cliente en caso de encontrarlo, sino, retorna None
         """
 
         for cliente in SucursalCine._clientes:
-            if cliente.getDocumento() == numeroDocumento and cliente.getTipoDocumento().value == tipoDocumento:
+            if cliente.getDocumento() == numeroDocumento:
                 return cliente
         
         return None

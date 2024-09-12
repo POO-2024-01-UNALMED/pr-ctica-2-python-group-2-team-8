@@ -14,6 +14,7 @@ from gestionAplicacion.sucursalCine import SucursalCine
 from gestionAplicacion.usuario.cliente import Cliente
 from gestionAplicacion.servicios.herencia.servicioComida import ServicioComida
 from gestionAplicacion.servicios.herencia.servicioSouvenirs import ServicioSouvenir
+from gestionAplicacion.servicios.herencia.servicio import Servicio 
 from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
@@ -21,6 +22,10 @@ from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
 
 class FieldFrame(tk.Frame):
+
+    _clienteProceso = None
+    _frameMenuPrincipal = None
+    _framesFuncionalidades = []
 
     def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = None, tituloValores = "", infoElementosInteractuables = None, habilitado = None):
         super().__init__(ventanaLogicaProyecto)
@@ -31,7 +36,6 @@ class FieldFrame(tk.Frame):
         self._habilitado = habilitado
 
         self._elementosInteractivos = []
-        self._clienteProceso = None
         
         tituloFrame = tk.Label(self, text=tituloProceso, font= ("Verdana bold",30), anchor="center")
         tituloFrame.grid(row=0, column=0, columnspan=4, sticky='we')
@@ -56,7 +60,8 @@ class FieldFrame(tk.Frame):
                 elementoInteractivo = tk.Entry(self)
             
             elif len(infoElementosInteractuables[i]) == 1:
-                elementoInteractivo = tk.Entry(self, textvariable=tk.StringVar(str(infoElementosInteractuables[i][0])))
+                elementoInteractivo = tk.Entry(self)
+                elementoInteractivo.insert(0, infoElementosInteractuables[i][0])
 
             else:
                 elementoInteractivo = ttk.Combobox(self, values=infoElementosInteractuables[i][0])
@@ -92,6 +97,14 @@ class FieldFrame(tk.Frame):
         indice = self._elementosInteractivos.index(criterio)
         criterio.set(self._infoElementosInteractuables[indice][1])
 
+    @classmethod
+    def setFrameMenuPrincipal(cls, frameMenuPrincipal):
+        FieldFrame._frameMenuPrincipal = frameMenuPrincipal
+
+    @classmethod
+    def getFrameMenuPrincipal(cls):
+        return FieldFrame._frameMenuPrincipal
+
     def funBorrar(self):
         for elementoInteractivo in self._elementosInteractivos:
             if isinstance(elementoInteractivo, ttk.Combobox):
@@ -107,8 +120,21 @@ class FieldFrame(tk.Frame):
             frameAnterior.pack_forget()
         self.pack(expand=True)
     
-    def getClienteProceso(self):
-        return self._clienteProceso
+    @classmethod
+    def getClienteProceso(cls):
+        return FieldFrame._clienteProceso
+    
+    @classmethod
+    def setClienteProceso(cls, clienteProceso):
+        FieldFrame._clienteProceso = clienteProceso
+
+    @classmethod
+    def getFramesFuncionalidades(cls):
+        return FieldFrame._framesFuncionalidades
+    
+    @classmethod
+    def setFramesFuncionalidades(cls, framesFuncionalidades):
+        FieldFrame._framesFuncionalidades = framesFuncionalidades
     
     def tieneValoresPorDefecto(self):
         for i in range(0, len(self._infoElementosInteractuables)):
@@ -119,7 +145,27 @@ class FieldFrame(tk.Frame):
                 return True
         
         return False
-                
+
+    def logicaInicioProcesosFuncionalidades(self, clienteProceso):
+
+        FieldFrame.setClienteProceso(clienteProceso)
+
+        #Creación Frames funcionalidades
+        framesFuncionalidades = [
+            FrameReservarTicket(), # <_ Funcionalidad 1
+            FrameReservarTicket(), # <- Funcionalidad 2
+            FrameReservarTicket(), # <- Funcionalidad 3
+            FrameReservarTicket(), # <- funcionalidad 4
+            FrameReservarTicket() # <- Funcionalidad 5
+        ]
+
+        #Setteamos los frames de las funcionalidades al atributo de clase
+        FieldFrame.setFramesFuncionalidades(framesFuncionalidades)
+
+        #Ejecutamos la lógica de la ventana del menú principal
+        frameVentanaPrincipal.construirMenu()
+        frameVentanaPrincipal.mostrarFrame(self)
+
 class FrameInicioSesion(FieldFrame):
 
     def __init__(self):
@@ -149,14 +195,14 @@ class FrameInicioSesion(FieldFrame):
             confirmacionUsuario = messagebox.askokcancel('Confirmación de datos', f'Los datos ingresados son:\nTipo de documento: {tipoDocumentoSeleccionado}\nNúmero de documento: {numDocumentoSeleccionado}\nSucursal seleccionada: {sucursalSeleccionada}')
             
             if confirmacionUsuario:
-                clienteProceso = SucursalCine.buscarCliente(numDocumentoSeleccionado, tipoDocumentoSeleccionado)
+                clienteProceso = SucursalCine.buscarCliente(numDocumentoSeleccionado)
 
-                if self._clienteProceso is None:
+                if clienteProceso is None:
                     FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada).mostrarFrame(self)
 
                 else:
-                    self._clienteProceso = clienteProceso
-                    messagebox.showinfo('Encontrado -> Llamar a field principal')
+                    self.logicaInicioProcesosFuncionalidades(clienteProceso)              
+
         else:
             messagebox.showerror('Error', 'No pueden haber campos vacíos o con valores por defecto')
 
@@ -191,8 +237,7 @@ class FrameCrearUsuario(FieldFrame):
             confirmacionCliente = messagebox.askokcancel('Confirmación datos', f'Los datos ingresados son:\nNombre: {nombreCliente}\nEdad: {edadCliente}')
 
             if confirmacionCliente:
-                self._clienteProceso = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual))
-                #Ir a frameVentanaPrincipal 
+                self.logicaInicioProcesosFuncionalidades(Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual)))
         
         else:
             messagebox.showerror('Error', 'No pueden haber campos vacíos o con valores por defecto')
@@ -201,30 +246,51 @@ class FrameCrearUsuario(FieldFrame):
 class FrameVentanaPrincipal(FieldFrame):
 
     def __init__(self):
-        super().__init__(
-            tituloProceso="",
-            descripcionProceso="",
-            tituloCriterios="",
-            textEtiquetas="",
-            tituloValores="",
-            infoElementosInteractuables="",
-            habilitado=""
-        )
+        super().__init__( textEtiquetas = [])
+
+        self._imagenFramePrincipal = tk.PhotoImage(file = 'src/iuMain/imagenes/fachadaCine.png')
+        
+        self._labelImagen = tk.Label(self, image = self._imagenFramePrincipal)
+        self._labelImagen.grid(row=0, column=0)
+
+        FieldFrame.setFrameMenuPrincipal(self)
+
         #Se buscan los widget que tenga FieldFrame y se eliminan para este frame.
         for widget in self.winfo_children():
             if isinstance(widget, tk.Button):
                 widget.destroy()
 
+    def construirMenu(self):
         barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Courier", 9))
         ventanaLogicaProyecto.config(menu=barraMenuPrincipal)
         menuOpcionesPrincipal = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Courier", 9), activebackground= "grey", activeforeground="black")
         barraMenuPrincipal.add_cascade(label="Funcionalidades", menu= menuOpcionesPrincipal, font=("Courier", 9))
 
-        menuOpcionesPrincipal.add_command(label="Reserva de tiquetes", command = "")
+        menuOpcionesPrincipal.add_command(label="Reserva de tiquetes", command = self.ingresarFuncionalidad1)
         menuOpcionesPrincipal.add_command(label="Zona de juegos", command="")
         menuOpcionesPrincipal.add_command(label="Calificaciones", command="")
         menuOpcionesPrincipal.add_command(label="Servicio de comida/souvenir", command="")
-        menuOpcionesPrincipal.add_command(label="Sistema de membresías", command="")    
+        menuOpcionesPrincipal.add_command(label="Sistema de membresías", command="")
+    
+    def ingresarFuncionalidad1(evento):
+        FieldFrame.getFramesFuncionalidades()[0].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+
+class FrameReservarTicket(FieldFrame):
+
+    def __init__(self):
+        super().__init__(
+            tituloProceso = 'Reservar ticket',
+            descripcionProceso = f'En este espacio solicitamos los datos necesarios para reservar un ticket, debe ingresar los datos de forma secuencial, es decir, en el orden en que se encuentran (Fecha Actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})',
+            tituloCriterios = 'Criterios reserva',
+            textEtiquetas = ['Seleccionar película : ', 'Seleccionar formato : ', 'Seleccionar horario : '], 
+            tituloValores = 'Valores ingresados',
+            infoElementosInteractuables = [[[], 'Selecionar película'], [[], 'Seleccionar formato'], [[], 'Seleccionar horario']],
+            habilitado = [False, False, False]
+        )
+
+        self._peliculaProceso = None
+        self._horarioProceso = None
+    
 
 def objetosBasePractica2():
 
@@ -232,8 +298,8 @@ def objetosBasePractica2():
     sucursalCine2 = SucursalCine("Marinilla")
     sucursalCine3 = SucursalCine("Medellín")
 
-    #servicioComida = ServicioComida("comida", sucursalCine2)
-    #servicioSouvenirs = ServicioSouvenir("souvenir", sucursalCine2)
+    servicioComida = ServicioComida("comida", sucursalCine2)
+    servicioSouvenirs = ServicioSouvenir("souvenir", sucursalCine2)
 
     # Productos de la sucursal de Marinilla
 
@@ -252,12 +318,12 @@ def objetosBasePractica2():
     producto4S = Producto("Llavero","Katana","souvenir",22000,200,"Acción",sucursalCine2)
     producto5S = Producto("Peluche","Pajaro loco","souvenir",29000,200,"Comedia",sucursalCine2)
 
-    #sucursalCine2.getServicios().add(servicioComida)
-    #sucursalCine2.getServicios().add(servicioSouvenirs)
+    sucursalCine2.getServicios().append(servicioComida)
+    sucursalCine2.getServicios().append(servicioSouvenirs)
 
     cliente1 = Cliente("Rusbel", 18, 13434, TipoDocumento.CC, sucursalCine2)
     cliente2 = Cliente("Andy", 18, 14343, TipoDocumento.CC, sucursalCine1)
-    cliente3 = Cliente('Gerson', 24, 98765, TipoDocumento.CC, sucursalCine3)
+    cliente3 = Cliente('Gerson', 23, 98765, TipoDocumento.CC, sucursalCine3)
     cliente4 = Cliente('Juanjo', 18, 987, TipoDocumento.CC, sucursalCine1)
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
@@ -330,6 +396,11 @@ def objetosBasePractica2():
     metodoPago2 = MetodoPago("AV Villas", 0.05, 120000)
     metodoPago3 = MetodoPago("Banco Agrario", 0.15, 300000)
     metodoPago4 = MetodoPago("Efectivo", 0, 5000000)
+
+    sucursalCine2.getServicios()[0].setCliente(cliente1)
+
+    sucursalCine2.getServicios()[0].setInventario(sucursalCine2.getServicios()[0].actualizarInventario())
+    print(sucursalCine2.getServicios()[0].mostrarInventario())
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
