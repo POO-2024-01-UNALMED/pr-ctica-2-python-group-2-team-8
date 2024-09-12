@@ -12,6 +12,7 @@ class Servicio (ABC):
         self._bonosCliente = []
         self._valorPedido = 0.0
         self._sucursalUbicacion = sucursalUbicacion
+        sucursalUbicacion.getServicios().append(self)
 
         
     @abstractmethod
@@ -95,17 +96,14 @@ class Servicio (ABC):
         return pedido
 
     def mostrarInventario(self):
-        productos = "\n----------Productos disponibles----------\n\n0. Ningún producto"
+        p = []
         i = 0
         if len(self._inventario) == 0:
-            return "\nNO HAY PRODUCTOS DISPONIBLES :(\n"
+            return p
         for producto in self._inventario:
             i= i+1
-            disponibilidad = ""
-            if producto.getCantidad() == 0:
-                disponibilidad = " --> NO HAY EN EL MOMENTO DE ESTE PRODUCTO"
-            productos += f"\n{i}. {producto.getNombre()} {producto.getTamaño()} ${producto.getPrecio()}{disponibilidad}"
-        return productos
+            p.append(f"{producto.getNombre()} {producto.getTamaño()}")
+        return p
 
     def hacerPedido(self, indice, cantidad):
         producto_inventario = self.inventario[indice]

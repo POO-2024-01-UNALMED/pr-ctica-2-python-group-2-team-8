@@ -531,7 +531,11 @@ class SucursalCine:
             return sucursal_seleccionada
 
 
-
+    def mostrarServicios (self):
+        s = []
+        n = 0
+        for servicio in self._servicios:
+            s.append(f"{n+1}. {servicio.getNombre()}")
 
 
 #Getters and Setters

@@ -155,8 +155,9 @@ class FieldFrame(tk.Frame):
 
         #Creación Frames funcionalidades
         framesFuncionalidades = [
+
             FrameReservarTicket(), # <_ Funcionalidad 1
-            FrameReservarTicket(), # <- Funcionalidad 2
+            FrameFuncionalidad2(), # <- Funcionalidad 2
             FrameReservarTicket(), # <- Funcionalidad 3
             FrameReservarTicket(), # <- funcionalidad 4
             FrameFuncionalidad5() # <- Funcionalidad 5
@@ -168,6 +169,21 @@ class FieldFrame(tk.Frame):
         #Ejecutamos la lógica de la ventana del menú principal
         frameVentanaPrincipal.construirMenu()
         frameVentanaPrincipal.mostrarFrame(self)
+    
+class FrameFuncionalidad2(FieldFrame):
+    def __init__(self):
+
+        self._sucursalActual = self._clienteProceso.getCineUbicacionActual()
+
+        super().__init__(
+            tituloProceso = "Generacion de orden",
+            descripcionProceso = "En este apartado podras seleccionar el servicio que deseas para generar una orden",
+            tituloCriterios = "Servicio",
+            textEtiquetas = ['Seleccione tipo de servicio'],
+            tituloValores = "Servicio al que deseas acceder",
+            infoElementosInteractuables = [self._sucursalActual.mostrarServicios()],
+            habilitado = [False]
+        )
 
 class FrameInicioSesion(FieldFrame):
 
@@ -272,11 +288,14 @@ class FrameVentanaPrincipal(FieldFrame):
         menuOpcionesPrincipal.add_command(label="Reserva de tiquetes", command = self.ingresarFuncionalidad1)
         menuOpcionesPrincipal.add_command(label="Zona de juegos", command="")
         menuOpcionesPrincipal.add_command(label="Calificaciones", command="")
-        menuOpcionesPrincipal.add_command(label="Servicio de comida/souvenir", command="")
+        menuOpcionesPrincipal.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
         menuOpcionesPrincipal.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
     
     def ingresarFuncionalidad1(evento):
         FieldFrame.getFramesFuncionalidades()[0].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+    
+    def ingresarFuncionalidad2(evento):
+        FieldFrame.getFramesFuncionalidades()[1].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
 
     def ingresarFuncionalidad5(evento):
         FieldFrame.getFramesFuncionalidades()[4].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
@@ -388,9 +407,6 @@ def objetosBasePractica2():
     producto3S = Producto("Gorra","L","souvenir",11000,200,"Normal",sucursalCine2)
     producto4S = Producto("Llavero","Katana","souvenir",22000,200,"Acción",sucursalCine2)
     producto5S = Producto("Peluche","Pajaro loco","souvenir",29000,200,"Comedia",sucursalCine2)
-
-    sucursalCine2.getServicios().append(servicioComida)
-    sucursalCine2.getServicios().append(servicioSouvenirs)
 
     cliente1 = Cliente("Rusbel", 18, 13434, TipoDocumento.CC, sucursalCine2)
     cliente2 = Cliente("Andy", 18, 14343, TipoDocumento.CC, sucursalCine1)
