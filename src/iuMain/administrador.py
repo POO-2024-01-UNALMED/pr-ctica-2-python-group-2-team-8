@@ -498,9 +498,9 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
             tituloValores = 'Valores ingresados',
             infoElementosInteractuables = [
                 [Cliente.mostrarPeliculaParaCalificar(
-                    peliculasDisponiblesParaCalificar = self.peliculasCalificar), 'Selecionar película'],
+                    peliculasDisponiblesParaCalificar = self._peliculasCalificar), 'Selecionar película'],
                 [Cliente.mostrarProductosParaCalificar(
-                    productosDisponiblesParaCalificar = self.productosCalificar), 'Seleccionar producto'], 
+                    productosDisponiblesParaCalificar = self._productosCalificar), 'Seleccionar producto'], 
                 [[], 'Ingresa tu valoracion']
             ],
             habilitado = [False, False, False],
@@ -571,6 +571,7 @@ def objetosBasePractica2():
     cliente2 = Cliente("Andy", 18, 14343, TipoDocumento.CC, sucursalCine1)
     cliente3 = Cliente('Gerson', 23, 98765, TipoDocumento.CC, sucursalCine3)
     cliente4 = Cliente('Juanjo', 18, 987, TipoDocumento.CC, sucursalCine1)
+    cliente4 = Cliente('Santiago', 18, 1125274009, TipoDocumento.CC, sucursalCine3)
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
     salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)
