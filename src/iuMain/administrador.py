@@ -378,9 +378,9 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
     def __init__(self):
         super().__init__(
             tituloProceso="Calificaciones",
-            descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
+            descripcionProceso= f"Bienvenido al apartado de calificaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
             textEtiquetas= []
-        )    
+        )   
 
     def crearBotonesMembresia(self):
         botonBasico = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text="Básico").grid(padx=10, pady=10, row= 2, column=0)
@@ -388,6 +388,14 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
         botonGlobal = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Global").grid(padx=10, pady=10, row= 2, column=2)
         botonChallenger = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Challenger").grid(padx=10, pady=10, row= 2, column=3)
         botonRadiante = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Radiante").grid(padx=10, pady=10, row= 2, column=4)
+class FrameFuncionalidad3Calificaciones(FieldFrame):
+
+    def __init__(self):
+        super().__init__(
+            tituloProceso="Calificaciones",
+            descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
+            textEtiquetas= []
+        ) 
 
 def objetosBasePractica2():
 
