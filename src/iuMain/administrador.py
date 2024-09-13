@@ -369,7 +369,10 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
         super().__init__(
             tituloProceso="Calificaciones",
             descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
-            textEtiquetas= []
+            tituloCriterios = 'Criterios reserva',
+            textEtiquetas= ["Seleccionar pelicula o producto a calificar: "],
+            tituloValores = 'Valores ingresados',
+            infoElementosInteractuables = [Cliente.mostrar_pelicula_para_calificar and Cliente.mostrar_productos_para_calificar]
         )     
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
