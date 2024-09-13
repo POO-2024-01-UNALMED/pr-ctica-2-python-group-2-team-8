@@ -171,6 +171,9 @@ class FieldFrame(tk.Frame):
         #Ejecutamos la lógica de la ventana del menú principal
         frameVentanaPrincipal.construirMenu()
         frameVentanaPrincipal.mostrarFrame(self)
+
+#class FremeOrden(FieldFrame):
+
     
 class FrameFuncionalidad2(FieldFrame):
     def __init__(self):
@@ -180,12 +183,18 @@ class FrameFuncionalidad2(FieldFrame):
         super().__init__(
             tituloProceso = "Generacion de orden",
             descripcionProceso = "En este apartado podras seleccionar el servicio que deseas para generar una orden",
-            tituloCriterios = "Servicio",
+            tituloCriterios = "Criterio servicio",
             textEtiquetas = ['Seleccione tipo de servicio'],
-            tituloValores = "Servicio al que deseas acceder",
-            infoElementosInteractuables = [self._sucursalActual.mostrarServicios()],
+            tituloValores = "Dato servicio",
+            infoElementosInteractuables = [[self._sucursalActual.mostrarServicios(), "Seleccione un servicio"]],
             habilitado = [False]
         )
+
+    #def funAceptar(self):
+    #    if not self.tieneValoresPorDefecto():
+            
+
+                 
 
 class FrameInicioSesion(FieldFrame):
 
@@ -416,6 +425,9 @@ def objetosBasePractica2():
 
     servicioComida = ServicioComida("comida", sucursalCine2)
     servicioSouvenirs = ServicioSouvenir("souvenir", sucursalCine2)
+
+    print(sucursalCine2.getServicios())
+    print(sucursalCine2.mostrarServicios())
 
     # Productos de la sucursal de Marinilla
 
