@@ -170,9 +170,8 @@ class FieldFrame(tk.Frame):
             FrameReservarTicket(), # <_ Funcionalidad 1
             FrameFuncionalidad2(), # <- Funcionalidad 2
             #FrameFuncionalidad3Calificaciones(), # <- Funcionalidad 3
-            FrameFuncionalidad2(),
-            FrameReservarTicket(), # <- funcionalidad 4
-            FrameFuncionalidad5(), # <- Funcionalidad 5
+            FrameZonaJuegos(), # <- funcionalidad 4
+            FrameFuncionalidad5() # <- Funcionalidad 5
         ]
 
         #Setteamos los frames de las funcionalidades al atributo de clase
@@ -329,6 +328,13 @@ class FrameVentanaPrincipal(FieldFrame):
 
     def ingresarFuncionalidad5(evento):
         FieldFrame.getFramesFuncionalidades()[4].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+
+class FrameZonaJuegos(FieldFrame):
+    def __init__(self):
+
+        clienteProceso = FieldFrame.getClienteProceso()
+
+        #if clienteProceso
 
 class FrameReservarTicket(FieldFrame):
     def __init__(self):
