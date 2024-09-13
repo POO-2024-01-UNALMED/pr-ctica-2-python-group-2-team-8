@@ -45,7 +45,7 @@ class Cliente():
         for i, pelicula in peliculasDisponiblesParaCalificar:
             if peliculas:
                 peliculas += "\n"
-            peliculas += f"{i}. {pelicula.nombre} {pelicula.tipo_de_formato}"
+            peliculas += f"{i}. {pelicula.getNombre()} {pelicula.getTipoDeFormato()}"
         return peliculas
         
     #Description:Este metodo se encarga de mostrar el historial de comida que cada cliente ha consumido hasta el momento
@@ -57,7 +57,7 @@ class Cliente():
         for i, producto in productosDisponiblesParaCalificar:
             if pedidos:
                 pedidos += "\n"
-            pedidos += f"{i}. {producto.nombre} {producto.tamaño}"
+            pedidos += f"{i}. {producto.getNombre()} {producto.getTamaño()}"
         return pedidos
 
     def verificarCuenta(self):

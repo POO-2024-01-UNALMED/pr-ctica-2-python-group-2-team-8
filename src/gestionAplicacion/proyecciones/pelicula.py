@@ -342,18 +342,18 @@ class Pelicula:
 #el fin de efectuar la actualización y solicitud de actualización de las salas de cine.
 
 
-    def seleccionar_horario_mas_lejano(self,horario: datetime):
-        horarios_pelicula = None
-        is_asientos_disponibles = False
+    def seleccionarHorarioMasLejano(self,horario: datetime):
+        horariosPelicula = None
+        isAsientosDisponibles = False
 
-        horarios = self.filtrar_horarios_pelicula()
+        horarios = self.filtrarHorariosPelicula()
         if len(horarios) > 0:
             for horario in horarios:
-                is_asientos_disponibles = self.is_disponibilidad_asiento_sala_virtual(horario)
-                if is_asientos_disponibles:
+                isAsientosDisponibles = self.isDisponibilidadAsientoSalaVirtual(horario)
+                if isAsientosDisponibles:
                     horarios_pelicula = horario
 
-        return horarios_pelicula
+        return horariosPelicula
         
 
 #Description:Este metodo se encarga de seleccionar un asiento aleatoriamente en la sala de cine, esto se hace
@@ -361,17 +361,17 @@ class Pelicula:
 #obsequio le ofrecemos este bono,el metodo retorna un numAsiento de forma aleatoria y ese asiento es al que se 
 #le va a dar al cliente.
 	 
-    def seleccionar_asiento_aleatorio(self, horario_proceso: datetime) -> str:
+    def seleccionarAsientoAleatorio(self, horarioProceso: datetime) -> str:
         validacion = True
-        num_asiento = None
+        numAsiento = None
         
         while validacion:
             fila = random.randint(1, 8)
             columna = random.randint(1, 8)
-            validacion = not self.is_disponibilidad_asiento_sala_virtual(horario_proceso, fila, columna)
-            num_asiento = f"{fila}-{columna}"
+            validacion = not self.isDisponibilidadAsientoSalaVirtual(horarioProceso, fila, columna)
+            numAsiento = f"{fila}-{columna}"
         
-        return num_asiento
+        return numAsiento
 
 #Getters and Setters
 ################################################
@@ -440,3 +440,16 @@ class Pelicula:
     
     def setSalaCinePresentacion(self, salaCinePresentacion):
         self._salaCinePresentacion = salaCinePresentacion
+
+    def getValoracion(self):
+        return self._valoracion
+    
+    def setValoracion(self, valoracion):
+        self._valoracion = valoracion    
+
+    def isStrikeCambio(self):
+        return self._strikeCambio
+    
+    def setStrikeCambio(self, strikeCambio):
+        self._strikeCambio = strikeCambio   
+

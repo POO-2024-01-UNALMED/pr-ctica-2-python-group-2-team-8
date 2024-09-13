@@ -323,6 +323,19 @@ class SucursalCine:
     def notificarFechaLimiteMembresia(cls):
         pass
 
+    #Description: Este metodo se encarga de remover las peliculas que fueron mal calificadas en dos sucursales, por lo
+	 #tanto por temas de negocio decidimos eliminar esta pelicula por malas ventas, usando la funcion remove, quitandola
+	 #de la cartelera principal de peliculas.
+	 
+	 
+    def eliminarPeliculas(self, peliculasEliminar):
+       
+        for pelicula in peliculasEliminar:
+            if pelicula in self.cartelera:
+                self.cartelera.remove(pelicula)
+            else:
+                print(f"La película {pelicula} no está en la cartelera.")
+
 #Description: Este metodo se encarga de remover los productos que fueron mal calificadas en dos sucursales, por lo
 #tanto por temas de negocio decidimos eliminar este producto por malas ventas, usando la funcion remove, quitandola
 #de la cartelera principal de peliculas.
@@ -466,13 +479,13 @@ class SucursalCine:
             if pelicula.seleccionar_horario_mas_lejano() is None:
                 continue
 
-            if primera_comparacion:
-                pelicula_peor_calificada = pelicula
-                primera_comparacion = False
-            elif pelicula.get_valoracion() < pelicula_peor_calificada.get_valoracion():
-                pelicula_peor_calificada = pelicula
+            if primeraComparacion:
+                peliculaPeorCalificada = pelicula
+                primeraComparacion = False
+            elif pelicula.getValoracion() < peliculaPeorCalificada.getValoracion():
+                peliculaPeorCalificada = pelicula
 
-        return pelicula_peor_calificada
+        return peliculaPeorCalificada
     
 #Description: Este metodo se encarga de analizar por semana que peliculas han sido bien o mal calificadas, evaluando
 #las calificaciones de los clientes, si una pelicula es calificada por debajo de 3, la consideramos como mal calificada
@@ -483,34 +496,34 @@ class SucursalCine:
 #buenas o malas recibidas por los clientes, y cambiandolas de sede, esperamos que su calificacion mejore, si esto
 #no se da, la pelicula es eliminada de la cartelera, ya que se considera como mala.
 
-    def logica_calificacion_peliculas(self, pelicula):
-        peliculas_calificadas = Pelicula.filtrar_por_nombre_de_pelicula(pelicula.get_nombre(), self.cartelera)
-        if not peliculas_calificadas:
+    def logicaCalificacionPeliculas(self, pelicula):
+        peliculasCalificadas = Pelicula.obtenerPeliculasPorNombre(pelicula.getNombre(), self._cartelera)
+        if not peliculasCalificadas:
             return
 
         promedio = 0
-        verificacion_cambio = True
+        verificacionCambio = True
         
-        for pelicula in peliculas_calificadas:
-            promedio += pelicula.get_valoracion()
-            verificacion_cambio = verificacion_cambio and pelicula.is_strike_cambio()
+        for pelicula in peliculasCalificadas:
+            promedio += pelicula.getValoracion()
+            verificacionCambio = verificacionCambio and pelicula.isStrikeCambio()
 
-        calificacion_real = promedio / len(peliculas_calificadas)
+        calificacionReal = promedio / len(peliculasCalificadas)
 
-        if calificacion_real < 3:
-            if verificacion_cambio:
-                sucursal = self.seleccionar_sucursal_aleatoriamente()
-                for pelicula1 in peliculas_calificadas:
-                    self.eliminar_peliculas([pelicula1])
-                    if pelicula1.get_tipo_de_formato() == "2D":
-                        Pelicula(pelicula1.get_nombre(), int(pelicula1.precio * 0.9), pelicula1.genero, pelicula1.duracion, pelicula1.clasificacion, pelicula1.get_tipo_de_formato(), sucursal)
+        if calificacionReal < 3:
+            if verificacionCambio:
+                sucursal = self.seleccionarSucursalAleatoriamente()
+                for pelicula1 in peliculasCalificadas:
+                    self.eliminarPeliculas([pelicula1])
+                    if pelicula1.getTipoDeFormato() == "2D":
+                        Pelicula(pelicula1.getNombre(), int(pelicula1.precio * 0.9), pelicula1.genero, pelicula1.duracion, pelicula1.clasificacion, pelicula1.getTipoDeFormato(), sucursal)
             else:
-                self.eliminar_peliculas(peliculas_calificadas)
-        elif calificacion_real > 4.5:
-            sucursal = self.seleccionar_sucursal_aleatoriamente()
-            for pelicula2 in peliculas_calificadas:
-                if pelicula2.get_tipo_de_formato() == "2D":
-                    Pelicula(pelicula2.get_nombre(), int(pelicula2.precio * 1.10), pelicula2.genero, pelicula2.duracion, pelicula2.clasificacion, pelicula2.get_tipo_de_formato(), sucursal)
+                self.eliminarPeliculas(peliculasCalificadas)
+        elif calificacionReal > 4.5:
+            sucursal = self.seleccionarSucursalAleatoriamente()
+            for pelicula2 in peliculasCalificadas:
+                if pelicula2.getTipoDeFormato() == "2D":
+                    Pelicula(pelicula2.getNombre(), int(pelicula2.precio * 1.10), pelicula2.genero, pelicula2.duracion, pelicula2.clasificacion, pelicula2.getTipoDeFormato(), sucursal)
 
 
 #################### PORQUE ESTA ESTE METODO AQUI Y EN SERVICIO?????????????????????
@@ -521,15 +534,15 @@ class SucursalCine:
 #se selecciona una sucursal aleatoriamente, ya que esto nos permetira mas adelante el cambio de sucursal de una
 #pelicula a otra.
 # 	 
-    def seleccionar_sucursal_aleatoriamente(self,sucursal_cine):
-     if len(sucursal_cine) <= 1:
+    def seleccionarSucursalAleatoriamente(self,sucursalCine):
+     if len(sucursalCine) <= 1:
         raise ValueError("No hay suficientes sucursales para seleccionar una diferente.")
     
      while True:
-        numero_aleatorio = random.randint(0, len(sucursal_cine) - 1)
-        sucursal_seleccionada = sucursal_cine[numero_aleatorio]
-        if sucursal_cine != sucursal_seleccionada:
-            return sucursal_seleccionada
+        numeroAleatorio = random.randint(0, len(sucursalCine) - 1)
+        sucursalSeleccionada = sucursalCine[numeroAleatorio]
+        if sucursalCine != sucursalSeleccionada:
+            return sucursalSeleccionada
 
 
     def mostrarServicios(self):
