@@ -72,7 +72,7 @@ class Pelicula:
         carteleraPersonalizadaCliente = []
 
         for pelicula in cliente.getCineUbicacionActual().getCartelera():
-            if len(pelicula.filtrarHorariosPelicula()) > 0 or pelicula.isPeliculaEnPresentacion(cliente.getCineUbicacionActual()):
+            if len(pelicula.filtrarHorariosPelicula()) > 0 or pelicula.isPeliculaEnPresentacion():
                 if int(pelicula._clasificacion) <= cliente.getEdad():
                     carteleraPersonalizadaCliente.append(pelicula)
         
@@ -236,6 +236,21 @@ class Pelicula:
             if len(filtroHorariosProxPresentaciones) == 7 : break
         
         return filtroHorariosProxPresentaciones
+    
+    def filtrarHorariosParaMostrar(self):
+        
+        """
+        :Description: Este método se encarga de generar la lista de horarios que serán mostrados en el combobox de la interfaz
+        """
+
+        if self.isPeliculaEnPresentacion():
+            horarioPresentacion = self.whereIsPeliculaEnPresentacion().getHorarioPeliculaEnPresentacion()
+            horariosParaMostrar = self.filtrarHorariosPelicula()
+            horariosParaMostrar.insert(0, horarioPresentacion)
+            return horariosParaMostrar
+        
+        else:
+            return self.filtrarHorariosPelicula()
 
     def filtrarHorariosPeliculaParaSalaCine(self):
 
@@ -259,7 +274,7 @@ class Pelicula:
 
     #def mostrarHorarioPelicula(self, horarioPelicula):
 
-    def isPeliculaEnPresentacion(self, sucursalCine):
+    def isPeliculaEnPresentacion(self):
 
         """
         :Description: Este método se encarga de buscar si la pelicula que ejecuta este método se encuentra en presentación, la 
@@ -277,28 +292,27 @@ class Pelicula:
         :return boolean: Este método retorna un boolean, que representa si la película cumple, o no, con los criterios.
         """
 
-        for salaDeCine in sucursalCine.getSalasDeCine():
+        for salaDeCine in self._sucursalCartelera.getSalasDeCine():
+            
             try:
-                if salaDeCine.getPeliculaEnPresntacion() is self and salaDeCine.getHorarioPeliculaEnPresentacion() + self._sucursalCartelera.getTiempoLimiteReservaTicket() < self._sucursalCartelera.getFechaActual():
+                if salaDeCine.getPeliculaEnPresentacion() is self and salaDeCine.getHorarioPeliculaEnPresentacion() + self._sucursalCartelera.getTiempoLimiteReservaTicket() > self._sucursalCartelera.getFechaActual():
                     if salaDeCine.isDisponibilidadAlgunAsientoReserva(): return True
-            except AttributeError:
+            except ValueError:
                 pass
+            
         
         return False
 
-    def whereIsPeliculaEnPresentacion(self, sucursalCine):
+    def whereIsPeliculaEnPresentacion(self):
 
         """
         :Description: Este método se encarga de retornar la sala de cine donde película que ejecuta este método se encuentra en 
         presentación.
 	    
-        :param sucursalCine: Este método recibe como parámetro la sede (De tipo SucursalCine) en donde se realiza este proceso
-	    para obtener sus salas de cine.
-	    
         :return SalaCine: Este método retorna la sala de cine donde está siendo proyectada la película.
         """
         
-        for salaDeCine in sucursalCine.getSalasDeCine():
+        for salaDeCine in self._sucursalCartelera.getSalasDeCine():
             if salaDeCine.getPeliculaEnPresentacion() is self:
                 return salaDeCine
 
@@ -381,6 +395,9 @@ class Pelicula:
     
     def setNombre(self, nombre):
         self._nombre = nombre
+
+    def getPrecio(self):
+        return self._precio
 
     def getGenero(self):
         return self._genero

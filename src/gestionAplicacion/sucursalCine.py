@@ -230,7 +230,7 @@ class SucursalCine:
 	    </ol>
         """
 
-        SucursalCine._fechaActual = datetime.now()
+        SucursalCine._fechaActual = datetime.now().replace(hour=10, minute=0)
 
         for sede in SucursalCine._sucursalesCine:
 

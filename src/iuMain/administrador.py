@@ -20,6 +20,7 @@ from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
 from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
+from excepciones.iuExceptions import iuExceptions, iuEmptyValues, iuDefaultValues
 
 class FieldFrame(tk.Frame):
 
@@ -27,7 +28,7 @@ class FieldFrame(tk.Frame):
     _frameMenuPrincipal = None
     _framesFuncionalidades = []
 
-    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = None, tituloValores = "", infoElementosInteractuables = None, habilitado = None):
+    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = None, tituloValores = "", infoElementosInteractuables = None, habilitado = None, botonVolver = False):
         super().__init__(ventanaLogicaProyecto)
         self._tituloCriterios = tituloCriterios
         self._infoEtiquetas = textEtiquetas
@@ -36,6 +37,7 @@ class FieldFrame(tk.Frame):
         self._habilitado = habilitado
 
         self._elementosInteractivos = []
+        self._frameAnterior = None
         
         tituloFrame = tk.Label(self, text=tituloProceso, font= ("Verdana bold",30), anchor="center")
         tituloFrame.grid(row=0, column=0, columnspan=4, sticky='we')
@@ -79,10 +81,23 @@ class FieldFrame(tk.Frame):
 
             self._elementosInteractivos.append(elementoInteractivo)
 
-        tk.Button(self, text="Borrar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funBorrar,
-        width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = len(self._infoEtiquetas)+3, columnspan=3)
-        tk.Button(self, text="Aceptar", font = ("Verdana", 12), fg = "white", bg = "gray", command=self.funAceptar,
-        width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 0, row = len(self._infoEtiquetas)+3)
+        if botonVolver:
+            frameBotones = tk.Frame(self)
+
+            tk.Button(frameBotones, text="Aceptar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funAceptar,
+            width=12,height=2).grid(pady = (10,10), padx=(20, 20), column = 0, row = len(self._infoEtiquetas)+3, sticky = 'we')
+            tk.Button(frameBotones, text="Volver", font = ("Verdana", 12), fg = "white", bg = "gray", command=self.funVolver,
+            width=12,height=2).grid(pady = (10,10), padx=(20, 20), column = 1, row = len(self._infoEtiquetas)+3, sticky = 'we')
+            tk.Button(frameBotones, text="Borrar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funBorrar,
+            width=12,height=2).grid(pady = (10,10), padx=(20, 20), column = 2, row = len(self._infoEtiquetas)+3, sticky = 'we')
+
+            frameBotones.grid(column = 0, row = len(self._infoEtiquetas) + 3, columnspan=2, sticky='we')
+        
+        else:
+            tk.Button(self, text="Borrar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funBorrar,
+            width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = len(self._infoEtiquetas)+3)
+            tk.Button(self, text="Aceptar", font = ("Verdana", 12), fg = "white", bg = "gray", command=self.funAceptar,
+            width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 0, row = len(self._infoEtiquetas)+3)
 
     def getValue(self, criterio):
         indice = self._infoEtiquetas.index(criterio)
@@ -93,7 +108,7 @@ class FieldFrame(tk.Frame):
         self._elementosInteractivos[indice].delete("0","end")
         self._elementosInteractivos[indice].insert(0, valor)
     
-    def setValueComoboBox(self, criterio):
+    def setValueComboBox(self, criterio):
         indice = self._elementosInteractivos.index(criterio)
         criterio.set(self._infoElementosInteractuables[indice][1])
 
@@ -108,14 +123,36 @@ class FieldFrame(tk.Frame):
     def funBorrar(self):
         for elementoInteractivo in self._elementosInteractivos:
             if isinstance(elementoInteractivo, ttk.Combobox):
-                self.setValueComoboBox(elementoInteractivo)
+                self.setValueComboBox(elementoInteractivo)
             else:
                 elementoInteractivo.delete("0","end")
     
+    def evaluarExcepciones(self):
+        try:
+            valoresVacios = self.tieneCamposVacios()
+            if len(valoresVacios) > 0:
+                raise iuEmptyValues(valoresVacios)
+
+            valoresPorDefecto = self.tieneCamposPorDefecto()
+            if len(valoresPorDefecto) > 0:
+                raise iuDefaultValues(valoresPorDefecto)
+            
+            return True
+        
+        except iuExceptions as e:
+            messagebox.showerror('Error', e.mostrarMensaje())
+            return False
+    
     def funAceptar(self):
         pass
+
+    def funVolver(self):
+        self._frameAnterior.mostrarFrame(self)
     
     def mostrarFrame(self, frameAnterior = None):
+
+        self._frameAnterior = frameAnterior
+
         if frameAnterior is not None:
             frameAnterior.pack_forget()
         self.pack(expand=True)
@@ -136,16 +173,33 @@ class FieldFrame(tk.Frame):
     def setFramesFuncionalidades(cls, framesFuncionalidades):
         FieldFrame._framesFuncionalidades = framesFuncionalidades
     
-    def tieneValoresPorDefecto(self):
+    def tieneCamposPorDefecto(self):
+
+        camposPorDefecto = []
+
         for i in range(0, len(self._infoElementosInteractuables)):
 
             valorPorDefecto = '' if self._infoElementosInteractuables[i] == None else self._infoElementosInteractuables[i][0] if len(self._infoElementosInteractuables[i]) == 1 else self._infoElementosInteractuables[i][1]
 
             if self.getValue(self._infoEtiquetas[i]) == valorPorDefecto:
-                return True
+                camposPorDefecto.append(self._infoEtiquetas[i])
         
-        return False
+        return camposPorDefecto
     
+    def tieneCamposVacios(self):
+
+        camposVacios = []
+
+        for elemento in self._elementosInteractivos:
+
+            if isinstance(elemento, tk.Entry) and self._infoElementosInteractuables[self._elementosInteractivos.index(elemento)] == None:
+                continue
+
+            if elemento.get() == '':
+                camposVacios.append(self._infoEtiquetas[self._elementosInteractivos.index(elemento)])
+        
+        return camposVacios
+
     def getElementosInteractivos(self):
         return self._elementosInteractivos
 
@@ -200,7 +254,7 @@ class FrameInicioSesion(FieldFrame):
     
     def funAceptar(self):
 
-        if not self.tieneValoresPorDefecto():
+        if self.evaluarExcepciones():
             tipoDocumentoSeleccionado = self.getValue('Seleccionar Tipo D.I. :')
 
             try:
@@ -220,10 +274,7 @@ class FrameInicioSesion(FieldFrame):
                     FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada).mostrarFrame(self)
 
                 else:
-                    self.logicaInicioProcesosFuncionalidades(clienteProceso)              
-
-        else:
-            messagebox.showerror('Error', 'No pueden haber campos vacíos o con valores por defecto')
+                    self.logicaInicioProcesosFuncionalidades(clienteProceso)
 
 class FrameCrearUsuario(FieldFrame):
 
@@ -244,7 +295,7 @@ class FrameCrearUsuario(FieldFrame):
         
     def funAceptar(self):
 
-        if not self.tieneValoresPorDefecto():
+        if self.evaluarExcepciones():
             nombreCliente = self.getValue('Nombre :')
 
             try:
@@ -258,10 +309,6 @@ class FrameCrearUsuario(FieldFrame):
             if confirmacionCliente:
                 self.logicaInicioProcesosFuncionalidades(Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual)))
         
-        else:
-            messagebox.showerror('Error', 'No pueden haber campos vacíos o con valores por defecto')
-        
-
 class FrameVentanaPrincipal(FieldFrame):
 
     def __init__(self):
@@ -320,7 +367,7 @@ class FrameReservarTicket(FieldFrame):
             tituloProceso = 'Reservar ticket',
             descripcionProceso = f'En este espacio solicitamos los datos necesarios para reservar un ticket, debe ingresar los datos de forma secuencial, es decir, en el orden en que se encuentran (Fecha Actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})',
             tituloCriterios = 'Criterios reserva',
-            textEtiquetas = ['Seleccionar película : ', 'Seleccionar formato : ', 'Seleccionar horario : '], 
+            textEtiquetas = ['Seleccionar película :', 'Seleccionar formato :', 'Seleccionar horario :'], 
             tituloValores = 'Valores ingresados',
             infoElementosInteractuables = [
                 [Pelicula.mostrarNombrePeliculas(
@@ -330,8 +377,12 @@ class FrameReservarTicket(FieldFrame):
                 [[], 'Seleccionar formato'], 
                 [[], 'Seleccionar horario']
             ],
-            habilitado = [False, False, False]
+            habilitado = [False, False, False],
+            botonVolver = True
         )
+
+        self._labelInfoPeliculaSeleccionada = tk.Label(self, text='', font= ("Verdana",12), anchor="center")
+        self._labelInfoPeliculaSeleccionada.grid(column=0, row=len(self._infoEtiquetas) + 4, columnspan=4)
 
         for elemento in self.getElementosInteractivos():
             elemento.grid_configure(sticky='we')
@@ -340,30 +391,53 @@ class FrameReservarTicket(FieldFrame):
         self._comboBoxFormatos = self.getElementosInteractivos()[1]
         self._comboBoxHorarios = self.getElementosInteractivos()[2]
 
+        self._comboBoxFormatos.configure(state = 'disabled')
+        self._comboBoxHorarios.configure(state = 'disabled')
+
         self._comboBoxPeliculas.bind('<<ComboboxSelected>>', self.setFormatos)
         self._comboBoxFormatos.bind('<<ComboboxSelected>>', self.setHorarios)
         
     def setFormatos(self, event):
-        nombrePeliculaSeleccionada = self.getValue('Seleccionar película : ')
+        nombrePeliculaSeleccionada = self.getValue('Seleccionar película :')
 
         self._formatosPeliSeleccionada = Pelicula.obtenerPeliculasPorNombre(nombrePeliculaSeleccionada, self._carteleraCliente)
 
         self._comboBoxFormatos.configure(values = [peli.getTipoDeFormato() for peli in self._formatosPeliSeleccionada])
 
+        self._comboBoxFormatos.configure(state = 'readonly')
+        self._comboBoxFormatos.set(self._infoElementosInteractuables[1][1])
+
+        self._comboBoxHorarios.configure(state = 'disabled')
+        self._comboBoxHorarios.set(self._infoElementosInteractuables[2][1])
+
+        self._labelInfoPeliculaSeleccionada.configure(text = '')
+
     def setHorarios(self, event):
         
         for pelicula in self._formatosPeliSeleccionada:
-            if pelicula.getTipoDeFormato() == self.getValue('Seleccionar formato : '):
+            if pelicula.getTipoDeFormato() == self.getValue('Seleccionar formato :'):
                 self._peliculaProceso = pelicula 
 
-
-        self._horariosPeliSeleccionada = self._peliculaProceso.filtrarHorariosPelicula()
+        self._horariosPeliSeleccionada = self._peliculaProceso.filtrarHorariosParaMostrar()
 
         self._comboBoxHorarios.configure(values = self._horariosPeliSeleccionada)
+        self._comboBoxHorarios.configure(state = 'readonly')
+
+        self._labelInfoPeliculaSeleccionada.configure(text = f'Precio: {self._peliculaProceso.getPrecio()}, Género: {self._peliculaProceso.getGenero()}')
     
-    #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
+    def funBorrar(self):
+        super().funBorrar()
+        self._comboBoxHorarios.configure(state = 'disabled')
+        self._comboBoxFormatos.configure(state = 'disabled')
+        self._labelInfoPeliculaSeleccionada.configure(text = '')
+    
+    def funAceptar(self):
+        if self.evaluarExcepciones():
+            pass
+        
+    
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
-    #Crear botón de volver en el FieldFrame (Crear un frame que almacene tres o dos botones según cierto parámetro, ese parámetro dará por defecto 2)
+   
 
 class FrameFuncionalidad5(FieldFrame):
 
@@ -487,7 +561,6 @@ def objetosBasePractica2():
     sucursalCine2.getServicios()[0].setCliente(cliente1)
 
     sucursalCine2.getServicios()[0].setInventario(sucursalCine2.getServicios()[0].actualizarInventario())
-    print(sucursalCine2.getServicios()[0].mostrarInventario())
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
