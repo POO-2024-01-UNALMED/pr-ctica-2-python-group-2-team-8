@@ -41,6 +41,7 @@ class SucursalCine:
         self._bonosCreados = []
         self._salasDeCine = []
         self._cartelera = []
+        self._tarjetasCinemar = []
         self._cantidadTicketsCreados = 1
     
 #Methods
@@ -584,6 +585,9 @@ class SucursalCine:
     
     def setFechaActual(self, fechaActual):
         SucursalCine._fechaActual = fechaActual
+
+    def getTarjetasCinemar(self):
+        return self._tarjetasCinemar
 
     @classmethod
     def getMetodosDePagoDisponibles(cls):

@@ -20,6 +20,7 @@ from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
 from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
+from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
 
 class FieldFrame(tk.Frame):
 
@@ -119,6 +120,7 @@ class FieldFrame(tk.Frame):
         if frameAnterior is not None:
             frameAnterior.pack_forget()
         self.pack(expand=True)
+        FieldFrame.setFrameMenuPrincipal(self)
     
     @classmethod
     def getClienteProceso(cls):
@@ -159,7 +161,7 @@ class FieldFrame(tk.Frame):
             FrameReservarTicket(), # <_ Funcionalidad 1
             FrameFuncionalidad2(), # <- Funcionalidad 2
             FrameFuncionalidad3Calificaciones(), # <- Funcionalidad 3
-            FrameReservarTicket(), # <- funcionalidad 4
+            FrameZonaJuegos(), # <- funcionalidad 4
             FrameFuncionalidad5() # <- Funcionalidad 5
         ]
 
@@ -286,7 +288,7 @@ class FrameVentanaPrincipal(FieldFrame):
         barraMenuPrincipal.add_cascade(label="Funcionalidades", menu= menuOpcionesPrincipal, font=("Courier", 9))
 
         menuOpcionesPrincipal.add_command(label="Reserva de tiquetes", command = self.ingresarFuncionalidad1)
-        menuOpcionesPrincipal.add_command(label="Zona de juegos", command="")
+        menuOpcionesPrincipal.add_command(label="Zona de juegos", command=self.ingresarFuncionalidad4)
         menuOpcionesPrincipal.add_command(label="Calificaciones", command=self.ingresarFuncionalidad3)
         menuOpcionesPrincipal.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
         menuOpcionesPrincipal.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
@@ -300,9 +302,21 @@ class FrameVentanaPrincipal(FieldFrame):
     def ingresarFuncionalidad3(evento):
         FieldFrame.getFramesFuncionalidades()[2].mostrarFrame(FieldFrame.getFrameMenuPrincipal())    
 
+    def ingresarFuncionalidad4(evento): 
+        FieldFrame.getFramesFuncionalidades()[3].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+
     def ingresarFuncionalidad5(evento):
         FieldFrame.getFramesFuncionalidades()[4].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
         FieldFrame.getFramesFuncionalidades()[4].crearBotonesMembresia()
+
+class FrameZonaJuegos(FieldFrame):
+    def __init__(self):
+
+        clienteProceso = FieldFrame.getClienteProceso()
+
+        #if clienteProceso
+
+        
 
 class FrameReservarTicket(FieldFrame):
 
@@ -363,6 +377,7 @@ class FrameReservarTicket(FieldFrame):
         self._horariosPeliSeleccionada = self._peliculaProceso.filtrarHorariosPelicula()
 
         self._comboBoxHorarios.configure(values = self._horariosPeliSeleccionada)
+
 class FrameFuncionalidad3Calificaciones(FieldFrame):
 
     def __init__(self):
@@ -495,10 +510,16 @@ def objetosBasePractica2():
     metodoPago3 = MetodoPago("Banco Agrario", 0.15, 300000)
     metodoPago4 = MetodoPago("Efectivo", 0, 5000000)
 
+    for sucursal in SucursalCine.getSucursalesCine():
+        for i in range (10):
+            sucursal.getTarjetasCinemar().append(TarjetaCinemar())
+    
+    print(len(sucursalCine1.getTarjetasCinemar()), len(sucursalCine2.getTarjetasCinemar()), len(sucursalCine1.getTarjetasCinemar()) ) 
+
     sucursalCine2.getServicios()[0].setCliente(cliente1)
 
     sucursalCine2.getServicios()[0].setInventario(sucursalCine2.getServicios()[0].actualizarInventario())
-    print(sucursalCine2.getServicios()[0].mostrarInventario())
+    #print(sucursalCine2.getServicios()[0].mostrarInventario())
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
@@ -539,7 +560,7 @@ def ventanaDeInicio():
     #botonIngreso.place(relx = 0.3, rely = 0.8462962963, relwidth=0.4, relheight = 0.1305555556)
 
 
-    # Función para cambiar la imagen cuando el mouse entra
+    # Función para cambiar la imagen cuando el mouse sale
     def cambiar_imagen(event):
         global indice_imagen
 
