@@ -158,7 +158,8 @@ class FieldFrame(tk.Frame):
 
             FrameReservarTicket(), # <_ Funcionalidad 1
             FrameFuncionalidad2(), # <- Funcionalidad 2
-            FrameFuncionalidad3Calificaciones(), # <- Funcionalidad 3
+            FrameReservarTicket(),
+            #FrameFuncionalidad3Calificaciones(), # <- Funcionalidad 3
             FrameReservarTicket(), # <- funcionalidad 4
             FrameFuncionalidad5() # <- Funcionalidad 5
         ]
@@ -169,6 +170,9 @@ class FieldFrame(tk.Frame):
         #Ejecutamos la lógica de la ventana del menú principal
         frameVentanaPrincipal.construirMenu()
         frameVentanaPrincipal.mostrarFrame(self)
+
+#class FremeOrden(FieldFrame):
+
     
 class FrameFuncionalidad2(FieldFrame):
     def __init__(self):
@@ -178,12 +182,18 @@ class FrameFuncionalidad2(FieldFrame):
         super().__init__(
             tituloProceso = "Generacion de orden",
             descripcionProceso = "En este apartado podras seleccionar el servicio que deseas para generar una orden",
-            tituloCriterios = "Servicio",
+            tituloCriterios = "Criterio servicio",
             textEtiquetas = ['Seleccione tipo de servicio'],
-            tituloValores = "Servicio al que deseas acceder",
-            infoElementosInteractuables = [self._sucursalActual.mostrarServicios()],
+            tituloValores = "Dato servicio",
+            infoElementosInteractuables = [[self._sucursalActual.mostrarServicios(), "Seleccione un servicio"]],
             habilitado = [False]
         )
+
+    #def funAceptar(self):
+    #    if not self.tieneValoresPorDefecto():
+            
+
+                 
 
 class FrameInicioSesion(FieldFrame):
 
@@ -363,17 +373,17 @@ class FrameReservarTicket(FieldFrame):
         self._horariosPeliSeleccionada = self._peliculaProceso.filtrarHorariosPelicula()
 
         self._comboBoxHorarios.configure(values = self._horariosPeliSeleccionada)
-class FrameFuncionalidad3Calificaciones(FieldFrame):
-
-    def __init__(self):
-        super().__init__(
-            tituloProceso="Calificaciones",
-            descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
-            tituloCriterios = 'Criterios reserva',
-            textEtiquetas= ["Seleccionar pelicula o producto a calificar: "],
-            tituloValores = 'Valores ingresados',
-            infoElementosInteractuables = [Cliente.mostrar_pelicula_para_calificar and Cliente.mostrar_productos_para_calificar]
-        )     
+#class FrameFuncionalidad3Calificaciones(FieldFrame):
+#
+#    def __init__(self):
+#        super().__init__(
+ #           tituloProceso="Calificaciones",
+  #          descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
+  #          tituloCriterios = 'Criterios reserva',
+ #           textEtiquetas= ["Seleccionar pelicula o producto a calificar: "],
+  #          tituloValores = 'Valores ingresados',
+  #          infoElementosInteractuables = [Cliente.mostrar_pelicula_para_calificar and Cliente.mostrar_productos_para_calificar]
+ #       )     
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
     #Crear botón de volver en el FieldFrame (Crear un frame que almacene tres o dos botones según cierto parámetro, ese parámetro dará por defecto 2)
@@ -404,6 +414,9 @@ def objetosBasePractica2():
 
     servicioComida = ServicioComida("comida", sucursalCine2)
     servicioSouvenirs = ServicioSouvenir("souvenir", sucursalCine2)
+
+    print(sucursalCine2.getServicios())
+    print(sucursalCine2.mostrarServicios())
 
     # Productos de la sucursal de Marinilla
 
