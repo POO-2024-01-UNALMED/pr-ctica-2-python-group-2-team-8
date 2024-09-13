@@ -1,3 +1,5 @@
+import math
+
 class Ticket:
     
 #Attributes
@@ -29,7 +31,7 @@ class Ticket:
         :return float: Retorna un float que corresponde al precio del ticket en caso de aplicarse o no el descuento.
         """
         
-        if (self._sucursalCompra.getCantidadTicketsGenerados() ** 1/2 ) % 1 == 0:
+        if math.sqrt(self._sucursalCompra.getCantidadTicketsGenerados()) % 1 == 0:
             if self._pelicula.getTipoDeFormato() == "4D" or self._pelicula.getTipoDeFormato() == "3D":
                 return self._pelicula.getPrecio() * 0.5
             else:
