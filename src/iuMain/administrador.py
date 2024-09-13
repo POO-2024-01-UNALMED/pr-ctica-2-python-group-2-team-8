@@ -158,7 +158,7 @@ class FieldFrame(tk.Frame):
 
             FrameReservarTicket(), # <_ Funcionalidad 1
             FrameFuncionalidad2(), # <- Funcionalidad 2
-            FrameReservarTicket(), # <- Funcionalidad 3
+            FrameFuncionalidad3Calificaciones(), # <- Funcionalidad 3
             FrameReservarTicket(), # <- funcionalidad 4
             FrameFuncionalidad5() # <- Funcionalidad 5
         ]
@@ -287,7 +287,7 @@ class FrameVentanaPrincipal(FieldFrame):
 
         menuOpcionesPrincipal.add_command(label="Reserva de tiquetes", command = self.ingresarFuncionalidad1)
         menuOpcionesPrincipal.add_command(label="Zona de juegos", command="")
-        menuOpcionesPrincipal.add_command(label="Calificaciones", command="")
+        menuOpcionesPrincipal.add_command(label="Calificaciones", command=self.ingresarFuncionalidad3)
         menuOpcionesPrincipal.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
         menuOpcionesPrincipal.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
     
@@ -296,6 +296,9 @@ class FrameVentanaPrincipal(FieldFrame):
     
     def ingresarFuncionalidad2(evento):
         FieldFrame.getFramesFuncionalidades()[1].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+
+    def ingresarFuncionalidad3(evento):
+        FieldFrame.getFramesFuncionalidades()[2].mostrarFrame(FieldFrame.getFrameMenuPrincipal())    
 
     def ingresarFuncionalidad5(evento):
         FieldFrame.getFramesFuncionalidades()[4].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
@@ -360,7 +363,14 @@ class FrameReservarTicket(FieldFrame):
         self._horariosPeliSeleccionada = self._peliculaProceso.filtrarHorariosPelicula()
 
         self._comboBoxHorarios.configure(values = self._horariosPeliSeleccionada)
-    
+class FrameFuncionalidad3Calificaciones(FieldFrame):
+
+    def __init__(self):
+        super().__init__(
+            tituloProceso="Calificaciones",
+            descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
+            textEtiquetas= []
+        )     
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
     #Crear botón de volver en el FieldFrame (Crear un frame que almacene tres o dos botones según cierto parámetro, ese parámetro dará por defecto 2)
@@ -373,14 +383,7 @@ class FrameFuncionalidad5(FieldFrame):
             descripcionProceso= f"Bienvenido a nuestro sistema de membresías. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
             textEtiquetas= []
         )
-class FrameFuncionalidad3Calificaciones(FieldFrame):
-
-    def __init__(self):
-        super().__init__(
-            tituloProceso="Calificaciones",
-            descripcionProceso= f"Bienvenido al apartado de calificaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
-            textEtiquetas= []
-        )   
+  
 
     def crearBotonesMembresia(self):
         botonBasico = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text="Básico").grid(padx=10, pady=10, row= 2, column=0)
@@ -388,14 +391,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
         botonGlobal = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Global").grid(padx=10, pady=10, row= 2, column=2)
         botonChallenger = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Challenger").grid(padx=10, pady=10, row= 2, column=3)
         botonRadiante = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Radiante").grid(padx=10, pady=10, row= 2, column=4)
-class FrameFuncionalidad3Calificaciones(FieldFrame):
 
-    def __init__(self):
-        super().__init__(
-            tituloProceso="Calificaciones",
-            descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
-            textEtiquetas= []
-        ) 
 
 def objetosBasePractica2():
 
