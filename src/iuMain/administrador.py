@@ -26,6 +26,7 @@ class FieldFrame(tk.Frame):
 
     _clienteProceso = None
     _frameMenuPrincipal = None
+    _framePasarelaDePagos = None
     _framesFuncionalidades = []
 
     def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = None, tituloValores = "", infoElementosInteractuables = None, habilitado = None):
@@ -94,7 +95,7 @@ class FieldFrame(tk.Frame):
         self._elementosInteractivos[indice].delete("0","end")
         self._elementosInteractivos[indice].insert(0, valor)
     
-    def setValueComoboBox(self, criterio):
+    def setValueComboBox(self, criterio):
         indice = self._elementosInteractivos.index(criterio)
         criterio.set(self._infoElementosInteractuables[indice][1])
 
@@ -105,6 +106,14 @@ class FieldFrame(tk.Frame):
     @classmethod
     def getFrameMenuPrincipal(cls):
         return FieldFrame._frameMenuPrincipal
+    
+    @classmethod
+    def setFramePasarelaDePagos(cls, framePasarelaDePagos):
+        FieldFrame._framePasarelaDePagos = framePasarelaDePagos
+
+    @classmethod
+    def getFramePasarelaDePagos(cls):
+        return FieldFrame._framePasarelaDePagos
 
     def funBorrar(self):
         for elementoInteractivo in self._elementosInteractivos:
@@ -160,13 +169,17 @@ class FieldFrame(tk.Frame):
 
             FrameReservarTicket(), # <_ Funcionalidad 1
             FrameFuncionalidad2(), # <- Funcionalidad 2
-            FrameFuncionalidad3Calificaciones(), # <- Funcionalidad 3
-            FrameZonaJuegos(), # <- funcionalidad 4
-            FrameFuncionalidad5() # <- Funcionalidad 5
+            #FrameFuncionalidad3Calificaciones(), # <- Funcionalidad 3
+            FrameFuncionalidad2(),
+            FrameReservarTicket(), # <- funcionalidad 4
+            FrameFuncionalidad5(), # <- Funcionalidad 5
         ]
 
         #Setteamos los frames de las funcionalidades al atributo de clase
         FieldFrame.setFramesFuncionalidades(framesFuncionalidades)
+        
+        #Setteamos el frame para los pagos.
+        FieldFrame.setFramePasarelaDePagos(FramePasarelaDePagos())
 
         #Ejecutamos la lógica de la ventana del menú principal
         frameVentanaPrincipal.construirMenu()
@@ -316,19 +329,8 @@ class FrameVentanaPrincipal(FieldFrame):
 
     def ingresarFuncionalidad5(evento):
         FieldFrame.getFramesFuncionalidades()[4].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
-        FieldFrame.getFramesFuncionalidades()[4].crearBotonesMembresia()
-
-class FrameZonaJuegos(FieldFrame):
-    def __init__(self):
-
-        clienteProceso = FieldFrame.getClienteProceso()
-
-        #if clienteProceso
-
-        
 
 class FrameReservarTicket(FieldFrame):
-
     def __init__(self):
 
         clienteProceso = FieldFrame.getClienteProceso()
@@ -387,13 +389,17 @@ class FrameReservarTicket(FieldFrame):
 
         self._comboBoxHorarios.configure(values = self._horariosPeliSeleccionada)
 
+
 class FrameFuncionalidad3Calificaciones(FieldFrame):
 
     def __init__(self):
         super().__init__(
             tituloProceso="Calificaciones",
             descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
-            textEtiquetas= []
+            tituloCriterios = 'Criterios reserva',
+            textEtiquetas= ["Seleccionar pelicula o producto a calificar: "],
+            tituloValores = 'Valores ingresados',
+            infoElementosInteractuables = [[Cliente.mostrar_pelicula_para_calificar() and Cliente.mostrar_productos_para_calificar()]]
         )     
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
@@ -402,20 +408,29 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
 class FrameFuncionalidad5(FieldFrame):
 
     def __init__(self):
+        clienteProceso = FieldFrame.getClienteProceso()
         super().__init__(
-            tituloProceso="Membresías",
-            descripcionProceso= f"Bienvenido a nuestro sistema de membresías. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
-            textEtiquetas= []
+            tituloProceso=f"Sistema de membresías.",
+            descripcionProceso= f"(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)}) \n {Membresia.verificarMembresiaActual(clienteProceso)}",
+            textEtiquetas=[""],
+            infoElementosInteractuables= [[Membresia.mostrarCategoria(clienteProceso, clienteProceso.getCineUbicacionActual()), "Seleccione membresía"]],
+            habilitado= [False]
         )
-  
 
-    def crearBotonesMembresia(self):
-        botonBasico = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text="Básico").grid(padx=10, pady=10, row= 2, column=0)
-        botonHeroico = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text = "Heroico").grid(padx=10, pady=10, row= 2, column=1)
-        botonGlobal = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Global").grid(padx=10, pady=10, row= 2, column=2)
-        botonChallenger = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Challenger").grid(padx=10, pady=10, row= 2, column=3)
-        botonRadiante = tk.Button(FieldFrame.getFramesFuncionalidades()[4], text= "Radiante").grid(padx=10, pady=10, row= 2, column=4)
+    def funAceptar(self):
+        FieldFrame.getFramePasarelaDePagos().mostrarFrame(self)
 
+class FramePasarelaDePagos(FieldFrame):
+
+    def __init__(self):
+        
+        super().__init__(
+            tituloProceso=f"Métodos de pago",
+            descripcionProceso=f"(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
+            textEtiquetas=[""],
+            infoElementosInteractuables=[None],
+            habilitado=[False]
+        )
 
 def objetosBasePractica2():
 
@@ -521,6 +536,8 @@ def objetosBasePractica2():
     metodoPago2 = MetodoPago("AV Villas", 0.05, 120000)
     metodoPago3 = MetodoPago("Banco Agrario", 0.15, 300000)
     metodoPago4 = MetodoPago("Efectivo", 0, 5000000)
+
+    Membresia.stockMembresia(SucursalCine.getSucursalesCine())
 
     for sucursal in SucursalCine.getSucursalesCine():
         for i in range (10):

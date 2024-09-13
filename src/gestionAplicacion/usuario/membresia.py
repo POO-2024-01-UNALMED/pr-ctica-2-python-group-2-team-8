@@ -12,6 +12,7 @@ class Membresia ():
         self._valorSuscripcionMensual = valorSuscripcionMensual
         self._duracionMembresiaDias = duracionMembresiaDias
         self._tipoMembresia = 0
+        SucursalCine.getTiposDeMembresia().append(self)
 
     #Metodos
     @classmethod
@@ -64,7 +65,7 @@ class Membresia ():
 	    <b>return</b>: <b>string</b> : Se retorna un texto mostrando el nombre de las categorias disponibles en la sucursal de la compra.
         """
 
-        resultado = "\n"
+        resultado = []
         i = 1
         membresiaActual = clienteProceso.getMembresia()
         nombreMembresiaActual = None
@@ -78,44 +79,32 @@ class Membresia ():
         #Se recorre la lista de tipos de membresia.
         for productoMembresia in sucursalCineProceso.getInventarioCine():
             #Se ignora los productos que no sean de tipo Membresia.
-            if (productoMembresia.getTipoProducto()=="Membresia"):
+            if (productoMembresia.getTipoProducto()!="Membresia"):
                 continue
 
-            if (resultado == "\n"):
-                if (productoMembresia.getCantidad == 0 and nombreMembresiaActual != productoMembresia.getNombre()):
-                    resultado = "Categoría " + i + ". " + productoMembresia.getNombre() + "(AGOTADA)\n"
-                    i+=1
-                    continue
+            if (productoMembresia.getCantidad == 0 and nombreMembresiaActual != productoMembresia.getNombre()):
+                texto = f"Categoría {i}. {productoMembresia.getNombre()} (AGOTADA)"
+                resultado.append(texto)
+                i+=1
+                continue
 
-                #Si el cliente ya tiene esta membresia y además, le faltan más de 5 dias para que expire, no se muestra en el menu.
-                elif(nombreMembresiaActual == productoMembresia.getNombre() and 
-                     (clienteProceso.getFechaLimiteMembresia() - datetime(6)) > SucursalCine.getFechaActual() and
-                     clienteProceso.getFechaLimiteMembresia() > SucursalCine.getFechaActual()):
-                    i+=1
-                    continue
-                else:
-                    resultado = "Categoría " + i + ". " + productoMembresia.getNombre() + ". Requisitos: " + int(productoMembresia.getPrecio) + " puntos." + "\n"
+            #Si el cliente ya tiene esta membresia y además, le faltan más de 5 dias para que expire, no se muestra en el menu.
+            elif(nombreMembresiaActual == productoMembresia.getNombre() and 
+                    (clienteProceso.getFechaLimiteMembresia() - datetime(6)) > SucursalCine.getFechaActual() and
+                    clienteProceso.getFechaLimiteMembresia() > SucursalCine.getFechaActual()):
+                i+=1
+                continue
 
-            else:
-                if (productoMembresia.getCantidad == 0 and nombreMembresiaActual != productoMembresia.getNombre()):
-                    resultado = "Categoría " + i + ". " + productoMembresia.getNombre() + "(AGOTADA)\n"
-                    i+=1
-                    continue
-
-                #Si el cliente ya tiene esta membresia y además, le faltan más de 5 dias para que expire, no se muestra en el menu.
-                elif(nombreMembresiaActual == productoMembresia.getNombre() and 
-                     (clienteProceso.getFechaLimiteMembresia() - datetime(6)) > SucursalCine.getFechaActual() and
-                     clienteProceso.getFechaLimiteMembresia() > SucursalCine.getFechaActual()):
-                    i+=1
-                    continue
-
-                elif(productoMembresia.getNombre() == "Challenger" or productoMembresia.getNombre() == "Radiante"):
+            elif(productoMembresia.getNombre() == "Challenger" or productoMembresia.getNombre() == "Radiante"):
                     if (productoMembresia.getNombre() == "Challenger"):
-                        resultado = resultado + "Categoria " + i + ". " + productoMembresia.getNombre() + "Requisitos: " + int(productoMembresia.getPrecio()) + " puntos y peliculas vistas: 10" + "\n"
+                        texto = f"Categoría {i}. {productoMembresia.getNombre()}. Requisitos: {int(productoMembresia.getPrecio())} puntos y peliculas vistas: 10"
+                        resultado.append(texto)
                     else:
-                        resultado = resultado + "Categoria " + i + ". " + productoMembresia.getNombre() + "Requisitos: " + int(productoMembresia.getPrecio()) + " puntos y peliculas vistas: 15" + "\n"
-                else:
-                    resultado = resultado + "Categoria " + i + ". " + productoMembresia.getNombre() + ". Requisitos: " + int(productoMembresia.getPrecio()) + " puntos." + "\n" 
+                        texto = f"Categoría {i}. {productoMembresia.getNombre()}. Requisitos: {int(productoMembresia.getPrecio())} puntos y peliculas vistas: 15"
+                        resultado.append(texto)
+            else:
+                texto = f"Categoría {i}. {productoMembresia.getNombre()}. Requisitos: {int(productoMembresia.getPrecio())} puntos"
+                resultado.append(texto)
             i+=1
         return resultado
 
@@ -229,11 +218,10 @@ class Membresia ():
         i = 50
         puntos = 0
         #Se revisa la lista de las sucursales de cine creadas.
-        for sucursalCine in sucursalesCine:
+        for sucursalCine in SucursalCine.getSucursalesCine():
             #Por cada membresia, se crea un producto de este tipo y se añade al inventario de la sucursal.
-            for membresia in SucursalCine.getTiposDeMembresia:
-                membresiaSucursal = Producto(membresia.getNombre(), "", i, "Membresia", "", puntos, "")
-                sucursalCine.getInventarioCine().append(membresiaSucursal)
+            for membresia in SucursalCine.getTiposDeMembresia():
+                membresiaSucursal = Producto(nombre=membresia.getNombre(), cantidad=i, tipoProducto="Membresia", precio=puntos, sucursalSede=sucursalCine)
                 puntos+=5000
                 i-=10
             #Se reinicia el contador de cantidad y puntos cada vez que se itere a una nueva sucursal de la lista.
