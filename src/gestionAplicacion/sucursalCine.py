@@ -41,6 +41,7 @@ class SucursalCine:
         self._bonosCreados = []
         self._salasDeCine = []
         self._cartelera = []
+        self._tarjetasCinemar = []
         self._cantidadTicketsCreados = 1
     
 #Methods
@@ -531,11 +532,13 @@ class SucursalCine:
             return sucursal_seleccionada
 
 
-    def mostrarServicios (self):
+    def mostrarServicios(self):
         s = []
         n = 0
         for servicio in self._servicios:
-            s.append(f"{n+1}. {servicio.getNombre()}")
+            n = n+1
+            s.append(f"{n}. " + servicio.getNombre())
+        return s
 
 
 #Getters and Setters
@@ -584,6 +587,9 @@ class SucursalCine:
     
     def setFechaActual(self, fechaActual):
         SucursalCine._fechaActual = fechaActual
+
+    def getTarjetasCinemar(self):
+        return self._tarjetasCinemar
 
     @classmethod
     def getMetodosDePagoDisponibles(cls):

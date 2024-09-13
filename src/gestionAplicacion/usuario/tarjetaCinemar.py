@@ -1,6 +1,6 @@
 class TarjetaCinemar:
 
-  def __init__(self, saldo, dueno):
+  def __init__(self, saldo = 0, dueno = None):
 
     self._saldo = saldo
     self._dueno = dueno
