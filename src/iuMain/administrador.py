@@ -479,12 +479,18 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
 
     
 
-    clienteProceso = FieldFrame.getClienteProceso()
-    peliculasCalificar = Cliente.getPeliculasDisponiblesParaCalificar()
-    productosCalificar = Cliente.getProductosDisponiblesParaCalificar()
+  
+    
+    
 
     def __init__(self):
+        self._clienteProceso = FieldFrame.getClienteProceso()
+        self._peliculasCalificar = self._clienteProceso.getPeliculasDisponiblesParaCalificar()
+        self._productosCalificar = self._clienteProceso.getProductosDisponiblesParaCalificar()
         super().__init__(
+
+           
+            
             tituloProceso="Calificaciones",
             descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas, en este espacio podras calificar nuestros servicios dependiendo tus gustos y aficiones.(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
             tituloCriterios = 'Criterios para calificar',
@@ -492,10 +498,10 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
             tituloValores = 'Valores ingresados',
             infoElementosInteractuables = [
                 [Cliente.mostrarPeliculaParaCalificar(
-                    peliculasDisponiblesParaCalificar = peliculasCalificar), 'Selecionar película'],
+                    peliculasDisponiblesParaCalificar = self.peliculasCalificar), 'Selecionar película'],
                 [Cliente.mostrarProductosParaCalificar(
-                    productosDisponiblesParaCalificar = productosCalificar), 'Seleccionar formato'], 
-                [[], 'Seleccionar horario']
+                    productosDisponiblesParaCalificar = self.productosCalificar), 'Seleccionar producto'], 
+                [[], 'Ingresa tu valoracion']
             ],
             habilitado = [False, False, False],
             botonVolver = True

@@ -471,12 +471,12 @@ class SucursalCine:
 #la peor calificacion, osea, la pelicula mas deficiente segun los gustos de los clientes, con esta pelicula vamos 
 #a generar combos en recompensa a los clientes que nos dejaron sus reseñas.
 
-    def peor_pelicula(self):
-        pelicula_peor_calificada = None
-        primera_comparacion = True
+    def peorPelicula(self):
+        peliculaPeorCalificada = None
+        primeraComparacion = True
 
         for pelicula in self.cartelera:
-            if pelicula.seleccionar_horario_mas_lejano() is None:
+            if pelicula.seleccionarHorarioMasLejano() is None:
                 continue
 
             if primeraComparacion:

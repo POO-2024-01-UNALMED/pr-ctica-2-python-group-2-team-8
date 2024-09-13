@@ -41,7 +41,7 @@ class Cliente():
     #una pelicula que no haya visto.
 
     def mostrarPeliculaParaCalificar(peliculasDisponiblesParaCalificar):
-        peliculas = ""
+        peliculas = []
         for i, pelicula in peliculasDisponiblesParaCalificar:
             if peliculas:
                 peliculas += "\n"
@@ -53,7 +53,7 @@ class Cliente():
     #un producto que no haya consumido.
 
     def mostrarProductosParaCalificar(productosDisponiblesParaCalificar):
-        pedidos = ""
+        pedidos = []
         for i, producto in productosDisponiblesParaCalificar:
             if pedidos:
                 pedidos += "\n"
