@@ -18,6 +18,8 @@ class Cliente():
         #Atributos Funcionalidad 2
 
         #Atributos Funcionalidad 3
+        self._peliculasDisponiblesParaCalificar = []
+        self._productosDisponiblesParaCalificar = []
 
         #Atributos Funcionalidad 4
         self._cuenta = cuenta
@@ -38,9 +40,9 @@ class Cliente():
     #hacer una calificacion en concreto de las peliculas que el cliente se vio, evitando que el cliente pueda calificar 
     #una pelicula que no haya visto.
 
-    def mostrar_pelicula_para_calificar(peliculas_disponibles_para_calificar):
+    def mostrarPeliculaParaCalificar(peliculasDisponiblesParaCalificar):
         peliculas = ""
-        for i, pelicula in enumerate(peliculas_disponibles_para_calificar, start=1):
+        for i, pelicula in peliculasDisponiblesParaCalificar:
             if peliculas:
                 peliculas += "\n"
             peliculas += f"{i}. {pelicula.nombre} {pelicula.tipo_de_formato}"
@@ -50,9 +52,9 @@ class Cliente():
     # para poder  hacer una calificacion en concreto de los productos que el cliente cosnumio, evitando que el cliente pueda calificar 
     #un producto que no haya consumido.
 
-    def mostrar_productos_para_calificar(productos_disponibles_para_calificar):
+    def mostrarProductosParaCalificar(productosDisponiblesParaCalificar):
         pedidos = ""
-        for i, producto in enumerate(productos_disponibles_para_calificar, start=1):
+        for i, producto in productosDisponiblesParaCalificar:
             if pedidos:
                 pedidos += "\n"
             pedidos += f"{i}. {producto.nombre} {producto.tamaño}"
@@ -237,4 +239,15 @@ class Cliente():
     
     def setMetodosdePago(self, metodosDePago):
         self._metodosDePago = metodosDePago
+
+    def getPeliculasDisponiblesParaCalificar(self):
+        return self._peliculasDisponiblesParaCalificar
+
+    def setNombre(self, peliculasDisponiblesParaCalificar):
+        self._peliculasDisponiblesParaCalificar = peliculasDisponiblesParaCalificar    
     
+    def getProductosDisponiblesParaCalificar(self):
+        return self._productosDisponiblesParaCalificar
+
+    def setNombre(self, productosDisponiblesParaCalificar):
+        self._productosDisponiblesParaCalificar = productosDisponiblesParaCalificar 

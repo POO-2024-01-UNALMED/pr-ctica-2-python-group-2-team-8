@@ -477,20 +477,33 @@ class FrameReservarTicket(FieldFrame):
         
 class FrameFuncionalidad3Calificaciones(FieldFrame):
 
+    
+
+    clienteProceso = FieldFrame.getClienteProceso()
+    peliculasCalificar = Cliente.getPeliculasDisponiblesParaCalificar()
+    productosCalificar = Cliente.getProductosDisponiblesParaCalificar()
+
     def __init__(self):
         super().__init__(
             tituloProceso="Calificaciones",
-            descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas. (Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
-            tituloCriterios = 'Criterios reserva',
+            descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas, en este espacio podras calificar nuestros servicios dependiendo tus gustos y aficiones.(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
+            tituloCriterios = 'Criterios para calificar',
             textEtiquetas= ["Seleccionar pelicula o producto a calificar: "],
             tituloValores = 'Valores ingresados',
-            infoElementosInteractuables = [None],#[Cliente.mostrar_pelicula_para_calificar() and Cliente.mostrar_productos_para_calificar()]]
-            habilitado = [True],
+            infoElementosInteractuables = [
+                [Cliente.mostrarPeliculaParaCalificar(
+                    peliculasDisponiblesParaCalificar = peliculasCalificar), 'Selecionar película'],
+                [Cliente.mostrarProductosParaCalificar(
+                    productosDisponiblesParaCalificar = productosCalificar), 'Seleccionar formato'], 
+                [[], 'Seleccionar horario']
+            ],
+            habilitado = [False, False, False],
             botonVolver = True
+                   
         )     
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
-   
+    
 
 class FrameFuncionalidad5(FieldFrame):
 
@@ -572,6 +585,8 @@ def objetosBasePractica2():
     pelicula1_5.crearPeliculas()
     pelicula1_6 = Pelicula("Spy x Familiy Código: Blanco", 19000, "Infantil", timedelta( minutes=90 ), "+5", "2D", sucursalCine1)
     pelicula1_6.crearPeliculas()
+
+    
 
     salaDeCine2_1 = SalaCine(1, "2D", sucursalCine2)
     salaDeCine2_2 = SalaCine(2, "3D", sucursalCine2)
