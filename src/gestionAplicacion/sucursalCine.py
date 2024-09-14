@@ -556,7 +556,7 @@ class SucursalCine:
         n = 0
         for servicio in self._servicios:
             n = n+1
-            s.append(f"{n}. " + servicio.getNombre())
+            s.append("Servicio " + servicio.getNombre())
         return s
 
 

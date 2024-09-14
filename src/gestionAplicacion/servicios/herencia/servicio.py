@@ -12,7 +12,7 @@ class Servicio (ABC):
         self._bonosCliente = []
         self._valorPedido = 0.0
         self._sucursalUbicacion = sucursalUbicacion
-        sucursalUbicacion.getServicios().append(self)
+        self._sucursalUbicacion.getServicios().append(self)
 
         
     @abstractmethod

@@ -54,6 +54,13 @@ class FieldFrame(tk.Frame):
         tituloVal = tk.Label(self, text = tituloValores, font= ("Verdana bold",20), anchor="center")
         tituloVal.grid(column=1, row=2, padx = (10,10), pady = (10,10))
 
+####################################################################################################
+####################################################################################################
+####################################################################################################
+####################################################################################################
+####################################################################################################
+####################################################################################################
+
         for i in range(len(textEtiquetas)):
 
             labelCriterio = tk.Label(self, text = textEtiquetas[i], font= ("Verdana",12), anchor="center")
@@ -241,8 +248,27 @@ class FieldFrame(tk.Frame):
         #Setteamos los frames de las funcionalidades al atributo de clase
         FieldFrame.setFramesFuncionalidades(framesFuncionalidades)
 
-#class FremeOrden(FieldFrame):
+####################################################################################################
+####################################################################################################
+####################################################################################################
+####################################################################################################
+####################################################################################################
+####################################################################################################
 
+class FrameGeneracionDeProductos(FieldFrame):
+    def __init__(self, servicio):
+        servicio.setCliente(self._clienteProceso)
+        servicio.setInventario(servicio.actualizarInventario())
+
+        super().__init__(
+            tituloProceso = "Generacion de orden",
+            descripcionProceso = "En este apartado podras seleccionar los productos que deseas comprar",
+            tituloCriterios = "Criterio de la orden",
+            textEtiquetas = ['Producto',"Cantidad"],
+            tituloValores = "Datos de compra",
+            infoElementosInteractuables = [[servicio.mostrarInventario(), "Seleccione un Producto"],None],
+            habilitado = [False,True]
+        )
     
 class FrameFuncionalidad2(FieldFrame):
     def __init__(self):
@@ -259,11 +285,17 @@ class FrameFuncionalidad2(FieldFrame):
             habilitado = [False]
         )
 
-    #def funAceptar(self):
-    #    if not self.tieneValoresPorDefecto():
-            
-
-                 
+    def funAceptar(self):
+        if not self.tieneCamposPorDefecto():
+            if len(self._sucursalActual.getServicios())>1:
+                if self._elementosInteractivos[0].get() == "Servicio comida":
+                    FrameGeneracionDeProductos(self._sucursalActual.getServicios()[0]).mostrarFrame(self)
+                else:
+                    FrameGeneracionDeProductos(self._sucursalActual.getServicios()[1]).mostrarFrame(self)
+            else:
+                FrameGeneracionDeProductos(self._sucursalActual.getServicios()[0]).mostrarFrame(self)
+        else:
+           messagebox.showerror("Error","Por favor seleccione un servicio")
 
 class FrameInicioSesion(FieldFrame):
 
@@ -319,6 +351,11 @@ class FrameCrearUsuario(FieldFrame):
 
     #Construimos el frame usando FieldFrame
     def __init__(self, tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada):
+
+        self._imagenFramePrincipal = tk.PhotoImage(file = 'src/iuMain/imagenes/fachadaCine.png')
+        self._labelImagen = tk.Label(self, image = self._imagenFramePrincipal)
+        self._labelImagen.grid(row=0, column=0)
+
         super().__init__(
             tituloProceso = 'Crear Usuario', 
             descripcionProceso = 'Hemos detectado que es la primera vez que visitas nuestras sucursales, te invitamos a diligenciar el siguiente formulario de registro',
@@ -1016,9 +1053,6 @@ def objetosBasePractica2():
     servicioComida = ServicioComida("comida", sucursalCine2)
     servicioSouvenirs = ServicioSouvenir("souvenir", sucursalCine2)
 
-    print(sucursalCine2.getServicios())
-    print(sucursalCine2.mostrarServicios())
-
     # Productos de la sucursal de Marinilla
 
     producto1 = Producto("Hamburguesa","Grande","comida",20000,200,"Normal",sucursalCine2)
@@ -1120,11 +1154,6 @@ def objetosBasePractica2():
             sucursal.getTarjetasCinemar().append(TarjetaCinemar())
     
     #print(len(sucursalCine1.getTarjetasCinemar()), len(sucursalCine2.getTarjetasCinemar()), len(sucursalCine1.getTarjetasCinemar()) ) 
-
-    sucursalCine2.getServicios()[0].setCliente(cliente1)
-
-    sucursalCine2.getServicios()[0].setInventario(sucursalCine2.getServicios()[0].actualizarInventario())
-    #print(sucursalCine2.getServicios()[0].mostrarInventario())
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 

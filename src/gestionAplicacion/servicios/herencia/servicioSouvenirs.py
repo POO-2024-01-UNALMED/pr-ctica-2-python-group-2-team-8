@@ -10,7 +10,7 @@ class ServicioSouvenir(Servicio):
         inventario_general = self.cliente.getCineUbicacionActual().getInventarioCine()
         inventario = []
         for producto in inventario_general:
-            if producto.getTipoProducto() == "souvenir" and len(inventario_general) > 0:
+            if producto.getTipoProducto() == "souvenir":
                 inventario.append(producto)
         return inventario
 
