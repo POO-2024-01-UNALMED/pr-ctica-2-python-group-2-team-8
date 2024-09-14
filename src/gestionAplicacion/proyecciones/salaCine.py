@@ -93,7 +93,8 @@ class SalaCine:
         if not self._asientos[fila][columna].isDisponibilidad():
             self._asientos[fila][columna].setDisponibilidad(True)
 
-    def filtrarSalasDeCine(self, sucursalCine):
+    @classmethod
+    def filtrarSalasDeCine(cls, sucursalCine):
 
         """
         :Description: Este método se encarga de filtrar las salas de cine según si su película aún se encuentra en presentación,
@@ -110,14 +111,43 @@ class SalaCine:
 
         for salaDeCine in sucursalCine.getSalasDeCine():
             try:
-                if salaDeCine._horarioPeliculaEnPresentacion + salaDeCine._peliculaEnPresentacion.getDuracion() > self._sucursalUbicacion.getFechaActual():
+                if salaDeCine._horarioPeliculaEnPresentacion + salaDeCine._peliculaEnPresentacion.getDuracion() > sucursalCine.getFechaActual():
                     salasConPeliculasEnPresentacion.append(salaDeCine)
             except AttributeError:
                 pass
 
         return salasConPeliculasEnPresentacion
 
-    #def mostrarSalaCine
+    @classmethod
+    def mostrarSalasCine(cls, filtroSalasDeCine, clienteProceso):
+
+        """
+        :Description: Este método se encarga de generar una lista con el número de sala de las salas de cine, sugiriendo
+        la sala de cine que debería seleccionar el cliente en base a su lista de tickets
+
+        :param filtroSalasDecine: Este método recibe como parámetro el filtro de salas de cine realizado previamente
+
+        :param clienteProceso: Este método recibe como parámetro el cliente que accede a este servicio, con el fin de obtener
+        su lista de tickets para realizar la recomendación
+
+        :return salaCineStr: Este métod retorna una lista de Strings con el número de la sala de cine y, en caso de requerirlo,
+        la recomendación de ingreso
+        """
+
+        salasCineStr = []
+
+        for salaCine in filtroSalasDeCine:
+            salaAñadida = False
+            for ticket in clienteProceso.getTickets():
+                if ticket.getHorario() == salaCine._horarioPeliculaEnPresentacion and ticket.getSalaCine() is salaCine:
+                    salasCineStr.append(f'Recomendada: Sala #{salaCine._numeroSala}')
+                    salaAñadida = True
+            
+            if not salaAñadida:
+                salasCineStr.append(f'Sala #{salaCine._numeroSala}')
+        
+        return salasCineStr
+            
 
     def verificarTicket(self, cliente):
 
