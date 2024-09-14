@@ -31,7 +31,7 @@ class FieldFrame(tk.Frame):
     _framePasarelaDePagos = None
     _framesFuncionalidades = []
 
-    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = "", tituloValores = "", infoElementosInteractuables = None, habilitado = None, botonVolver = False):
+    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = "", tituloValores = "", infoElementosInteractuables = None, habilitado = None, botonVolver = False, desplazarBotonesFila = 0):
         super().__init__(ventanaLogicaProyecto)
         self._tituloCriterios = tituloCriterios
         self._infoEtiquetas = textEtiquetas
@@ -94,13 +94,13 @@ class FieldFrame(tk.Frame):
             tk.Button(frameBotones, text="Borrar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funBorrar,
             width=12,height=2).grid(pady = (10,10), padx=(20, 20), column = 2, row = len(self._infoEtiquetas)+3, sticky = 'we')
 
-            frameBotones.grid(column = 0, row = len(self._infoEtiquetas) + 3, columnspan=2, sticky='we')
+            frameBotones.grid(column = 0, row = len(self._infoEtiquetas) + 3 + desplazarBotonesFila, columnspan=2, sticky='we')
         
         else:
             tk.Button(self, text="Borrar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funBorrar,
-            width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = len(self._infoEtiquetas)+3)
+            width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = len(self._infoEtiquetas)+3 + desplazarBotonesFila)
             tk.Button(self, text="Aceptar", font = ("Verdana", 12), fg = "white", bg = "gray", command=self.funAceptar,
-            width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 0, row = len(self._infoEtiquetas)+3)
+            width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 0, row = len(self._infoEtiquetas)+3 + desplazarBotonesFila)
 
     def getValue(self, criterio):
         indice = self._infoEtiquetas.index(criterio)
@@ -167,7 +167,7 @@ class FieldFrame(tk.Frame):
         if frameAnterior is not None:
             frameAnterior.pack_forget()
         self.pack(expand=True)
-        FieldFrame.setFrameMenuPrincipal(self)
+        #FieldFrame.setFrameMenuPrincipal(self) <- Genera error al usar el botón volver
     
     @classmethod
     def getClienteProceso(cls):
@@ -616,12 +616,13 @@ class FrameReservarTicket(FieldFrame):
                 [[], 'Seleccionar horario']
             ],
             habilitado = [False, False, False],
-            botonVolver = True
+            botonVolver = True,
+            desplazarBotonesFila = 1
         )
 
         #Creamos un Label que almacenará información extra sobre la película seleccionada
         self._labelInfoPeliculaSeleccionada = tk.Label(self, text='', font= ("Verdana",12), anchor="center")
-        self._labelInfoPeliculaSeleccionada.grid(column=0, row=len(self._infoEtiquetas) + 4, columnspan=4)
+        self._labelInfoPeliculaSeleccionada.grid(column=0, row=len(self._infoEtiquetas) + 3, columnspan=4)
 
         #Expandimos los comboBox creados para visualizar mejor su contenido
         for elemento in self.getElementosInteractivos():
@@ -701,18 +702,18 @@ class FrameReservarTicket(FieldFrame):
             #Convertimos el horario obtenido de str a datetime
             self._horarioProceso = datetime.strptime(horarioString, '%Y-%m-%d %H:%M:%S')
 
-            #Evaluamos si el horario seleccionado fue un horario en presentación
-
             #Confirmamos las elecciones del usuario
-            confirmacion = messagebox.askokcancel('Confirmación datos', f'Has seleccionado {self._peliculaProceso.getNombre()}; con formato: {self._peliculaProceso.getTipoDeFormato()}; en el horario: {self._horarioProceso}')
+            confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado {self._peliculaProceso.getNombre()}; con formato: {self._peliculaProceso.getTipoDeFormato()}; en el horario: {self._horarioProceso}')
 
-            if confirmacion:
+            if confirmacionUsuario:
                 #Construimos el frame con la información obtenida y lo mostramos
                 FrameSeleccionarAsiento(self._peliculaProceso, self._horarioProceso, estaEnPresentacion).mostrarFrame(self)
     
-    #Crear FrameSalaCine
     #Crear FrameSalaDeEspera
     #Hacer testeos
+
+class FrameFuncionalidad1():
+    pass
 
 class FrameSeleccionarAsiento(FieldFrame):
     def __init__(self, peliculaProceso, horarioProceso, estaEnPresentacion):
@@ -805,14 +806,79 @@ class FrameSeleccionarAsiento(FieldFrame):
                     #Ingresamos a la pasarela de pago
                     pass
 
+class FrameIngresoASalaCine(FieldFrame):
+    
+    def __init__(self):
+        
+        #Facilitamos el acceso al cliente que realiza el proceso de ingreso a la sala de cine
+        self._clienteProceso = FieldFrame.getClienteProceso()
+
+        #Creamos variables de instancia
+        self._salasDeCineDisponibles = SalaCine.filtrarSalasDeCine(self._clienteProceso.getCineUbicacionActual())
+        self._salaCineSelccionada = None
+
+        #Facilitramos el acceso a la información de salas de cine
+        infoSalasDeCine = SalaCine.mostrarSalasCine(self._salasDeCineDisponibles, self._clienteProceso)
+
+        #Usamos el constructor de FieldFrame
+        super().__init__(
+            tituloProceso = 'Ingreso a sala de cine',
+            descripcionProceso = f'En este apartado puedes acceder a alguna de nuestras salas de cine disponibles haciendo uso de algún ticket reservado previamente.\nInstrucciones de uso:\n1. Se recomendará la sala de cine a la que puedes ingresar en estos momentos.\n2. Tras seleccionar una sala de cine, podrás ver información detallada sobre ella. \n(Fecha actual: {self._clienteProceso.getCineUbicacionActual().getFechaActual()})',
+            tituloCriterios = 'Criterios sala cine',
+            textEtiquetas = ['Seleccionar sala cine: '],
+            tituloValores = 'Salas disponibles',
+            infoElementosInteractuables = [[infoSalasDeCine, 'Selecciona la sala de cine']],
+            habilitado = [False],
+            botonVolver = True,
+            desplazarBotonesFila = 1
+        )
+
+        #Creamos un label para mostrar la información de la sala de cine seleccionada
+        self._labelInfoSalaCine = tk.Label(self, text='', font= ("Verdana",12), anchor="center")
+        self._labelInfoSalaCine.grid(column=0, row=len(self._infoEtiquetas) + 3, columnspan=4)
+        
+        #Facilitamos el acceso al comboBox creado y le asignamos un evento
+        self._comboBoxSalaCine = self.getElementosInteractivos()[0]
+        self._comboBoxSalaCine.bind('<<ComboboxSelected>>', self._setInfoSalaCine)
+
+    def _setInfoSalaCine(self, evento):
+        #Seleccionamos la sala de cine y seteamos la información de la sala de cine en el Label
+        self._salaCineSelccionada = self._seleccionarSalaCine()
+        self._labelInfoSalaCine.configure(text = f'Película en presentación: {self._salaCineSelccionada.getPeliculaEnPresentacion().getNombre()}.\nHorario inicio presentación: {self._salaCineSelccionada.getHorarioPeliculaEnPresentacion()}')
+    
+    def _seleccionarSalaCine(self):
+        #Obtenemos el número de sala de cine
+        numeroSalaDeCine = int(self._comboBoxSalaCine.get().split('#')[1])
+        
+        #Iteramos sobre las salas de cine y retornamos la sala de cine coincida con el número de sala obtenido
+        for salaCine in self._salasDeCineDisponibles:
+            if salaCine.getNumeroSala() == numeroSalaDeCine:
+                return salaCine
+    
+    def funBorrar(self):
+        super().funBorrar()
+        self._labelInfoSalaCine.configure(text = '')
+
+    def funAceptar(self):
+        #Evaluamos las excepciones
+        if self.evaluarExcepciones():
+
+            #Confirmamos la elección del usuario
+            confirmarEleccion = messagebox.askokcancel('Confirmación dato seleccionado', f'Has seleccionado la sala de cine #{self._salaCineSelccionada.getNumeroSala()}, ¿Es esto correcto?')
+            
+            if confirmarEleccion:
+                #Validamos si puede ingresar a la sala de cine
+                if self._salaCineSelccionada.verificarTicket(self._clienteProceso):
+                    #Ingresamos al visual frame de sala de cine
+                    pass
+                else:
+                    messagebox.showerror('Error', 'No tienes un ticket válido para ingresar a esta sala de cine')
+
+class FrameSalaDeEspera(FieldFrame):
+    pass
+
 class FrameFuncionalidad3Calificaciones(FieldFrame):
-
     
-
-  
-    
-    
-
     def __init__(self):
         self._clienteProceso = FieldFrame.getClienteProceso()
         self._peliculasCalificar = self._clienteProceso.getPeliculasDisponiblesParaCalificar()
