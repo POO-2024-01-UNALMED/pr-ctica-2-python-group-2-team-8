@@ -251,3 +251,9 @@ class Cliente():
 
     def setNombre(self, productosDisponiblesParaCalificar):
         self._productosDisponiblesParaCalificar = productosDisponiblesParaCalificar 
+    
+    def getCuenta(self):
+        return self._cuenta
+    
+    def setCuenta(self, cuenta):
+        self._cuenta = cuenta

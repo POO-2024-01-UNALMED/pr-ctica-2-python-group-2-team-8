@@ -30,7 +30,7 @@ class FieldFrame(tk.Frame):
     _framePasarelaDePagos = None
     _framesFuncionalidades = []
 
-    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = None, tituloValores = "", infoElementosInteractuables = None, habilitado = None, botonVolver = False):
+    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = "", tituloValores = "", infoElementosInteractuables = None, habilitado = None, botonVolver = False):
         super().__init__(ventanaLogicaProyecto)
         self._tituloCriterios = tituloCriterios
         self._infoEtiquetas = textEtiquetas
@@ -353,7 +353,7 @@ class FrameVentanaPrincipal(FieldFrame):
         barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Courier", 9))
         ventanaLogicaProyecto.config(menu=barraMenuPrincipal)
         menuOpcionesPrincipal = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Courier", 9), activebackground= "grey", activeforeground="black")
-        barraMenuPrincipal.add_cascade(label="Funcionalidades", menu= menuOpcionesPrincipal, font=("Courier", 9))
+        barraMenuPrincipal.add_cascade(label="Procesos y Consultas", menu= menuOpcionesPrincipal, font=("Courier", 9))
 
         menuOpcionesPrincipal.add_command(label="Reserva de tiquetes", command = self.ingresarFuncionalidad1)
         menuOpcionesPrincipal.add_command(label="Zona de juegos", command=self.ingresarFuncionalidad4)
@@ -377,11 +377,109 @@ class FrameVentanaPrincipal(FieldFrame):
         FieldFrame.getFramesFuncionalidades()[4].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
 
 class FrameZonaJuegos(FieldFrame):
+    
+    #clienteProceso = FieldFrame.getClienteProceso()
+
     def __init__(self):
 
-        clienteProceso = FieldFrame.getClienteProceso()
 
-        #if clienteProceso
+        tituloProceso = 'Zona de Juegos\n'
+        descripcionProceso ='En este espacio podras hacer uso de todos nuestros juegos y conseguir recompensas pagando con tu tarjeta cinemar, la cual podras adquirir y recargar en este mismo espacio.\n'
+        botonVolver = True
+        fecha = f'Fecha Actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}\nHora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)}\n'
+
+        super().__init__(
+            tituloProceso = tituloProceso,
+            descripcionProceso = descripcionProceso,
+            botonVolver = botonVolver  
+        )
+
+        #se destruyen todos los widgets creados por el init del padre
+        for widget in self.winfo_children():
+
+            widget.destroy()
+        
+        #se añaden widgets con el uso de canvas para dar mas estetica
+        self._imagenFondo = tk.PhotoImage(file = 'src/iuMain/imagenes/ZonaJuegos.png')
+
+        self.canvas =tk.Canvas(self, width=self._imagenFondo.width(), height=self._imagenFondo.height())
+        self.canvas.pack()
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self._imagenFondo)
+        
+        self.canvas.create_text(320, 100, text=tituloProceso, fill="black", font= ("Showcard Gothic",30))
+        self.canvas.create_text(320, 200, text=descripcionProceso, fill="black", font= ("Lucida Console",15, "bold"), width=500)
+        self.canvas.create_text(320, 310, text=fecha, fill="black", font= ("Lucida Console",15, "bold"))
+
+        boton1 = tk.Button(self, text="Ingresar", font= ("Lucida Console",15, "bold"), fg = "black", bg = "light blue",command=self.funAceptar, width=12,height=2)
+        boton2 = tk.Button(self, text="Volver", font= ("Lucida Console",15, "bold"), fg = "black", bg = "light blue", command=self.funVolver, width=12,height=2)
+
+        self.canvas.create_window(230, 380, window=boton1, anchor="center")
+        self.canvas.create_window(420, 380, window=boton2, anchor="center")
+    
+    #Metodo para el boton ingresar
+    def funAceptar(self):
+        if FieldFrame.getClienteProceso().verificarCuenta():
+            pass
+        else: 
+            self.AlertaSinCuenta()
+
+    #Metodo para mostrar alerta cuando el cliente no tiene cuenta
+    def AlertaSinCuenta(self):
+
+        mensaje = messagebox.askyesno("Sin Cuenta", "•No tienes una Tarjeta Cinemar asociada, ¿Deseas Adquirirla?  🤔 -> 💳❔")
+
+        if mensaje:
+
+            label_ids = [] #lista que almacena los label_ids
+
+            #Se añaden al canvas para simular una cuenta regresiva con el for
+            for i in range(5,0,-1):
+
+                label = tk.Label(
+                        self, 
+                        text="Se le restará el precio de la tarjeta($5000) al saldo de su tarjeta. Redireccionando en " + str(i), 
+                        font=("Lucida Console", 11, "bold"), 
+                        width=500, 
+                        fg="black", 
+                        bg="sky blue", 
+                        bd=2, 
+                        relief="solid",
+                        wraplength= 500
+                        
+                    )
+                
+                #Se añaden al canvas para simular una cuenta regresiva
+                self.canvas.after(1500 * (5 - i), lambda lbl=label: label_ids.append(self.canvas.create_window(320, 450, window=lbl)))
+
+
+                #Metodos para eliminar los labels creados
+                def eliminar_labels():
+                    for label_id in label_ids:
+                        self.canvas.delete(label_id)
+            
+
+                # Tiempo total para que los Labels se muestren y luego se eliminen (5 etiquetas * 1.5 segundos = 7.5 segundos)
+                self.canvas.after(7500, eliminar_labels)
+        else:
+            label = tk.Label(
+                        self, 
+                        text="Recuerda que para Ingresar debes tener una Tarjeta Cinemar", 
+                        font=("Lucida Console", 11, "bold"), 
+                        width=500, 
+                        fg="black", 
+                        bg="sky blue", 
+                        bd=2, 
+                        relief="solid",
+                        wraplength= 500
+                        
+                    )
+
+            label_id = self.canvas.create_window(320, 450, window=label)
+
+            # Usar lambda para eliminar el Label después de 5 segundos
+            self.canvas.after(4000, lambda: self.canvas.delete(label_id))
+        
+
 
 class FrameReservarTicket(FieldFrame):
     def __init__(self):
@@ -498,9 +596,9 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
             tituloValores = 'Valores ingresados',
             infoElementosInteractuables = [
                 [Cliente.mostrarPeliculaParaCalificar(
-                    peliculasDisponiblesParaCalificar = self.peliculasCalificar), 'Selecionar película'],
+                    peliculasDisponiblesParaCalificar = self._peliculasCalificar), 'Selecionar película'],
                 [Cliente.mostrarProductosParaCalificar(
-                    productosDisponiblesParaCalificar = self.productosCalificar), 'Seleccionar producto'], 
+                    productosDisponiblesParaCalificar = self._productosCalificar), 'Seleccionar producto'], 
                 [[], 'Ingresa tu valoracion']
             ],
             habilitado = [False, False, False],
@@ -651,7 +749,7 @@ def objetosBasePractica2():
         for i in range (10):
             sucursal.getTarjetasCinemar().append(TarjetaCinemar())
     
-    print(len(sucursalCine1.getTarjetasCinemar()), len(sucursalCine2.getTarjetasCinemar()), len(sucursalCine1.getTarjetasCinemar()) ) 
+    #print(len(sucursalCine1.getTarjetasCinemar()), len(sucursalCine2.getTarjetasCinemar()), len(sucursalCine1.getTarjetasCinemar()) ) 
 
     sucursalCine2.getServicios()[0].setCliente(cliente1)
 
@@ -659,6 +757,7 @@ def objetosBasePractica2():
     #print(sucursalCine2.getServicios()[0].mostrarInventario())
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
+
 
 def ventanaDeInicio(): 
 
@@ -719,7 +818,7 @@ def ventanaDeInicio():
         tk.PhotoImage(file="src/iuMain/imagenes/P45.png"),
 
     ]
-    imagenLabel = tk.Button(frameInferiorIzquierdoP4, image= imagenes[indice_imagen], command = ingresarVentanaPrincipal, bd = 1, relief = "solid")
+    imagenLabel = tk.Button(frameInferiorIzquierdoP4, image= imagenes[indice_imagen], command = ingresarVentanaPrincipal, bd = 1, relief = "solid", bg = "#ADD8E6")
     imagenLabel.place(relheight = 1, relwidth = 1)
     #imagenLabel.place(relx = 0.05, y = 5, relheight= 0.8, relwidth=0.9)
 
@@ -861,7 +960,6 @@ if __name__ == '__main__':
     #Frames de lógica proyecto
     frameIniciarSesion = FrameInicioSesion()
     frameVentanaPrincipal = FrameVentanaPrincipal()
-
 
     ventanaLogicaProyecto.withdraw()
     ventanaInicio.mainloop()
