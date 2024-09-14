@@ -122,6 +122,24 @@ class Cliente():
                 ticketsParaUsar.append(ticket)
         
         return ticketsParaUsar
+    
+    def mostrarTicketsParaSalaDeEspera(self):
+
+        """
+        :Description: Este método se encarga de retornar los tickets correspondientes a la sucursal de cine en la que se encuentra el cliente
+        cuyo horario aún no se encuentra en presentación.
+	    
+        :return list(Ticket): Este método retorna el resultado de la verifcación, con el fin de que el cliente solo pueda usar los tickets
+	    en la sala de espera cuyo horario sea estrictamente mayor y sean de esta sucursal.
+        """
+
+        ticketsParaUsar = []
+
+        for ticket in self._tickets:
+            if ticket.getSucursalCompra() is self._cineUbicacionActual and ticket.getHorario() > self._cineUbicacionActual.getFechaActual():
+                ticketsParaUsar.append(ticket)
+        
+        return ticketsParaUsar
 
     def generoMasVisto(self):
 

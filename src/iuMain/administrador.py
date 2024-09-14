@@ -219,9 +219,18 @@ class FieldFrame(tk.Frame):
 
         FieldFrame.setClienteProceso(clienteProceso)
 
+        self.refrescarFramesFuncionalidades()
+        
+        #Setteamos el frame para los pagos.
+        FieldFrame.setFramePasarelaDePagos(FramePasarelaDePagos())
+
+        #Ejecutamos la lógica de la ventana del menú principal
+        frameVentanaPrincipal.construirMenu()
+        frameVentanaPrincipal.mostrarFrame(self)
+    
+    def refrescarFramesFuncionalidades(self):
         #Creación Frames funcionalidades
         framesFuncionalidades = [
-
             FrameReservarTicket(), # <_ Funcionalidad 1
             FrameFuncionalidad2(), # <- Funcionalidad 2
             FrameFuncionalidad3Calificaciones(), # <- Funcionalidad 3
@@ -231,13 +240,6 @@ class FieldFrame(tk.Frame):
 
         #Setteamos los frames de las funcionalidades al atributo de clase
         FieldFrame.setFramesFuncionalidades(framesFuncionalidades)
-        
-        #Setteamos el frame para los pagos.
-        FieldFrame.setFramePasarelaDePagos(FramePasarelaDePagos())
-
-        #Ejecutamos la lógica de la ventana del menú principal
-        frameVentanaPrincipal.construirMenu()
-        frameVentanaPrincipal.mostrarFrame(self)
 
 #class FremeOrden(FieldFrame):
 
@@ -300,14 +302,17 @@ class FrameInicioSesion(FieldFrame):
             
             if confirmacionUsuario:
                 #Evaluamos si es la primera vez que visita nuestro cine
-                clienteProceso = SucursalCine.buscarCliente(numDocumentoSeleccionado)
+                clienteProceso = SucursalCine.buscarCliente(numDocumentoSeleccionado, tipoDocumentoSeleccionado)
 
                 if clienteProceso is None:
                     #Si es la primera vez, nos dirigimos al frame de crear usuario para crearlo
                     FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada).mostrarFrame(self)
-
+                elif type(clienteProceso) == str:
+                    #Detectamos que el número de documento ya se encuentra asignado a otro cliente
+                    messagebox.showerror('Error', 'Hemos detectado que este número de documento se encuentra asociado a otro cliente, por favor verifica el tipo o número de documento digitado.')
                 else:
                     #En caso de que no, ingresamos al menú principal de nuestro cine
+                    messagebox.showinfo('Inicio de sesión exitoso', f'{clienteProceso.getNombre()}, Bienvenid@ a cinemar sede {sucursalSeleccionada}')
                     self.logicaInicioProcesosFuncionalidades(clienteProceso)
 
 class FrameCrearUsuario(FieldFrame):
@@ -517,8 +522,17 @@ class FrameZonaJuegos(FieldFrame):
 
             # Usar lambda para eliminar el Label después de 5 segundos
             self.canvas.after(4000, lambda: self.canvas.delete(label_id))
-        
 
+#################################################################################################################################
+
+class FrameFuncionalidad1():
+    #Crear el frame inical de mi funcionalidad (Crear estándar visual frame para ello)
+    #Separar por módulos la lógica de cada funcionalidad
+    #Definir lógica de procesos de pago (Con Gerson)
+    #Serializar
+    #Hacer Testeos
+    #Hacer documentación
+    pass
 
 class FrameReservarTicket(FieldFrame):
     def __init__(self):
@@ -643,12 +657,6 @@ class FrameReservarTicket(FieldFrame):
             if confirmacionUsuario:
                 #Construimos el frame con la información obtenida y lo mostramos
                 FrameSeleccionarAsiento(self._peliculaProceso, self._horarioProceso, estaEnPresentacion).mostrarFrame(self)
-    
-    #Crear FrameSalaDeEspera
-    #Hacer testeos
-
-class FrameFuncionalidad1():
-    pass
 
 class FrameSeleccionarAsiento(FieldFrame):
     def __init__(self, peliculaProceso, horarioProceso, estaEnPresentacion):
@@ -810,7 +818,73 @@ class FrameIngresoASalaCine(FieldFrame):
                     messagebox.showerror('Error', 'No tienes un ticket válido para ingresar a esta sala de cine')
 
 class FrameSalaDeEspera(FieldFrame):
-    pass
+    
+    def __init__(self):
+
+        #Facilitamos el acceso a al cliente que está realizando el proceso
+        self._clienteProceso = FieldFrame.getClienteProceso()
+        #Eliminamos los tickets caducados de la lista de tickets del cliente
+        self._clienteProceso.dropTicketsCaducados()
+
+        #Creamos las variables de instancia a usar
+        self._ticketsDisponiblesParaUsarEnSede = self._clienteProceso.mostrarTicketsParaSalaDeEspera()
+        self._horarioAvanzarTiempo = None
+
+        super().__init__(
+            tituloProceso = 'Sala de espera',
+            descripcionProceso = f'En este apartado podrás esperar (Avanzar el tiempo) hasta el horario de presentación de la película asociada a alguno de tus tickets previamente adquiridos en esta sede y cuyo horario sea estrictamente mayor a la fecha actual.\nConsideraciones de uso:\n1. Debes seleciconar un ticket para poder visualizar su información\n(Fecha actual: {self._clienteProceso.getCineUbicacionActual().getFechaActual().replace(microsecond = 0)})',
+            tituloCriterios = 'Criterios Ticket',
+            textEtiquetas = ['Seleccionar ticket :'],
+            tituloValores = 'Datos ticket',
+            infoElementosInteractuables = [ [[f'Horario ticket: {ticket.getHorario()}' for ticket in self._ticketsDisponiblesParaUsarEnSede], 'Seleccionar ticket'] ],
+            habilitado = [False],
+            botonVolver = True,
+            desplazarBotonesFila = 1
+        )
+
+        #Creamos y ubicamos el label que mostrará información sobre el ticket seleccionado
+        self._labelInfoTicketSeleccionado = tk.Label(self, text='', font= ("Verdana",12), anchor="center")
+        self._labelInfoTicketSeleccionado.grid(column=0, row=len(self._infoEtiquetas) + 3, columnspan=4)
+
+        #Facilitamos el acceso al comboBox de tickets y le asignamos un evento
+        self._comboBoxTicketsDisponibles = self.getElementosInteractivos()[0]
+        self._comboBoxTicketsDisponibles.bind('<<ComboboxSelected>>', self._setInfoTicket)
+    
+    def _setInfoTicket(self, evento):
+
+        #Obtenemos el horario seleccionado a partir del ticket seleccionado
+        ticketSeleccionado = self._ticketsDisponiblesParaUsarEnSede[self._comboBoxTicketsDisponibles.current()]
+        self._horarioAvanzarTiempo = ticketSeleccionado.getHorario()
+
+        #Actualizamos la información del label de información de ticket seleccionado
+        self._labelInfoTicketSeleccionado.configure(text = f'Película: {ticketSeleccionado.getPelicula().getNombre()}\nSala de cine número: {ticketSeleccionado.getSalaDeCine().getNumeroSala()}')
+    
+    def funBorrar(self):
+        #Seteamos los valores por defecto
+        super().funBorrar()
+        #Reestablecemos la información del label de información de ticket seleccionado
+        self._labelInfoTicketSeleccionado.configure(text = '')
+    
+    def funAceptar(self):
+        
+        #Evaluamos las excepciones
+        if self.evaluarExcepciones():
+
+            #Confirmamos la elección del usuario
+            confirmacionUsuario = messagebox.askquestion('Adevertencia', f'(Fecha actual: {self._clienteProceso.getCineUbicacionActual().getFechaActual().replace(microsecond = 0)}) Estas apunto de esperar (Avanzar el tiempo) hasta {self._horarioAvanzarTiempo}, en caso de tener tickets antes de la fecha y hora a esperar, estos serán eliminados, ¿Desea continuar?')
+
+            if confirmacionUsuario:
+                #Avanzamos el tiempo y notificamos al usuario
+                self._clienteProceso.getCineUbicacionActual().setFechaActual(self._horarioAvanzarTiempo)
+                messagebox.showinfo('Avance de tiempo exitoso', f'Fecha actual: {self._horarioAvanzarTiempo}')
+
+                #Actualizamos la lógica de los frames con el nuevo horario seleccionado
+                self.refrescarFramesFuncionalidades()
+
+                #Regresa al menú de la funcionalidad 1 (Falta implementarlo)
+                FieldFrame._frameMenuPrincipal.mostrarFrame(self)
+
+#################################################################################################################################
 
 class FrameFuncionalidad3Calificaciones(FieldFrame):
     
