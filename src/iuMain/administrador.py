@@ -974,6 +974,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
             ],
             habilitado = [False, False, False],
             botonVolver = True
+            
                    
         )     
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
@@ -1035,12 +1036,14 @@ def objetosBasePractica2():
     producto3S = Producto("Gorra","L","souvenir",11000,200,"Normal",sucursalCine2)
     producto4S = Producto("Llavero","Katana","souvenir",22000,200,"Acción",sucursalCine2)
     producto5S = Producto("Peluche","Pajaro loco","souvenir",29000,200,"Comedia",sucursalCine2)
+    
 
     cliente1 = Cliente("Rusbel", 18, 13434, TipoDocumento.CC, sucursalCine2)
     cliente2 = Cliente("Andy", 18, 14343, TipoDocumento.CC, sucursalCine1)
     cliente3 = Cliente('Gerson', 23, 98765, TipoDocumento.CC, sucursalCine3)
     cliente4 = Cliente('Juanjo', 18, 987, TipoDocumento.CC, sucursalCine1)
-    cliente5 = Cliente('Sanitago', 18, 1125274009, TipoDocumento.CC, sucursalCine3)
+    cliente5 = Cliente('Santiago', 18, 1125274009, TipoDocumento.CC, sucursalCine3)
+    
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
     salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)
@@ -1061,6 +1064,7 @@ def objetosBasePractica2():
     pelicula1_5.crearPeliculas()
     pelicula1_6 = Pelicula("Spy x Familiy Código: Blanco", 19000, "Infantil", timedelta( minutes=90 ), "+5", "2D", sucursalCine1)
     pelicula1_6.crearPeliculas()
+    #cliente5.getPeliculasDisponiblesParaCalificar.add(pelicula1_2)
 
     salaDeCine2_1 = SalaCine(1, "2D", sucursalCine2)
     salaDeCine2_2 = SalaCine(2, "3D", sucursalCine2)
