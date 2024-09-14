@@ -332,7 +332,7 @@ class SucursalCine:
        
         for pelicula in peliculasEliminar:
             if pelicula in self.cartelera:
-                self.cartelera.remove(pelicula)
+                self._cartelera.remove(pelicula)
             else:
                 print(f"La película {pelicula} no está en la cartelera.")
 
@@ -341,10 +341,10 @@ class SucursalCine:
 #de la cartelera principal de peliculas.
 	 
 	 
-    def eliminar_producto(self, productos_eliminar):
-        for producto in productos_eliminar:
-            if producto in self.inventario_cine:
-                self.inventario_cine.remove(producto)
+    def eliminarProducto(self, productosEliminar):
+        for producto in productosEliminar:
+            if producto in self._inventarioCine:
+                self._inventarioCine.remove(producto)
 
 #Description : Este método se encarga de retornar los productos cuyo nombre coincide con el nombre del producto seleccionada por el cliente.
 #@param nombreProducto : Este método recibe como parámetro el nombre del producto (De tipo String) con el cuál se realizará el filtrado.
@@ -353,14 +353,14 @@ class SucursalCine:
 #@return <b>ArrayList<Producto></b> : Este método retorna un ArrayList de los productos cuyo nombre coinciden con el nombre seleccionado 
 #por el cliente.
 	 
-    def filtrar_por_nombre_de_producto(nombre_producto, inventario):
-     productos_encontrados = []
+    def filtrarPorNombreDeProducto(nombreProducto, inventario):
+     productosEncontrados = []
 
      for producto in inventario:
-        if producto.get_nombre() == nombre_producto:
-            productos_encontrados.append(producto)
+        if producto.getNombre() == nombreProducto:
+            productosEncontrados.append(producto)
 
-     return productos_encontrados 
+     return productosEncontrados 
     
 #Description: Este metodo se encarga de analizar por semana que productos han sido bien o mal calificadas, evaluando
 #las calificaciones de los clientes, si un producto es calificado por debajo de 3, lo consideramos como mal calificado
@@ -371,101 +371,101 @@ class SucursalCine:
 #bien o mal recibidos por los clientes, y cambiandolos de sede, esperamos que su calificacion mejore, si esto
 #no se da, el producto es eliminado del inventario, ya que se considera como malo.
 
-    def logica_calificacion_productos(self, producto):
-        productosCalificados = self.filtrar_por_nombre_de_producto(producto.get_nombre())
+    def logicaCalificacionProductos(self, producto):
+        productosCalificados = self.filtrarPorNombreDeProducto(producto.getNombre())
         
-        verificacion_cambio = True
+        verificacionCambio = True
 
-        if producto.get_valoracion_comida() < 3:
-            if verificacion_cambio:
-                sucursal = self.seleccionar_sucursal_aleatoriamente(producto.get_sucursal_sede())
+        if producto.getValoracionComida() < 3:
+            if verificacionCambio:
+                sucursal = self.seleccionarSucursalAleatoriamente(producto.getSucursalSede())
                 for producto1 in productosCalificados:
-                    if producto1 in self.inventario_cine:
-                        self.inventario_cine.remove(producto1)
-                    if producto1.get_tipo_producto() == "comida":
-                        new_producto = Producto(producto1.get_nombre(), producto1.get_tamaño(), producto1.get_tipo_producto(), producto1.get_precio() * 0.9, producto1.get_cantidad(), producto1.get_genero(), sucursal)
-                        self.inventario_cine.append(new_producto)
-                    elif producto1.get_tipo_producto() == "souvenir":
-                        new_producto = Producto(producto1.get_nombre(), producto1.get_tamaño(), producto1.get_tipo_producto(), producto1.get_precio() * 0.9, producto1.get_cantidad(), producto1.get_genero(), sucursal)
-                        self.inventario_cine.append(new_producto)
+                    if producto1 in self._inventarioCine:
+                        self._inventarioCine.remove(producto1)
+                    if producto1.getTipoProducto() == "comida":
+                        nuevoProducto = Producto(producto1.getNombre(), producto1.getTamaño(), producto1.getTipoProducto(), producto1.getPrecio() * 0.9, producto1.getCantidad(), producto1.getGenero(), sucursal)
+                        self._inventarioCine.append(nuevoProducto)
+                    elif producto1.getTipoProducto() == "souvenir":
+                        nuevoProducto = Producto(producto1.getNombre(), producto1.getTamaño(), producto1.getTipoProducto(), producto1.getPrecio() * 0.9, producto1.getCantidad(), producto1.getGenero(), sucursal)
+                        self._inventarioCine.append(nuevoProducto)
             else:
-                self.eliminar_producto(productosCalificados)
+                self.eliminarProducto(productosCalificados)
 
-        elif producto.get_valoracion_comida() > 4.5:
-            sucursal1 = self.seleccionar_sucursal_aleatoriamente(producto.get_sucursal_sede())
+        elif producto.getValoracionComida() > 4.5:
+            sucursal1 = self.seleccionarSucursalAleatoriamente(producto.getSucursalSede())
             for producto2 in productosCalificados:
-                if producto2.get_tipo_producto() == "comida":
-                    new_producto = Producto(producto2.get_nombre(), producto2.get_tamaño(), producto2.get_tipo_producto(), producto2.get_precio() * 1.10, producto2.get_cantidad(), producto2.get_genero(), sucursal1)
-                    self.inventario_cine.append(new_producto)
-                elif producto2.get_tipo_producto() == "souvenir":
-                    new_producto = Producto(producto2.get_nombre(), producto2.get_tamaño(), producto2.get_tipo_producto(), producto2.get_precio() * 1.10, producto2.get_cantidad(), producto2.get_genero(), sucursal1)
-                    self.inventario_cine.append(new_producto)         
+                if producto2.getTipoProducto() == "comida":
+                    nuevoProducto = Producto(producto2.getNombre(), producto2.getTamaño(), producto2.getTipoProducto(), producto2.getPrecio() * 1.10, producto2.getCantidad(), producto2.getGenero(), sucursal1)
+                    self._inventarioCine.append(nuevoProducto)
+                elif producto2.getTipoProducto() == "souvenir":
+                    nuevoProducto = Producto(producto2.getNombre(), producto2.getTamaño(), producto2.getTipoProducto(), producto2.getPrecio() * 1.10, producto2.getCantidad(), producto2.getGenero(), sucursal1)
+                    self._inventarioCine.append(nuevoProducto)         
 
 #Description: Este método se encarga de realizar la distribución de productos en los inventarios de los productos
 #ccada semana luego de haber efectuado el cambio de producto de sucursal propio de la funcionalidad 3. 
 
 
-    def logica_semanal_producto(sucursales_cine):
+    def logicaSemanalProducto(sucursales_cine):
      for sede in sucursales_cine:
-        for producto in sede.get_inventario_cine():
-            if producto.get_tipo_producto() == "comida" or producto.get_tipo_producto() == "souvenir":
-                sede.logica_calificacion_productos(producto) 
+        for producto in sede.getInventarioCine():
+            if producto.getTipoProducto() == "comida" or producto.getTipoProducto() == "souvenir":
+                sede.logicaCalificacionProductos(producto) 
 
 #Description: Este metodo se encarga de revisar en el arrayList de inventario que producto ha tenido
 #la mejor calificacion, osea, el producto mas eficiente segun los gustos de los clientes, con este producto vamos 
 #a generar combos en recompensa a los clientes que nos dejaron sus reseñas
 	 
-    def mejor_producto(self):
-        producto_mejor_calificado = None
-        primera_comparacion = True
+    def mejorProducto(self):
+        productoMejorCalificado = None
+        primeraComparacion = True
 
-        for producto in self.inventario_cine:
-            if producto.get_tipo_producto().lower() in ["comida", "souvenir"]:
-                if primera_comparacion:
-                    producto_mejor_calificado = producto
-                    primera_comparacion = False
-                elif producto.get_valoracion_comida() > producto_mejor_calificado.get_valoracion_comida():
-                    producto_mejor_calificado = producto
+        for producto in self._inventarioCine:
+            if producto.getTipoProducto().lower() in ["comida", "souvenir"]:
+                if primeraComparacion:
+                    productoMejorCalificado = producto
+                    primeraComparacion = False
+                elif producto.getValoracionComida() > productoMejorCalificado.getValoracionComida():
+                    productoMejorCalificado = producto
 
-        return producto_mejor_calificado                   
+        return productoMejorCalificado                   
 
 #Description: Este metodo se encarga de revisar en el arrayList de inventario que producto ha tenido
 #la peor calificacion, osea, el producto mas deficiente segun los gustos de los clientes, con este producto vamos 
 #a generar combos en recompensa a los clientes que nos dejaron sus reseñas.
 
-    def peor_producto(self):
-        producto_peor_calificado = None
-        primera_comparacion = True
+    def peorProducto(self):
+        productoPeorCalificado = None
+        primeraComparacion = True
 
-        for producto in self.inventario_cine:
-            if producto.get_tipo_producto().lower() in ["comida", "souvenir"]:
-                if primera_comparacion:
-                    producto_peor_calificado = producto
-                    primera_comparacion = False
-                elif producto.get_valoracion_comida() < producto_peor_calificado.get_valoracion_comida():
-                    producto_peor_calificado = producto
+        for producto in self._inventarioCine:
+            if producto.getTipoProducto().lower() in ["comida", "souvenir"]:
+                if primeraComparacion:
+                    productoPeorCalificado = producto
+                    primeraComparacion = False
+                elif producto.getValoracionComida() < productoPeorCalificado.getValoracionComida():
+                    productoPeorCalificado = producto
 
-        return producto_peor_calificado
+        return productoPeorCalificado
     
 #Description: Este metodo se encarga de revisar en el arrayList de peliculasDisponibles que pelicula ha tenido
 #la mejor calificacion, osea, la pelicula mas eficiente segun los gustos de los clientes, con esta pelicula vamos 
 #a generar combos en recompensa a los clientes que nos dejaron sus reseñas.
 	 
-    def mejor_pelicula(self):
-        pelicula_mejor_calificada = None
-        primera_comparacion = True
+    def mejorPelicula(self):
+        peliculaMejorCalificada = None
+        primeraComparacion = True
 
-        for pelicula in self.cartelera:
-            if pelicula.seleccionar_horario_mas_lejano() is None:
+        for pelicula in self._cartelera:
+            if pelicula.seleccionarHorarioMasLejano() is None:
                 continue
 
-            if primera_comparacion:
-                pelicula_mejor_calificada = pelicula
-                primera_comparacion = False
-            elif pelicula.get_valoracion() > pelicula_mejor_calificada.get_valoracion():
-                pelicula_mejor_calificada = pelicula
+            if primeraComparacion:
+                peliculaMejorCalificada = pelicula
+                primeraComparacion = False
+            elif pelicula.getValoracion() > peliculaMejorCalificada.getValoracion():
+                peliculaMejorCalificada = pelicula
 
-        return pelicula_mejor_calificada
+        return peliculaMejorCalificada
     
 #Description: Este metodo se encarga de revisar en el arrayList de peliculasDisponibles que pelicula ha tenido
 #la peor calificacion, osea, la pelicula mas deficiente segun los gustos de los clientes, con esta pelicula vamos 
@@ -475,7 +475,7 @@ class SucursalCine:
         peliculaPeorCalificada = None
         primeraComparacion = True
 
-        for pelicula in self.cartelera:
+        for pelicula in self._cartelera:
             if pelicula.seleccionarHorarioMasLejano() is None:
                 continue
 

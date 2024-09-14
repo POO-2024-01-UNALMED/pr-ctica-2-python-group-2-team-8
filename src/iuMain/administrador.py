@@ -22,6 +22,7 @@ from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
 from excepciones.iuExceptions import iuExceptions, iuEmptyValues, iuDefaultValues
 from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
+from gestionAplicacion.usuario.ticket import Ticket
 
 class FieldFrame(tk.Frame):
 
@@ -44,7 +45,7 @@ class FieldFrame(tk.Frame):
         tituloFrame = tk.Label(self, text=tituloProceso, font= ("Verdana bold",30), anchor="center")
         tituloFrame.grid(row=0, column=0, columnspan=4, sticky='we')
 
-        descripcionFrame = tk.Label(self, text=descripcionProceso, font= ("Verdana",10), anchor="center", wraplength=300)
+        descripcionFrame = tk.Label(self, text=descripcionProceso, font= ("Verdana",10), anchor="center", wraplength=500)
         descripcionFrame.grid(row=1, column=0, columnspan=4, sticky='we')
 
         tituloCrit = tk.Label(self, text = tituloCriterios, font= ("Verdana bold",20), anchor="center")
@@ -264,6 +265,7 @@ class FrameFuncionalidad2(FieldFrame):
 
 class FrameInicioSesion(FieldFrame):
 
+    #Construimos el frame usando FieldFrame
     def __init__(self):
         super().__init__(
             tituloProceso = 'Iniciar Sesión',
@@ -277,30 +279,40 @@ class FrameInicioSesion(FieldFrame):
     
     def funAceptar(self):
 
+        #Evaluamos las excepciones de UI
         if self.evaluarExcepciones():
+
+            #Obtenemos el tipo de documento ingresado
             tipoDocumentoSeleccionado = self.getValue('Seleccionar Tipo D.I. :')
 
+            #obtenemos el numero de documento ingresado y evaluamos si es de tipo int
             try:
                 numDocumentoSeleccionado = int(self.getValue('Número D.I. :'))
             except ValueError:
                 messagebox.showerror('Error', f'El campo {self._infoEtiquetas[1].strip(':')}debe ser numérico')
                 return
 
+            #Obtenemos la sucursal seleciconada
             sucursalSeleccionada = self.getValue('Seleccionar Sucursal :')
             
+            #Confirmamos las elecciones hechas por el usuario
             confirmacionUsuario = messagebox.askokcancel('Confirmación de datos', f'Los datos ingresados son:\nTipo de documento: {tipoDocumentoSeleccionado}\nNúmero de documento: {numDocumentoSeleccionado}\nSucursal seleccionada: {sucursalSeleccionada}')
             
             if confirmacionUsuario:
+                #Evaluamos si es la primera vez que visita nuestro cine
                 clienteProceso = SucursalCine.buscarCliente(numDocumentoSeleccionado)
 
                 if clienteProceso is None:
+                    #Si es la primera vez, nos dirigimos al frame de crear usuario para crearlo
                     FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada).mostrarFrame(self)
 
                 else:
+                    #En caso de que no, ingresamos al menú principal de nuestro cine
                     self.logicaInicioProcesosFuncionalidades(clienteProceso)
 
 class FrameCrearUsuario(FieldFrame):
 
+    #Construimos el frame usando FieldFrame
     def __init__(self, tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada):
         super().__init__(
             tituloProceso = 'Crear Usuario', 
@@ -312,24 +324,30 @@ class FrameCrearUsuario(FieldFrame):
             habilitado = [True, True]
             )
         
+        #Guardamos los valores obtenidos en el inicio de sesión en vars de instancia
         self._tipoDocumentoCliente = tipoDocumentoSeleccionado
         self._numDocumentoCliente = numDocumentoSeleccionado
         self._ubicacionSucursalActual = sucursalSeleccionada
         
     def funAceptar(self):
 
+        #Evaluamos las excepciones
         if self.evaluarExcepciones():
+            #Obtenemos el nombre ingresado
             nombreCliente = self.getValue('Nombre :')
 
+            #Obtenemos la edad ingresada y verificamos si es de tipo int
             try:
                 edadCliente = int(self.getValue('Edad :'))
             except ValueError:
                 messagebox.showerror('Error', f'El campo {self._infoEtiquetas[1].strip(':')}debe ser numérico')
                 return
             
+            #Confirmamos las elecciones hechas por el ususario
             confirmacionCliente = messagebox.askokcancel('Confirmación datos', f'Los datos ingresados son:\nNombre: {nombreCliente}\nEdad: {edadCliente}')
 
             if confirmacionCliente:
+                #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
                 self.logicaInicioProcesosFuncionalidades(Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual)))
         
 class FrameVentanaPrincipal(FieldFrame):
@@ -484,6 +502,7 @@ class FrameZonaJuegos(FieldFrame):
 class FrameReservarTicket(FieldFrame):
     def __init__(self):
 
+        #Definimos las variables que usaremos en nuestro proceso
         clienteProceso = FieldFrame.getClienteProceso()
 
         self._carteleraCliente = Pelicula.filtrarCarteleraPorCliente(clienteProceso)
@@ -495,9 +514,10 @@ class FrameReservarTicket(FieldFrame):
         filtroNombresCartelera = Pelicula.filtrarCarteleraPorNombre(self._carteleraCliente)
         filtroPelisRecomendadas = Pelicula.filtarCarteleraPorGenero(self._carteleraCliente, clienteProceso.generoMasVisto())
 
+        #Construimos el frame usando FieldFrame
         super().__init__(
             tituloProceso = 'Reservar ticket',
-            descripcionProceso = f'En este espacio solicitamos los datos necesarios para reservar un ticket, debe ingresar los datos de forma secuencial, es decir, en el orden en que se encuentran (Fecha Actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})',
+            descripcionProceso = f'En este espacio solicitamos los datos necesarios para reservar un ticket, debe ingresar los datos de forma secuencial, es decir, en el orden en que se encuentran (Fecha Actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().replace(microsecond = 0)})',
             tituloCriterios = 'Criterios reserva',
             textEtiquetas = ['Seleccionar película :', 'Seleccionar formato :', 'Seleccionar horario :'], 
             tituloValores = 'Valores ingresados',
@@ -513,32 +533,40 @@ class FrameReservarTicket(FieldFrame):
             botonVolver = True
         )
 
+        #Creamos un Label que almacenará información extra sobre la película seleccionada
         self._labelInfoPeliculaSeleccionada = tk.Label(self, text='', font= ("Verdana",12), anchor="center")
         self._labelInfoPeliculaSeleccionada.grid(column=0, row=len(self._infoEtiquetas) + 4, columnspan=4)
 
+        #Expandimos los comboBox creados para visualizar mejor su contenido
         for elemento in self.getElementosInteractivos():
             elemento.grid_configure(sticky='we')
 
+        #Creamos apuntadores a cada uno de los elementos interactivos para facilitar su acceso
         self._comboBoxPeliculas = self.getElementosInteractivos()[0]
         self._comboBoxFormatos = self.getElementosInteractivos()[1]
         self._comboBoxHorarios = self.getElementosInteractivos()[2]
 
+        #Modificamos el estado de los comboBox para forzar a que se rellene el formulario de forma secuencial
         self._comboBoxFormatos.configure(state = 'disabled')
         self._comboBoxHorarios.configure(state = 'disabled')
 
+        #Definimos la operación respecto al evento de seleccionar un item del comboBox
         self._comboBoxPeliculas.bind('<<ComboboxSelected>>', self.setFormatos)
         self._comboBoxFormatos.bind('<<ComboboxSelected>>', self.setHorarios)
-        
+
     def setFormatos(self, event):
+        #Obtenemos el nombre de la película seleccionada
         nombrePeliculaSeleccionada = self.getValue('Seleccionar película :')
 
+        #Buscamos las películas con el mismo nombre (obtenemos los formatos disponibles de esa película)
         self._formatosPeliSeleccionada = Pelicula.obtenerPeliculasPorNombre(nombrePeliculaSeleccionada, self._carteleraCliente)
 
+        #Configuramos el comboBox de formatos respecto a la información obtenida y lo habilitamos
         self._comboBoxFormatos.configure(values = [peli.getTipoDeFormato() for peli in self._formatosPeliSeleccionada])
-
         self._comboBoxFormatos.configure(state = 'readonly')
         self._comboBoxFormatos.set(self._infoElementosInteractuables[1][1])
 
+        #Reestablecemos el comboBox de Horarios y el label de información adicional en caso de modificar la película seleccionada nuevamente
         self._comboBoxHorarios.configure(state = 'disabled')
         self._comboBoxHorarios.set(self._infoElementosInteractuables[2][1])
 
@@ -546,33 +574,151 @@ class FrameReservarTicket(FieldFrame):
 
     def setHorarios(self, event):
         
+        #Seleccionamos la película que corresponde al formato seleccionada
         for pelicula in self._formatosPeliSeleccionada:
             if pelicula.getTipoDeFormato() == self.getValue('Seleccionar formato :'):
                 self._peliculaProceso = pelicula 
 
+        #Mostramos sus horarios de presentación
         self._horariosPeliSeleccionada = self._peliculaProceso.filtrarHorariosParaMostrar()
 
+        #Configuramos el comboBox de horarios para con la información obtenida y lo habilitamos
         self._comboBoxHorarios.configure(values = self._horariosPeliSeleccionada)
         self._comboBoxHorarios.configure(state = 'readonly')
 
+        #Configuramos el label de información adicional con la película seleciconada
         self._labelInfoPeliculaSeleccionada.configure(text = f'Precio: {self._peliculaProceso.getPrecio()}, Género: {self._peliculaProceso.getGenero()}')
     
     def funBorrar(self):
+        #Setteamos los valores por defecto de cada comboBox
         super().funBorrar()
+
+        #Configuramos el estado de los comboBox para que sean seleccionados de forma secuencial
         self._comboBoxHorarios.configure(state = 'disabled')
         self._comboBoxFormatos.configure(state = 'disabled')
         self._labelInfoPeliculaSeleccionada.configure(text = '')
     
     def funAceptar(self):
+
+        #Evaluamos las excepciones de UI
         if self.evaluarExcepciones():
-            pass
+            #Obtenemos el horario seleccionado
+            horarioString = self._comboBoxHorarios.get()
+
+            #Evaluamos si es un horario en presentación
+            estaEnPresentacion = False
+            if horarioString.__contains__('En vivo:'):
+                horarioSplit = horarioString.split(':', 1)
+                horarioString = horarioSplit[1].lstrip(' ')
+                estaEnPresentacion = True
+
+            #Convertimos el horario obtenido de str a datetime
+            self._horarioProceso = datetime.strptime(horarioString, '%Y-%m-%d %H:%M:%S')
+
+            #Evaluamos si el horario seleccionado fue un horario en presentación
+
+            #Confirmamos las elecciones del usuario
+            confirmacion = messagebox.askokcancel('Confirmación datos', f'Has seleccionado {self._peliculaProceso.getNombre()}; con formato: {self._peliculaProceso.getTipoDeFormato()}; en el horario: {self._horarioProceso}')
+
+            if confirmacion:
+                #Construimos el frame con la información obtenida y lo mostramos
+                FrameSeleccionarAsiento(self._peliculaProceso, self._horarioProceso, estaEnPresentacion).mostrarFrame(self)
     
-    #Programar botón aceptar de FrameReservaTicket
-    #Crear FrameAsientos
     #Crear FrameSalaCine
     #Crear FrameSalaDeEspera
     #Hacer testeos
+
+class FrameSeleccionarAsiento(FieldFrame):
+    def __init__(self, peliculaProceso, horarioProceso, estaEnPresentacion):
         
+        #Guardamos la información obtenida del FrameDeReserva
+        self._peliculaProceso = peliculaProceso
+        self._horarioProceso = horarioProceso
+        self._estaEnPresentacion = estaEnPresentacion
+
+        #Creamos los atributos de instancia que usaremos durante el desarrollo de este frame
+        self._asientosPelicula = peliculaProceso.getAsientosSalasVirtuales()[peliculaProceso.getHorariosPresentacion().index(horarioProceso)]
+        self._filaSeleccionada = 100
+        self._columnaSeleccionada = 100
+
+        super().__init__(
+            tituloProceso = 'Selección de asiento',
+            descripcionProceso = f'En este apartado seleccionaremos uno de los asientos disponibles para hacer efectivo el proceso de reserva de ticket.\nConsideraciones: \n1. La pantalla se encuentra frente a la fila 1. \n2. Una vez seleccionada una fila (solo se muestran los números de fila con algún asiento disponible) se examinará cuáles son los asientos disponibles en ella, es decir, se debe elegir de forma secuencial, primero fila y luego columna (Fecha actual {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().replace(microsecond = 0)}).',
+            tituloCriterios = 'Criterios asiento',
+            textEtiquetas = ['Seleccionar fila :', 'Seleccionar columna :'],
+            tituloValores = 'Datos asiento',
+            infoElementosInteractuables = [[Pelicula.filasConAsientosDisponibles(self._asientosPelicula), 'Selecciona la fila' ], [[], 'Selecciona la columna']],
+            habilitado = [False, False],
+            botonVolver = True 
+        )
+
+        #Asociamos los elementos interactivos a variables para facilitar su acceso
+        self._comboBoxFilas = self.getElementosInteractivos()[0]
+        self._comboBoxCols = self.getElementosInteractivos()[1]
+
+        #Asignamos sus respectivo estado y eventos
+        self._comboBoxCols.configure(state = 'disabled')
+        self._comboBoxFilas.bind('<<ComboboxSelected>>', self.setColumnas)
+
+    """
+        #Creamos el label con información de la ubicación de la pantalla
+        ubicacionPantalla = tk.Label(self, text='Pantalla', font= ("Verdana",12), anchor="center")
+        ubicacionPantalla.grid(column=0, row=len(self._infoEtiquetas) + 4, columnspan=4)
+
+        #Creamos un frame con la información de disponibilidad y número de cada asiento
+        disponibilidadDeAsientos = tk.Frame(self, width=100, height=50)
+        disponibilidadDeAsientos.grid(column=0, row=len(self._infoEtiquetas) + 6, columnspan=4)
+        for i in range(0, len(self._asientosPelicula)):
+            for j in range(0, len(self._asientosPelicula[i])):
+
+                asiento = tk.Entry(ubicacionPantalla, state = 'disabled', width = 5, background='green')
+                asiento.insert(0, f'{i+1}:{j+1}')
+
+                if self._asientosPelicula[i][j] == 1:
+                    asiento.config(background = 'red')
+
+                asiento.grid(row = i, column = j)
+    """
+
+    def setColumnas(self, evento):
+        self._filaSeleccionada = int(self._comboBoxFilas.get())
+
+        self._comboBoxCols.configure(values = Pelicula.asientosDisponibles(self._filaSeleccionada, self._asientosPelicula), state = 'readonly')
+
+    def funBorrar(self):
+        #Setteamos los valores por defecto de cada comboBox
+        super().funBorrar()
+
+        #Configuramos el estado del comboBox de columnas
+        self._comboBoxCols.configure(state = 'disabled')
+    
+    def funAceptar(self):
+        #Evaluamos las excepciones de UI
+        if self.evaluarExcepciones():
+            #Creamos un apuntador al cliente para facilitar su acceso
+            clienteProceso = FieldFrame.getClienteProceso()
+
+            #Obtenemos la columna seleccionada
+            self._columnaSeleccionada = int(self._comboBoxCols.get())
+            
+            #Confirmamos la elecicón de datos
+            confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el asiento en la fila: {self._filaSeleccionada}; con la columna: {self._columnaSeleccionada}')
+
+            if confirmacionUsuario:
+                #Confirmamos ingreso a la pasarela de pagos
+                cofirmacionParaPasarelaDePago = messagebox.askokcancel('Confirmación elección datos de reserva', 'Ya hemos concluido la selección de datos necesarios para la reserva de ticket, ahora procederemos a realizar el pago, ¿Desea Continuar?')
+
+                if cofirmacionParaPasarelaDePago:
+                    #Construimos el ticket en cuestión
+                    ticketProceso = Ticket(self._peliculaProceso, self._horarioProceso, f'{self._filaSeleccionada}-{self._columnaSeleccionada}', clienteProceso.getCineUbicacionActual())
+
+                    #Notificamos al cliente en caso de recibir el descuento
+                    if ticketProceso.getPrecio() != self._peliculaProceso.getPrecio():
+                        messagebox.showinfo('¡FELICITACIONES!', f'Por ser el cliente número: {clienteProceso.getCineUbicacionActual().getCantidadTicketsGenerados()} has recibido un descuento del {'80%' if self._peliculaProceso.getTipoDeFormato() == '2D' else '50%'}')
+
+                    #Ingresamos a la pasarela de pago
+                    pass
+
 class FrameFuncionalidad3Calificaciones(FieldFrame):
 
     
@@ -669,6 +815,7 @@ def objetosBasePractica2():
     cliente2 = Cliente("Andy", 18, 14343, TipoDocumento.CC, sucursalCine1)
     cliente3 = Cliente('Gerson', 23, 98765, TipoDocumento.CC, sucursalCine3)
     cliente4 = Cliente('Juanjo', 18, 987, TipoDocumento.CC, sucursalCine1)
+    cliente5 = Cliente('Sanitago', 18, 1125274009, TipoDocumento.CC, sucursalCine3)
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
     salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)
@@ -689,8 +836,6 @@ def objetosBasePractica2():
     pelicula1_5.crearPeliculas()
     pelicula1_6 = Pelicula("Spy x Familiy Código: Blanco", 19000, "Infantil", timedelta( minutes=90 ), "+5", "2D", sucursalCine1)
     pelicula1_6.crearPeliculas()
-
-    
 
     salaDeCine2_1 = SalaCine(1, "2D", sucursalCine2)
     salaDeCine2_2 = SalaCine(2, "3D", sucursalCine2)

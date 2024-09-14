@@ -246,7 +246,7 @@ class Pelicula:
         if self.isPeliculaEnPresentacion():
             horarioPresentacion = self.whereIsPeliculaEnPresentacion().getHorarioPeliculaEnPresentacion()
             horariosParaMostrar = self.filtrarHorariosPelicula()
-            horariosParaMostrar.insert(0, horarioPresentacion)
+            horariosParaMostrar.insert(0, f'En vivo: {horarioPresentacion}')
             return horariosParaMostrar
         
         else:
@@ -315,6 +315,50 @@ class Pelicula:
         for salaDeCine in self._sucursalCartelera.getSalasDeCine():
             if salaDeCine.getPeliculaEnPresentacion() is self:
                 return salaDeCine
+            
+    def filasConAsientosDisponibles(matrizDeAsientos):
+
+        """
+        :Description: Este método se encarga de retornar una lista de las filas con asientos disponibles
+
+        :param matrizDeAsientos: Este método recibe como parámetro los asientos que analizará
+
+        :return list(int): Este método retorna una lista con los números de las filas que tienen algún asiento disponible
+        """
+
+        numeroFilaDisponible = []
+        i = 0
+
+        for filaAsientos in matrizDeAsientos:
+            i+=1
+            
+            for asiento in filaAsientos:
+                if asiento == 0:
+                    numeroFilaDisponible.append(i)
+                    break
+        
+        return numeroFilaDisponible
+    
+    def asientosDisponibles(fila, matrizDeAsientos):
+
+        """
+        :Description: Este método se encarga de retornar una lista de los asientos disponibles dada una fila de asientos
+
+        :param matrizDeAsientos: Este método recibe como parámetro los asientos que analizará
+
+        :return list(int): Este método retorna una lista con los números de las columnas que representan los asientos disponibles
+        """
+
+        numeroColumnaDisponible = []
+        i = 0
+
+        for asiento in matrizDeAsientos[fila]:
+            i+=1
+
+            if asiento == 0:
+                numeroColumnaDisponible.append(i)
+        
+        return numeroColumnaDisponible
 
     def crearPeliculas(self):
 

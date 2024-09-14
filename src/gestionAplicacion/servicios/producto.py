@@ -23,7 +23,7 @@ class Producto():
 	#param longitud :  se pasa el como parametro la longitud que se desea el codigo
 	#@return <b>Bono</b> :  Se retorna el bono creado
 	
-    def generar_codigo_aleatorio(longitud):
+    def generarCodigoAleatorio(longitud):
      caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
      codigo = ''.join(random.choice(caracteres) for _ in range(longitud))
      return codigo
@@ -32,8 +32,8 @@ class Producto():
     #Description: Este metodo se encarga de revisar que un producto tenga unidades disponibles en el inventario, 
 	#ya que con esto se hace una evaluacion a si unaproducto es apta para calificar o no.
 
-    def verificar_inventario_producto(self):
-        if len(self.inventario_cine) <= len(self.tipos_de_membresia):
+    def verificarInventarioProducto(self):
+        if len(self.inventarioCine) <= len(self.tiposDeMembresia):
             return False
         else:
             return True
