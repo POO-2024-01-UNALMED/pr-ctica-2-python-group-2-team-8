@@ -368,17 +368,35 @@ class FrameVentanaPrincipal(FieldFrame):
                 widget.destroy()
 
     def construirMenu(self):
-        barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Courier", 9))
+        barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Times New Roman", 10))
         ventanaLogicaProyecto.config(menu=barraMenuPrincipal)
-        menuOpcionesPrincipal = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Courier", 9), activebackground= "grey", activeforeground="black")
-        barraMenuPrincipal.add_cascade(label="Procesos y Consultas", menu= menuOpcionesPrincipal, font=("Courier", 9))
+        menuArchivo = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Times New Roman", 10), activebackground= "light blue", activeforeground="black")
+        menuProcesosConsultas = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Times New Roman", 10), activebackground= "light blue", activeforeground="black")
+        menuAyuda = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Times New Roman", 10), activebackground= "light blue", activeforeground="black")
 
-        menuOpcionesPrincipal.add_command(label="Reserva de tiquetes", command = self.ingresarFuncionalidad1)
-        menuOpcionesPrincipal.add_command(label="Zona de juegos", command=self.ingresarFuncionalidad4)
-        menuOpcionesPrincipal.add_command(label="Calificaciones", command=self.ingresarFuncionalidad3)
-        menuOpcionesPrincipal.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
-        menuOpcionesPrincipal.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
+        barraMenuPrincipal.add_cascade(label="Archivo", menu=menuArchivo, font=("Times New Roman", 10))
+        barraMenuPrincipal.add_cascade(label="Procesos y Consultas", menu= menuProcesosConsultas, font=("Times New Roman", 10))
+        barraMenuPrincipal.add_cascade(label="Ayuda", menu= menuAyuda, font=("Times New Roman", 10))
+        
+        menuArchivo.add_command(label="Aplicación", command=self.mostrarDescripcionSistema)
+        menuArchivo.add_command(label="Salir", command=self.mostrarVentanaInicio)
+
+        menuProcesosConsultas.add_command(label="Reserva de tiquetes", command = self.ingresarFuncionalidad1)
+        menuProcesosConsultas.add_command(label="Zona de juegos", command=self.ingresarFuncionalidad4)
+        menuProcesosConsultas.add_command(label="Calificaciones", command=self.ingresarFuncionalidad3)
+        menuProcesosConsultas.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
+        menuProcesosConsultas.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
+
+        menuAyuda.add_command(label="Acerca de", command=self.mostrarNombreAutores)
     
+
+    def mostrarDescripcionSistema(self):
+         messagebox.showinfo("Información del Sistema", "En este programa puedes:\n•Comprar Tickets\n•Comprar comida y regalos\n•Usar la zona de juegos\n•Adquirir membresias\n•Calificar nuestros servicios")
+    
+    def mostrarVentanaInicio(self):
+        ventanaLogicaProyecto.withdraw()
+        ventanaInicio.deiconify()
+
     def ingresarFuncionalidad1(evento):
         FieldFrame.getFramesFuncionalidades()[0].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
     
@@ -393,6 +411,9 @@ class FrameVentanaPrincipal(FieldFrame):
 
     def ingresarFuncionalidad5(evento):
         FieldFrame.getFramesFuncionalidades()[4].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+
+    def mostrarNombreAutores(self):
+         messagebox.showinfo("Autores de la Aplicación", "• Juan José Gonzalez Morales - Alias: El Juanjo\n• Edinson Andrés Ariza Mendoza - Alias: Pana Andy\n• Rusbel Danilo Jaramillo Hincapie - Alias: El Indigente\n• Gerson Bedoya Hinestroza - Alias: El viejo Gerson\n• Santiago Castro Herrera - Alias: EL LuisMi")
 
 class FrameZonaJuegos(FieldFrame):
     
@@ -430,7 +451,7 @@ class FrameZonaJuegos(FieldFrame):
 
         boton1 = tk.Button(self, text="Ingresar", font= ("Lucida Console",15, "bold"), fg = "black", bg = "light blue",command=self.funAceptar, width=12,height=2)
         boton2 = tk.Button(self, text="Volver", font= ("Lucida Console",15, "bold"), fg = "black", bg = "light blue", command=self.funVolver, width=12,height=2)
-
+        
         self.canvas.create_window(230, 380, window=boton1, anchor="center")
         self.canvas.create_window(420, 380, window=boton2, anchor="center")
     
