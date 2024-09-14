@@ -167,7 +167,7 @@ class FieldFrame(tk.Frame):
         if frameAnterior is not None:
             frameAnterior.pack_forget()
         self.pack(expand=True)
-        #FieldFrame.setFrameMenuPrincipal(self) <- Genera error al usar el botón volver
+        #FieldFrame.setFrameMenuPrincipal(self) #<- Genera error al usar el botón volver
     
     @classmethod
     def getClienteProceso(cls):
@@ -463,7 +463,7 @@ class FrameZonaJuegos(FieldFrame):
     #Metodo para el boton ingresar
     def funAceptar(self):
         if FieldFrame.getClienteProceso().verificarCuenta():
-            pass
+            FrameTarjetaCinemar().mostrarFrame(self)
         else: 
             self.AlertaSinCuenta()
 
@@ -500,10 +500,11 @@ class FrameZonaJuegos(FieldFrame):
                 def eliminar_labels():
                     for label_id in label_ids:
                         self.canvas.delete(label_id)
-            
+                    FrameTarjetaCinemar().mostrarFrame(self)
 
                 # Tiempo total para que los Labels se muestren y luego se eliminen (5 etiquetas * 1.5 segundos = 7.5 segundos)
                 self.canvas.after(7500, eliminar_labels)
+                
         else:
             label = tk.Label(
                         self, 
@@ -522,6 +523,69 @@ class FrameZonaJuegos(FieldFrame):
 
             # Usar lambda para eliminar el Label después de 5 segundos
             self.canvas.after(4000, lambda: self.canvas.delete(label_id))
+        
+class FrameTarjetaCinemar(FieldFrame):
+    
+    def __init__(self):
+
+        clienteProceso = FieldFrame.getClienteProceso()
+
+        super().__init__(
+                tituloProceso = 'Personalización Tarjeta Cinemar',
+                descripcionProceso = 'En este espacio podras personalizar tu tarjeta cinemar a tu gusto\n',
+                tituloCriterios = 'Criterios',
+                textEtiquetas = ['Seleccione color de la tarjeta :', 'Seleccione fuente de la tarjeta :', 'Seleccione color de la fuente :'], 
+                tituloValores = 'Elecciones',
+                infoElementosInteractuables = [
+                    [["coral","sky blue","lime green","gold" ,"fuchsia","violet","turquoise"], 'Color de la tarjeta'], 
+                    [["Helvetica", "Arial", "Courier New", "Comic Sans MS", "Verdana", "Times New Roman", "Georgia"], 'Fuente de la tarjeta'], 
+                    [["salmon", "light sea green", "medium orchid", "pale turquoise", "deep pink", "dodger blue", "light goldenrod yellow"], 'Color de la fuente']
+                ],
+                habilitado = [False, False, False],
+                botonVolver = True
+            )
+        
+        widgets = []
+        
+        for widget in self.winfo_children():
+
+            widgets.append(widget)
+
+        widgets[2].grid_configure(row=5, column=0)
+        widgets[3].grid_configure(row=5, column=2)
+        widgets[4].grid_configure(row=6, column=0)
+        widgets[5].grid_configure(row=6, column=1)
+        widgets[6].grid_configure(row=7, column=0)
+        widgets[7].grid_configure(row=7, column=1)
+        widgets[8].grid_configure(row=8, column=0)
+        widgets[9].grid_configure(row=8, column=1)
+        widgets[10].grid_configure(row=9, column=0, sticky = "we", columnspan = 4)
+
+        FrameTarjeta = tk.Frame(self, bg = "black", width=300, height=150)
+        FrameTarjeta.grid(row =2, rowspan= 3, column= 0, columnspan= 4)
+
+        for widget in widgets[-1].winfo_children():
+
+            widget.config(font= ("Times New Roman", 16, "bold"), width = 9, height = 1, bg = "sky blue", fg = "black")
+
+        tamaños = [25,14,16,16,12,12,12,12,12,12]
+
+        widgets[-1].config(bg = "light blue")
+        widgets.pop(-1)
+        
+        for i, w in enumerate(widgets):
+            if isinstance(w, ttk.Combobox):
+                pass
+            else:
+                w.config(font = ("Times New Roman", tamaños[i]), bg = "light blue")
+
+        widgets[2].config(font = ("Times New Roman", 16, "bold"))
+        widgets[3].config(font = ("Times New Roman", 16, "bold"))
+        
+        ventanaLogicaProyecto.config(bg= "light blue")
+        self.config(bg= "light blue")
+
+        
 
 #################################################################################################################################
 
@@ -1063,6 +1127,8 @@ def objetosBasePractica2():
     #print(sucursalCine2.getServicios()[0].mostrarInventario())
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
+
+    #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0])
 
 
 def ventanaDeInicio(): 
