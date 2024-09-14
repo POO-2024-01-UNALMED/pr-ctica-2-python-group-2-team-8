@@ -167,7 +167,7 @@ class FieldFrame(tk.Frame):
         if frameAnterior is not None:
             frameAnterior.pack_forget()
         self.pack(expand=True)
-        #FieldFrame.setFrameMenuPrincipal(self) <- Genera error al usar el botón volver
+        FieldFrame.setFrameMenuPrincipal(self) #<- Genera error al usar el botón volver
     
     @classmethod
     def getClienteProceso(cls):
@@ -495,10 +495,11 @@ class FrameZonaJuegos(FieldFrame):
                 def eliminar_labels():
                     for label_id in label_ids:
                         self.canvas.delete(label_id)
-            
+                    FrameTarjetaCinemar().mostrarFrame(self)
 
                 # Tiempo total para que los Labels se muestren y luego se eliminen (5 etiquetas * 1.5 segundos = 7.5 segundos)
-                self.canvas.after(7500, eliminar_labels or FrameTarjetaCinemar().mostrarFrame(self))
+                self.canvas.after(7500, eliminar_labels)
+                
         else:
             label = tk.Label(
                         self, 
@@ -523,9 +524,6 @@ class FrameTarjetaCinemar(FieldFrame):
     def __init__(self):
 
         clienteProceso = FieldFrame.getClienteProceso()
-
-        style = ttk.Style()
-        style.configure('TCombobox', fieldbackground='light blue', background='light blue')
 
         super().__init__(
                 tituloProceso = 'Personalización Tarjeta Cinemar',
@@ -1055,7 +1053,7 @@ def objetosBasePractica2():
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
-    cliente4.setCuenta(SucursalCine.getSucursalesCine()[0])
+    #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0])
 
 
 def ventanaDeInicio(): 
