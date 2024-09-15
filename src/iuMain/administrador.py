@@ -257,6 +257,9 @@ class FieldFrame(tk.Frame):
 
 class FrameGeneracionDeProductos(FieldFrame):
     def __init__(self, servicio):
+
+        self._servicio = servicio
+
         servicio.setCliente(self._clienteProceso)
         servicio.setInventario(servicio.actualizarInventario())
 
@@ -267,8 +270,51 @@ class FrameGeneracionDeProductos(FieldFrame):
             textEtiquetas = ['Producto',"Cantidad"],
             tituloValores = "Datos de compra",
             infoElementosInteractuables = [[servicio.mostrarInventario(), "Seleccione un Producto"],None],
-            habilitado = [False,True]
+            habilitado = [False,True,True]
         )
+    
+    #def agregar(self):
+    #    nombreProducto = self._elementosInteractivos[0].get()
+    #    n = 0
+    #    for productos in self._servicio.getInventario():
+    #        nombre = f"{productos.getNombre()} {productos.getTamaño()}"
+    #        if nombre == nombreProducto:
+    #            if productos.getCantidad() >= int(self._elementosInteractivos[1].get()):
+    #                self._servicio.agregarOrden(self._servicio.hacerPedido(n ,int(self._elementosInteractivos[1].get()) ,self._clienteProceso.getCineUbicacionActual()))
+    #                self.mostrar()
+   #                 break
+    #            else:
+   #                 messagebox.showerror("Error",f"No hay suficiente cantidad de {productos.getNombre()} {productos.getTamaño()}, solo hay: {productos.getCantidad()}")
+    #                break
+   #         n+=1
+    #
+    #boton=tk.Frame(self)
+   # agrega = tk.Button(boton,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=agregar,
+   #                    width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = 7)
+
+
+    def funAceptar(self):
+        if not self.tieneCamposPorDefecto():
+            nombreProducto = self._elementosInteractivos[0].get()
+        n = 0
+        for productos in self._servicio.getInventario():
+            nombre = f"{productos.getNombre()} {productos.getTamaño()}"
+            if nombre == nombreProducto:
+                if productos.getCantidad() >= int(self._elementosInteractivos[1].get()):
+                    self._servicio.agregarOrden(self._servicio.hacerPedido(n ,int(self._elementosInteractivos[1].get()) ,self._clienteProceso.getCineUbicacionActual()))
+                    self.mostrar()
+                    break
+                else:
+                    messagebox.showerror("Error",f"No hay suficiente cantidad de {productos.getNombre()} {productos.getTamaño()}, solo hay: {productos.getCantidad()}")
+                    break
+            n+=1
+        else:
+           messagebox.showerror("Error","Por favor rellene todos los campos")
+
+    def mostrar(self):
+        labelCriterio = tk.Label(self, text = "Productos en orden\n"+ self._servicio.mostrarOrden(), font= ("Verdana",12), anchor="center")
+        labelCriterio.grid(row=0, column=0, columnspan=4, sticky='we')
+
     
 class FrameFuncionalidad2(FieldFrame):
     def __init__(self):
@@ -284,6 +330,7 @@ class FrameFuncionalidad2(FieldFrame):
             infoElementosInteractuables = [[self._sucursalActual.mostrarServicios(), "Seleccione un servicio"]],
             habilitado = [False]
         )
+        
 
     def funAceptar(self):
         if not self.tieneCamposPorDefecto():
