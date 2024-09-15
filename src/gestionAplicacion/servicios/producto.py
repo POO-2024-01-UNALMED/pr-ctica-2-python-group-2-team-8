@@ -38,6 +38,23 @@ class Producto():
         else:
             return True
         
+    @classmethod
+    def obtenerProductosPorNombre(cls, nombreProducto, productos):
+
+       
+        
+        filtroPeliculasMismoNombre = []
+
+        for producto in productos:
+            if producto._nombre == nombreProducto:
+                filtroPeliculasMismoNombre.append(producto)
+        
+        return filtroPeliculasMismoNombre
+    
+
+   
+    
+
     def getGenero(self):
         return self._genero
 
