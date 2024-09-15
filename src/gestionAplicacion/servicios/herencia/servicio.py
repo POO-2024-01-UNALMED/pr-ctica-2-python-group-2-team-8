@@ -55,14 +55,19 @@ class Servicio (ABC):
         return total
 
     def agregarOrden(self, producto):
-        if 0 < len(self.orden):
-            for p in self.orden:
+        if 0 < len(self._orden):
+            n=1
+            for p in self._orden:
                 if producto.getNombre() == p.getNombre() and producto.getTamaño() == p.getTamaño():
                     p.setCantidad(p.getCantidad() + producto.getCantidad())
                     p.setPrecio(p.getPrecio() + producto.getPrecio())
                     break
+                elif len(self._orden) == n:
+                    self._orden.append(producto)
+                    break
+                n+=1
         else:
-            self.orden.append(producto)
+            self._orden.append(producto)
 
     def descontarProducto(self, producto):
         for p in self.orden:
@@ -88,9 +93,9 @@ class Servicio (ABC):
         pedido = ""
         total = 0
         n = 0
-        for producto in self.orden:
+        for producto in self._orden:
             n = n + 1 
-            pedido += f"\n{n} -- {producto.getCantidad()} {producto.getNombre()} {producto.getTamaño()} : ${producto.getPrecio()}"
+            pedido = f"\n{pedido} \n{n} -- {str(producto.getCantidad())} {producto.getNombre()} {producto.getTamaño()} : ${producto.getPrecio()}"
             total += producto.getPrecio()
         pedido += f"\nTotal: ${total}"
         return pedido
@@ -105,13 +110,11 @@ class Servicio (ABC):
             p.append(f"{producto.getNombre()} {producto.getTamaño()}")
         return p
 
-    def hacerPedido(self, indice, cantidad):
-        producto_inventario = self.inventario[indice]
-        if producto_inventario.getCantidad >= cantidad:
+    def hacerPedido(self, indice, cantidad, sucursal):
+        producto_inventario = self._inventario[indice]
+        if producto_inventario.getCantidad() >= cantidad:
             producto_inventario.setCantidad(producto_inventario.getCantidad() - cantidad)
-            producto = Producto(producto_inventario.nombre, producto_inventario.tamaño, cantidad)
-            producto.setPrecio(producto_inventario.getPrecio() * cantidad)
-            producto.setGenero(producto_inventario.getGenero())
+            producto = Producto(producto_inventario.getNombre(), producto_inventario.getTamaño(),"", (producto_inventario.getPrecio() * cantidad), cantidad, (producto_inventario.getGenero()), sucursal)
             return producto
         return None
     
