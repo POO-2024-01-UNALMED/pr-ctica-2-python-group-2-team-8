@@ -7,6 +7,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 import tkinter as tk
+from gestionAplicacion.servicios.bono import *
 from tkinter import ttk, messagebox
 from datetime import datetime, time, timedelta
 from gestionAplicacion.usuario.tipoDocumento import TipoDocumento
@@ -81,7 +82,7 @@ class FieldFrame(tk.Frame):
                 elementoInteractivo.set(infoElementosInteractuables[i][1])
 
 
-            elementoInteractivo.grid(column=1, row=i+3,columnspan=3, padx = (10,10), pady = (10,10))
+            elementoInteractivo.grid(column=1, row=i+3,columnspan=1, padx = (10,10), pady = (10,10))
 
             if not habilitado[i]:
 
@@ -265,11 +266,21 @@ class VisualFieldFrame(tk.Frame):
 ####################################################################################################
 ####################################################################################################
 
+class FrameReclamoDeBonos(FieldFrame):
+    def __init__(self, servicio):
+        servicio.actualizarBonos()
+        super().__init__(
+            tituloProceso = "Bonos",
+            descripcionProceso = "En este apartado podras reclamar los bonos que tenes asociados",
+            textEtiquetas = ['Bonos Disponibles'],
+            infoElementosInteractuables = [[servicio.mostrarBonos(servicio), "Seleccione un Producto"]],
+            habilitado = [False],
+        )
+
 class FrameGeneracionDeProductos(FieldFrame):
     def __init__(self, servicio):
 
         self._servicio = servicio
-
         servicio.setCliente(self._clienteProceso)
         servicio.setInventario(servicio.actualizarInventario())
 
@@ -280,50 +291,41 @@ class FrameGeneracionDeProductos(FieldFrame):
             textEtiquetas = ['Producto',"Cantidad"],
             tituloValores = "Datos de compra",
             infoElementosInteractuables = [[servicio.mostrarInventario(), "Seleccione un Producto"],None],
-            habilitado = [False,True,True]
+            habilitado = [False,True,True],
         )
-    
-    #def agregar(self):
-    #    nombreProducto = self._elementosInteractivos[0].get()
-    #    n = 0
-    #    for productos in self._servicio.getInventario():
-    #        nombre = f"{productos.getNombre()} {productos.getTamaño()}"
-    #        if nombre == nombreProducto:
-    #            if productos.getCantidad() >= int(self._elementosInteractivos[1].get()):
-    #                self._servicio.agregarOrden(self._servicio.hacerPedido(n ,int(self._elementosInteractivos[1].get()) ,self._clienteProceso.getCineUbicacionActual()))
-    #                self.mostrar()
-   #                 break
-    #            else:
-   #                 messagebox.showerror("Error",f"No hay suficiente cantidad de {productos.getNombre()} {productos.getTamaño()}, solo hay: {productos.getCantidad()}")
-    #                break
-   #         n+=1
-    #
-    #boton=tk.Frame(self)
-   # agrega = tk.Button(boton,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=agregar,
-   #                    width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = 7)
+        tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("Verdana bold",20), anchor="center")
+        tituloV.grid(column=2, row=2, padx = (10,10), pady = (10,10))
 
-
-    def funAceptar(self):
+        agregarb = tk.Button(self,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.agregar,
+        width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 2, row = 5,)
+        
+    def agregar(self):
         if not self.tieneCamposPorDefecto():
             nombreProducto = self._elementosInteractivos[0].get()
-        n = 0
-        for productos in self._servicio.getInventario():
-            nombre = f"{productos.getNombre()} {productos.getTamaño()}"
-            if nombre == nombreProducto:
-                if productos.getCantidad() >= int(self._elementosInteractivos[1].get()):
-                    self._servicio.agregarOrden(self._servicio.hacerPedido(n ,int(self._elementosInteractivos[1].get()) ,self._clienteProceso.getCineUbicacionActual()))
-                    self.mostrar()
-                    break
-                else:
-                    messagebox.showerror("Error",f"No hay suficiente cantidad de {productos.getNombre()} {productos.getTamaño()}, solo hay: {productos.getCantidad()}")
-                    break
-            n+=1
+            n = 0
+            for productos in self._servicio.getInventario():
+                nombre = f"{productos.getNombre()} {productos.getTamaño()}"
+                if nombre == nombreProducto:
+                    if productos.getCantidad() >= int(self._elementosInteractivos[1].get()):
+                        self._servicio.agregarOrden(self._servicio.hacerPedido(n ,int(self._elementosInteractivos[1].get()) ,self._clienteProceso.getCineUbicacionActual()))
+                        self.mostrar()
+                        eliminarb = tk.Button(self,text="Eliminar producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.agregar,
+                            width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = 6)
+                        break
+                    else:
+                        messagebox.showerror("Error",f"No hay suficiente cantidad de {productos.getNombre()} {productos.getTamaño()}, solo hay: {productos.getCantidad()}")
+                        break
+                n+=1
+            self.funBorrar()
         else:
-           messagebox.showerror("Error","Por favor rellene todos los campos")
+           messagebox.showerror("Error","Por favor llenar todos los campos")
+
+    def funAceptar(self):
+        FrameReclamoDeBonos(self._servicio).mostrarFrame()
 
     def mostrar(self):
-        labelCriterio = tk.Label(self, text = "Productos en orden\n"+ self._servicio.mostrarOrden(), font= ("Verdana",12), anchor="center")
-        labelCriterio.grid(row=0, column=0, columnspan=4, sticky='we')
+        labelCriterio = tk.Label(self, text = self._servicio.mostrarOrden(),anchor="w", font= ("Verdana",10))
+        labelCriterio.grid(row=3, column=2,rowspan=2, sticky="w")
 
     
 class FrameFuncionalidad2(FieldFrame):
@@ -1357,6 +1359,12 @@ def objetosBasePractica2():
     cliente3 = Cliente('Gerson', 23, 98765, TipoDocumento.CC, sucursalCine3)
     cliente4 = Cliente('Juanjo', 18, 987, TipoDocumento.CC, sucursalCine1)
     cliente5 = Cliente('Santiago', 18, 1125274009, TipoDocumento.CC, sucursalCine3)
+
+    producto2b = Producto("Hamburguesa","Grande","comida",0,1,"Normal",sucursalCine2)
+    bono1 = Bono(1234,producto2b,"comida",cliente1)
+    producto1b = Producto("Camisa","XL","souvenir",0,1,"Normal",sucursalCine2)
+    bono2 = Bono(1234,producto1b,"souvenir",cliente1)
+    bono3 = Bono(1234,producto2b,"comida",cliente1)
     
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)

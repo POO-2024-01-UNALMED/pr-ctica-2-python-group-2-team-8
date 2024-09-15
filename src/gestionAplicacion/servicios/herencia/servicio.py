@@ -26,17 +26,16 @@ class Servicio (ABC):
     @staticmethod
     def mostrarBonos(servicio):
         n = 0
-        bono = "\n====== Tienes los siguientes bonos disponibles ======\n" 
-        + "\n0. No reclamar ningún bono."
+        b = []
         for bono in servicio.getBonosCliente():
             n += 1
-            bono += f"\n{n}. {bono.getProducto().getNombre()} {bono.getProducto().getTamaño()} código: {bono.getCodigo()}"
-        return bono
+            b.append(f"\n{n}. {bono.getProducto().getNombre()} {bono.getProducto().getTamaño()}")
+        return b
 
     def actualizarBonos(self):
-        for bono in self.cliente.getCineActual().getBonosCreados():
-            if bono.getTipoServicio() == self.nombre and bono.getCliente() == self.cliente:
-               self.bonosCliente.append(bono) 
+        for bono in self.cliente.getCineUbicacionActual().getBonosCreados():
+            if bono.getTipoServicio() == self.getNombre() and bono.getCliente() == self.cliente:
+                self.getBonosCliente().append(bono) 
 
     def descuentarPorGenero(self, cine):
         for producto in self.orden:
@@ -95,7 +94,7 @@ class Servicio (ABC):
         n = 0
         for producto in self._orden:
             n = n + 1 
-            pedido = f"\n{pedido} \n{n} -- {str(producto.getCantidad())} {producto.getNombre()} {producto.getTamaño()} : ${producto.getPrecio()}"
+            pedido = f"{pedido} \n{n} -- {str(producto.getCantidad())} {producto.getNombre()} {producto.getTamaño()} : ${producto.getPrecio()}"
             total += producto.getPrecio()
         pedido += f"\nTotal: ${total}"
         return pedido
