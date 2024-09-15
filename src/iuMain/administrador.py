@@ -409,9 +409,9 @@ class FrameCrearUsuario(FieldFrame):
     #Construimos el frame usando FieldFrame
     def __init__(self, tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada):
 
-        self._imagenFramePrincipal = tk.PhotoImage(file = 'src/iuMain/imagenes/fachadaCine.png')
-        self._labelImagen = tk.Label(self, image = self._imagenFramePrincipal)
-        self._labelImagen.grid(row=0, column=0)
+        #self._imagenFramePrincipal = tk.PhotoImage(file = 'src/iuMain/imagenes/fachadaCine.png')
+        #self._labelImagen = tk.Label(self, image = self._imagenFramePrincipal)
+        #self._labelImagen.grid(row=0, column=0)
 
         super().__init__(
             tituloProceso = 'Crear Usuario', 
@@ -446,9 +446,19 @@ class FrameCrearUsuario(FieldFrame):
             confirmacionCliente = messagebox.askokcancel('Confirmación datos', f'Los datos ingresados son:\nNombre: {nombreCliente}\nEdad: {edadCliente}')
 
             if confirmacionCliente:
-                #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
-                self.logicaInicioProcesosFuncionalidades(Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual)))
-        
+                #Verificamos que tenga la edad mínima para ingresar al cine
+                if edadCliente > 5:
+                    #Verificamos que la edad ingresada sea apropiada para el documento seleccionado
+                    if (self._tipoDocumentoCliente == TipoDocumento.CC.value and edadCliente >= 18) or (self._tipoDocumentoCliente == TipoDocumento.TI.value and edadCliente < 18) or (self._tipoDocumentoCliente == TipoDocumento.CE.value and edadCliente >= 18):
+                        #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
+                        self.logicaInicioProcesosFuncionalidades(Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual)))
+                    
+                    else: 
+                        messagebox.showerror('Error', 'Debes seleccionar una edad apropiada para el documento seleccionado anteriormente')
+                
+                else:
+                    messagebox.showerror('Error', 'La edad mínima para acceder a nuestras instalaciones es de 5 años')
+
 class FrameVentanaPrincipal(FieldFrame):
 
     def __init__(self):
@@ -819,12 +829,16 @@ class FrameFuncionalidad1(FieldFrame):
                 
                 #Obtenemos el ínidice del criterio seleccionado
                 eleccionUsuario = self._comoboBoxProceso.current()
+                #Eliminamos los tickets caducados
+                self._clienteProceso.dropTicketsCaducados()
+                #Creamos una variable que almacenará los tickets para usar según el proceso
+                ticketsParaUsar = self._clienteProceso.filtrarTicketsParaSede() if eleccionUsuario == 1 else self._clienteProceso.mostrarTicketsParaSalaDeEspera()
+
                 #En caso de que quiera ingresar a sala de cine o sala de espera
                 if eleccionUsuario == 1 or eleccionUsuario == 2:
-                    #Eliminamos los tickets caducados
-                    self._clienteProceso.dropTicketsCaducados()
+                    
                     #Verificamos si tiene tickets disponibles para usar
-                    if len(self._clienteProceso.filtrarTicketsParaSede()) == 0:
+                    if len(ticketsParaUsar) == 0:
                         #Mostramos mensaje de error y finalizamos la ejecución
                         messagebox.showerror('Error', 'No tienes tickets reservados o estos no pertenecen a esta sucursal, para acceder a este proceso debes concluir de forma exitosa al menos un proceso de reserva de ticket')
                         return 
@@ -1367,7 +1381,7 @@ def objetosBasePractica2():
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
-    ticket = Ticket(pelicula1_1, datetime(2024, 9, 15, 12, 20, 0), '4-4', sucursalCine1)
+    ticket = Ticket(pelicula1_2, datetime(2024, 9, 15, 12, 20, 0), '4-4', sucursalCine1)
     ticket.setSucursalCompra(sucursalCine1)
     ticket.setSalaDeCine(salaDeCine1_1)
     cliente2.getTickets().append(ticket)
