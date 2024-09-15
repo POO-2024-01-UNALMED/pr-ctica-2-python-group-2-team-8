@@ -1211,7 +1211,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
             tituloProceso="Calificaciones",
             descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas, en este espacio podras calificar nuestros servicios dependiendo tus gustos y aficiones.(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
             tituloCriterios = 'Criterios para calificar',
-            textEtiquetas= ["Que quieres calificar : ","Escoge tu item :" ,  "Califica tu item :"],
+            textEtiquetas= ["Que quieres calificar :","Escoge tu item :" ,  "Califica tu item :"],
             tituloValores = 'Valores ingresados',
             infoElementosInteractuables = [
                 [["Producto","Pelicula"], 'Seleccionar una opcion'],
@@ -1226,14 +1226,14 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
         )
 
         self._comboBoxItems = self.getElementosInteractivos()[0]
-        self._comboBoxEscogeritem = self.getElementosInteractivos()[1]
+        self._comboBoxEscogerItem = self.getElementosInteractivos()[1]
         self._comboBoxCalificarItem = self.getElementosInteractivos()[2]
 
-        self._comboBoxEscogeritem.configure(state = 'disabled')
+        self._comboBoxEscogerItem.configure(state = 'disabled')
         self._comboBoxCalificarItem.configure(state = 'disabled')
 
         self._comboBoxItems.bind('<<ComboboxSelected>>', self.setMostrarItemParaCalificar)
-        self._comboBoxEscogeritem.bind('<<ComboboxSelected>>', self.setCalificarItem)
+        self._comboBoxEscogerItem.bind('<<ComboboxSelected>>', self.setCalificarItem)
 
 
     def setMostrarItemParaCalificar(self,evento):
@@ -1241,9 +1241,9 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
         if self._comboBoxItems.current() == 0:
 
        
-            self._comboBoxEscogeritem.configure(values = Cliente.mostrarProductosParaCalificar(self._productosCalificar))
-            self._comboBoxEscogeritem.configure(state = 'readonly')
-            self._comboBoxEscogeritem.set(self._infoElementosInteractuables[1][1])
+            self._comboBoxEscogerItem.configure(values = Cliente.mostrarProductosParaCalificar(self._productosCalificar))
+            self._comboBoxEscogerItem.configure(state = 'readonly')
+            self._comboBoxEscogerItem.set(self._infoElementosInteractuables[1][1])
 
         
             self._comboBoxCalificarItem.configure(state = 'disabled')
@@ -1253,9 +1253,9 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
 
         else:
             
-            self._comboBoxEscogeritem.configure(values = Cliente.mostrarPeliculaParaCalificar(self._peliculasCalificar))
-            self._comboBoxEscogeritem.configure(state = 'readonly')
-            self._comboBoxEscogeritem.set(self._infoElementosInteractuables[1][1])
+            self._comboBoxEscogerItem.configure(values = Cliente.mostrarPeliculaParaCalificar(self._peliculasCalificar))
+            self._comboBoxEscogerItem.configure(state = 'readonly')
+            self._comboBoxEscogerItem.set(self._infoElementosInteractuables[1][1])
 
         
             self._comboBoxCalificarItem.configure(state = 'disabled')
@@ -1269,6 +1269,14 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
         self._comboBoxCalificarItem.configure(values = calificacionesLista)
         self._comboBoxCalificarItem.configure(state = 'readonly')
         nombreProductoSeleccionado = self.getValue("Escoge tu item :")
+
+    def funBorrar(self):
+        #Setteamos los valores por defecto de cada comboBox
+        super().funBorrar()
+
+        #Configuramos el estado del comboBox de columnas
+        self._comboBoxEscogerItem.configure(state = 'disabled')  
+        self._comboBoxCalificarItem.configure(state = 'disabled')    
            
 
     def funAceptar(self):
@@ -1388,6 +1396,8 @@ def objetosBasePractica2():
     pelicula1_6.crearPeliculas()
     cliente5.getPeliculasDisponiblesParaCalificar().append(pelicula1_2)
     cliente5.getProductosDisponiblesParaCalificar().append(producto7)
+    cliente5.getPeliculasDisponiblesParaCalificar().append(pelicula1_3)
+    cliente5.getProductosDisponiblesParaCalificar().append(producto5)
 
     salaDeCine2_1 = SalaCine(1, "2D", sucursalCine2)
     salaDeCine2_2 = SalaCine(2, "3D", sucursalCine2)
