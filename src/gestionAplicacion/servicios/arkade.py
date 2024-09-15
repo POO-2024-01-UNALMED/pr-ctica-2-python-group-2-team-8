@@ -1,3 +1,4 @@
+#from ..sucursalCine import SucursalCine
 from gestionAplicacion.sucursalCine import SucursalCine
 
 class Arkade:
@@ -34,7 +35,7 @@ class Arkade:
 
     """
     Description: Este metodo toma la primera tarjeta cinemar disponible y le asocia el cliente,  se le asigna saldo 0,
-	y ademas, al Cliente se le asocia la tajeta cinemar y se elimina esa tarjeta de la lista de tarjetas en inventario
+	  y ademas, al Cliente se le asocia la tajeta cinemar y se elimina esa tarjeta de la lista de tarjetas en inventario
     en la sucursal.
 
     :param cliente: Se pasa como parametro el cliente que adquirirá la tarjeta
@@ -42,10 +43,10 @@ class Arkade:
 
     """ 
 
-    cliente.getCineActual().getInventarioTarjetasCinemar()[0].setDueno(cliente)
-    cliente.getCineActual().getInventarioTarjetasCinemar()[0].setSaldo(0)
-    cliente.setCuenta(cliente.getCineActual().getInventarioTarjetasCinemar()[0])
-    cliente.getCineActual().getInventarioTarjetasCinemar().pop(0)
+    cliente.getCineUbicacionActual().getTarjetasCinemar()[0].setDueno(cliente)
+    cliente.getCineUbicacionActual().getTarjetasCinemar()[0].setSaldo(-5000)
+    cliente.setCuenta(cliente.getCineUbicacionActual().getTarjetasCinemar()[0])
+    cliente.getCineUbicacionActual().getTarjetasCinemar().pop(0)
 
   @classmethod
   def mostrarJuegos(cls):

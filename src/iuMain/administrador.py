@@ -22,6 +22,7 @@ from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
 from excepciones.iuExceptions import iuExceptions, iuEmptyValues, iuDefaultValues
 from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
+from gestionAplicacion.servicios.arkade import Arkade
 from gestionAplicacion.usuario.ticket import Ticket
 
 class FieldFrame(tk.Frame):
@@ -174,7 +175,7 @@ class FieldFrame(tk.Frame):
         if frameAnterior is not None:
             frameAnterior.pack_forget()
         self.pack(expand=True)
-        #FieldFrame.setFrameMenuPrincipal(self) #<- Genera error al usar el botón volver
+        FieldFrame.setFrameMenuPrincipal(self) #<- Genera error al usar el botón volver
     
     @classmethod
     def getClienteProceso(cls):
@@ -459,11 +460,11 @@ class FrameVentanaPrincipal(FieldFrame):
 
 class FrameZonaJuegos(FieldFrame):
     
-    #clienteProceso = FieldFrame.getClienteProceso()
+    
 
     def __init__(self):
 
-
+        self.clienteProceso = FieldFrame.getClienteProceso()
         tituloProceso = 'Zona de Juegos\n'
         descripcionProceso ='En este espacio podras hacer uso de todos nuestros juegos y conseguir recompensas pagando con tu tarjeta cinemar, la cual podras adquirir y recargar en este mismo espacio.\n'
         botonVolver = True
@@ -537,6 +538,7 @@ class FrameZonaJuegos(FieldFrame):
                 def eliminar_labels():
                     for label_id in label_ids:
                         self.canvas.delete(label_id)
+                    Arkade.asociarTarjetaCliente(self.clienteProceso)
                     FrameTarjetaCinemar().mostrarFrame(self)
 
                 # Tiempo total para que los Labels se muestren y luego se eliminen (5 etiquetas * 1.5 segundos = 7.5 segundos)
@@ -563,9 +565,10 @@ class FrameZonaJuegos(FieldFrame):
         
 class FrameTarjetaCinemar(FieldFrame):
     
+
     def __init__(self):
 
-        clienteProceso = FieldFrame.getClienteProceso()
+        self.clienteProceso = FieldFrame.getClienteProceso()
 
         super().__init__(
                 tituloProceso = 'Personalización Tarjeta Cinemar',
@@ -582,47 +585,122 @@ class FrameTarjetaCinemar(FieldFrame):
                 botonVolver = True
             )
         
-        widgets = []
+        self.widgets = []
         
         for widget in self.winfo_children():
 
-            widgets.append(widget)
+            self.widgets.append(widget)
 
-        widgets[2].grid_configure(row=5, column=0)
-        widgets[3].grid_configure(row=5, column=2)
-        widgets[4].grid_configure(row=6, column=0)
-        widgets[5].grid_configure(row=6, column=1)
-        widgets[6].grid_configure(row=7, column=0)
-        widgets[7].grid_configure(row=7, column=1)
-        widgets[8].grid_configure(row=8, column=0)
-        widgets[9].grid_configure(row=8, column=1)
-        widgets[10].grid_configure(row=9, column=0, sticky = "we", columnspan = 4)
+        self.widgets[2].grid_configure(row=5, column=0)
+        self.widgets[3].grid_configure(row=5, column=2)
+        self.widgets[4].grid_configure(row=6, column=0)
+        self.widgets[5].grid_configure(row=6, column=1)
+        self.widgets[6].grid_configure(row=7, column=0)
+        self.widgets[7].grid_configure(row=7, column=1)
+        self.widgets[8].grid_configure(row=8, column=0)
+        self.widgets[9].grid_configure(row=8, column=1)
+        self.widgets[10].grid_configure(row=9, column=0, sticky = "we", columnspan = 4)
 
-        FrameTarjeta = tk.Frame(self, bg = "black", width=300, height=150)
-        FrameTarjeta.grid(row =2, rowspan= 3, column= 0, columnspan= 4)
+        self.FrameTarjeta = tk.Frame(self, bg = "black", width=300, height=150)
+        self.FrameTarjeta.grid(row =2, rowspan= 3, column= 0, columnspan= 4)
 
-        for widget in widgets[-1].winfo_children():
+        self.canvas = tk.Canvas(self.FrameTarjeta, width=300, height=150)
+        self.canvas.pack()
+
+        # Crear la tarjeta con personalizaciones
+        FrameTarjetaCinemar.crear_tarjeta(self.canvas, self.clienteProceso.getNombre() , self.clienteProceso.getCuenta().getSaldo(), self.clienteProceso._colorFondoTarjeta, 
+                    (self.clienteProceso._fuenteTarjeta, 16, "bold italic"), (self.clienteProceso._fuenteTarjeta, 12), self.clienteProceso._colorTextoTarjeta)
+
+
+        for widget in self.widgets[-1].winfo_children():
 
             widget.config(font= ("Times New Roman", 16, "bold"), width = 9, height = 1, bg = "sky blue", fg = "black")
 
-        tamaños = [25,14,16,16,12,12,12,12,12,12]
+        tamaños = [24,13,15,15,12,12,12,12,12,12]
 
-        widgets[-1].config(bg = "light blue")
-        widgets.pop(-1)
+        self.widgets[-1].config(bg = "light blue")
+        self.widgets.pop(-1)
         
-        for i, w in enumerate(widgets):
+        for i, w in enumerate(self.widgets):
             if isinstance(w, ttk.Combobox):
                 pass
             else:
                 w.config(font = ("Times New Roman", tamaños[i]), bg = "light blue")
 
-        widgets[2].config(font = ("Times New Roman", 16, "bold"))
-        widgets[3].config(font = ("Times New Roman", 16, "bold"))
+        self.widgets[2].config(font = ("Times New Roman", 16, "bold"))
+        self.widgets[3].config(font = ("Times New Roman", 16, "bold"))
         
         ventanaLogicaProyecto.config(bg= "light blue")
-        self.config(bg= "light blue")
+        self.config(bg= "light blue")   
 
+    def funAceptar(self):
+
+        valores = []
+        if self.evaluarExcepciones():
+            for comboBox in self.widgets:
+                if isinstance(comboBox, ttk.Combobox):
+                    valores.append(comboBox.get())
+
+            if valores[0] != 'Color de la tarjeta':
+
+                self.clienteProceso._colorFondoTarjeta = valores[0]
+
+                FrameTarjetaCinemar.crear_tarjeta(self.canvas, self.clienteProceso.getNombre() , self.clienteProceso.getCuenta().getSaldo(), self.clienteProceso._colorFondoTarjeta, 
+                    (self.clienteProceso._fuenteTarjeta, 16, "bold italic"), (self.clienteProceso._fuenteTarjeta, 12), self.clienteProceso._colorTextoTarjeta)
+                
+
+            if valores[1] != 'Fuente de la tarjeta':
+
+                self.clienteProceso._fuenteTarjeta = valores[1]
+
+                FrameTarjetaCinemar.crear_tarjeta(self.canvas, self.clienteProceso.getNombre() , self.clienteProceso.getCuenta().getSaldo(), self.clienteProceso._colorFondoTarjeta, 
+                    (self.clienteProceso._fuenteTarjeta, 16, "bold italic"), (self.clienteProceso._fuenteTarjeta, 12), self.clienteProceso._colorTextoTarjeta)
+
+            if valores[2] != 'Color de la fuente':
+
+                self.clienteProceso._colorTextoTarjeta = valores[2]
+
+                FrameTarjetaCinemar.crear_tarjeta(self.canvas, self.clienteProceso.getNombre() , self.clienteProceso.getCuenta().getSaldo(), self.clienteProceso._colorFondoTarjeta, 
+                    (self.clienteProceso._fuenteTarjeta, 16, "bold italic"), (self.clienteProceso._fuenteTarjeta, 12), self.clienteProceso._colorTextoTarjeta)
+                
+
+    def evaluarExcepciones(self):
+        try:
+            valoresPorDefecto = self.tieneCamposPorDefecto()
+            if len(valoresPorDefecto) == 3:
+                raise iuDefaultValues(valoresPorDefecto)
+            
+            return True
         
+        except iuExceptions as e:
+            messagebox.showerror('Error', e.mostrarMensaje())
+            return False
+
+    # Función para crear la tarjeta en un Canvas
+    @classmethod
+    def crear_tarjeta(cls, canvas, nombre, saldo, color_fondo, fuente_titulo, fuente_texto, color_texto):
+        # Tarjeta principal (rectángulo grande)
+        canvas.create_rectangle(0, 0, 300, 150, fill=color_fondo, outline="black", width=3)
+
+        # Borde decorativo
+        canvas.create_rectangle(5, 5, 295, 145, outline="white", width=2)
+
+        # Título de la tarjeta (con fuente y color personalizados)
+        canvas.create_text(150, 30, text="Tarjeta Cinemar", font=fuente_titulo, fill=color_texto)
+
+        # Espacio para el nombre del titular (con fuente y color personalizados)
+        canvas.create_text(150, 60, text=f"Nombre: {nombre}", font=fuente_texto, fill=color_texto)
+
+        # Espacio para el saldo (con fuente y color personalizados)
+        canvas.create_rectangle(50, 80, 250, 120, fill=color_fondo, outline="black", width=2)
+        canvas.create_text(150, 100, text=f"Saldo: {saldo}$", font=fuente_texto, fill=color_texto)
+
+        #Código de barras (simulado)
+        for i in range(18):
+            # Dibuja cada barra con un ancho de 5 píxeles y espaciado de 10 píxeles
+            x1 = 20 + i * 15  # Posición horizontal inicial y espaciado
+            x2 = x1 + 5  # Ancho de la barra
+            canvas.create_rectangle(x1, 125, x2, 145, fill="black")
 
 #################################################################################################################################
 
@@ -1161,7 +1239,7 @@ def objetosBasePractica2():
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
-    #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0])
+    #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
 
 
 def ventanaDeInicio(): 

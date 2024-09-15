@@ -1,5 +1,3 @@
-#from gestionAplicacion.sucursalCine import SucursalCine
-
 class Cliente():
     
     def __init__(self, nombre = "", edad = 0 , documento = 0, tipoDocumento = None, cineUbicacionActual = None, membresia = None,
@@ -26,6 +24,9 @@ class Cliente():
         self._codigosDescuento = codigosDescuento
         self._codigosBonos = codigosBonos
         self._bonos = bonos
+        self._colorFondoTarjeta = "white"  #blanco por defecto
+        self._fuenteTarjeta = "Times New Roman"
+        self._colorTextoTarjeta = "black"
 
         #Atributos Funcionalidad 5
         self._membresia = membresia
