@@ -1,6 +1,6 @@
 import random
 from gestionAplicacion.servicios.producto import Producto
-from iuMain.administrador import Administrador
+from iuMain.administrador import *
 
 class Bono:
   
@@ -9,7 +9,7 @@ class Bono:
     self._producto = producto
     self._tipoServicio = tipoServicio
     self._cliente = cliente
-    cliente.getCineActual().getBonosCreados().append(self)
+    cliente.getCineUbicacionActual().getBonosCreados().append(self)
 
   @classmethod
   def generarBonoComidaJuegos(cls,sucursal, cliente): 

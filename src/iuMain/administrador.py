@@ -7,6 +7,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 import tkinter as tk
+from gestionAplicacion.servicios.bono import *
 from tkinter import ttk, messagebox
 from datetime import datetime, time, timedelta
 from gestionAplicacion.usuario.tipoDocumento import TipoDocumento
@@ -81,7 +82,7 @@ class FieldFrame(tk.Frame):
                 elementoInteractivo.set(infoElementosInteractuables[i][1])
 
 
-            elementoInteractivo.grid(column=1, row=i+3,columnspan=3, padx = (10,10), pady = (10,10))
+            elementoInteractivo.grid(column=1, row=i+3,columnspan=1, padx = (10,10), pady = (10,10))
 
             if not habilitado[i]:
 
@@ -265,11 +266,21 @@ class VisualFieldFrame(tk.Frame):
 ####################################################################################################
 ####################################################################################################
 
+class FrameReclamoDeBonos(FieldFrame):
+    def __init__(self, servicio):
+        servicio.actualizarBonos()
+        super().__init__(
+            tituloProceso = "Bonos",
+            descripcionProceso = "En este apartado podras reclamar los bonos que tenes asociados",
+            textEtiquetas = ['Bonos Disponibles'],
+            infoElementosInteractuables = [[servicio.mostrarBonos(servicio), "Seleccione un Producto"]],
+            habilitado = [False],
+        )
+
 class FrameGeneracionDeProductos(FieldFrame):
     def __init__(self, servicio):
 
         self._servicio = servicio
-
         servicio.setCliente(self._clienteProceso)
         servicio.setInventario(servicio.actualizarInventario())
 
@@ -280,50 +291,41 @@ class FrameGeneracionDeProductos(FieldFrame):
             textEtiquetas = ['Producto',"Cantidad"],
             tituloValores = "Datos de compra",
             infoElementosInteractuables = [[servicio.mostrarInventario(), "Seleccione un Producto"],None],
-            habilitado = [False,True,True]
+            habilitado = [False,True,True],
         )
-    
-    #def agregar(self):
-    #    nombreProducto = self._elementosInteractivos[0].get()
-    #    n = 0
-    #    for productos in self._servicio.getInventario():
-    #        nombre = f"{productos.getNombre()} {productos.getTamaño()}"
-    #        if nombre == nombreProducto:
-    #            if productos.getCantidad() >= int(self._elementosInteractivos[1].get()):
-    #                self._servicio.agregarOrden(self._servicio.hacerPedido(n ,int(self._elementosInteractivos[1].get()) ,self._clienteProceso.getCineUbicacionActual()))
-    #                self.mostrar()
-   #                 break
-    #            else:
-   #                 messagebox.showerror("Error",f"No hay suficiente cantidad de {productos.getNombre()} {productos.getTamaño()}, solo hay: {productos.getCantidad()}")
-    #                break
-   #         n+=1
-    #
-    #boton=tk.Frame(self)
-   # agrega = tk.Button(boton,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=agregar,
-   #                    width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = 7)
+        tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("Verdana bold",20), anchor="center")
+        tituloV.grid(column=2, row=2, padx = (10,10), pady = (10,10))
 
-
-    def funAceptar(self):
+        agregarb = tk.Button(self,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.agregar,
+        width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 2, row = 5,)
+        
+    def agregar(self):
         if not self.tieneCamposPorDefecto():
             nombreProducto = self._elementosInteractivos[0].get()
-        n = 0
-        for productos in self._servicio.getInventario():
-            nombre = f"{productos.getNombre()} {productos.getTamaño()}"
-            if nombre == nombreProducto:
-                if productos.getCantidad() >= int(self._elementosInteractivos[1].get()):
-                    self._servicio.agregarOrden(self._servicio.hacerPedido(n ,int(self._elementosInteractivos[1].get()) ,self._clienteProceso.getCineUbicacionActual()))
-                    self.mostrar()
-                    break
-                else:
-                    messagebox.showerror("Error",f"No hay suficiente cantidad de {productos.getNombre()} {productos.getTamaño()}, solo hay: {productos.getCantidad()}")
-                    break
-            n+=1
+            n = 0
+            for productos in self._servicio.getInventario():
+                nombre = f"{productos.getNombre()} {productos.getTamaño()}"
+                if nombre == nombreProducto:
+                    if productos.getCantidad() >= int(self._elementosInteractivos[1].get()):
+                        self._servicio.agregarOrden(self._servicio.hacerPedido(n ,int(self._elementosInteractivos[1].get()) ,self._clienteProceso.getCineUbicacionActual()))
+                        self.mostrar()
+                        eliminarb = tk.Button(self,text="Eliminar producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.agregar,
+                            width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = 6)
+                        break
+                    else:
+                        messagebox.showerror("Error",f"No hay suficiente cantidad de {productos.getNombre()} {productos.getTamaño()}, solo hay: {productos.getCantidad()}")
+                        break
+                n+=1
+            self.funBorrar()
         else:
-           messagebox.showerror("Error","Por favor rellene todos los campos")
+           messagebox.showerror("Error","Por favor llenar todos los campos")
+
+    def funAceptar(self):
+        FrameReclamoDeBonos(self._servicio).mostrarFrame()
 
     def mostrar(self):
-        labelCriterio = tk.Label(self, text = "Productos en orden\n"+ self._servicio.mostrarOrden(), font= ("Verdana",12), anchor="center")
-        labelCriterio.grid(row=0, column=0, columnspan=4, sticky='we')
+        labelCriterio = tk.Label(self, text = self._servicio.mostrarOrden(),anchor="w", font= ("Verdana",10))
+        labelCriterio.grid(row=3, column=2,rowspan=2, sticky="w")
 
     
 class FrameFuncionalidad2(FieldFrame):
@@ -624,16 +626,21 @@ class FrameZonaJuegos(FieldFrame):
                 self.canvas.after(1500 * (5 - i), lambda lbl=label: label_ids.append(self.canvas.create_window(320, 450, window=lbl)))
 
 
-                #Metodos para eliminar los labels creados
-                def eliminar_labels():
-                    for label_id in label_ids:
-                        self.canvas.delete(label_id)
-                    Arkade.asociarTarjetaCliente(self.clienteProceso)
-                    FrameTarjetaCinemar().mostrarFrame()
-
-                # Tiempo total para que los Labels se muestren y luego se eliminen (5 etiquetas * 1.5 segundos = 7.5 segundos)
-                self.canvas.after(7500, eliminar_labels)
+            #Metodos para eliminar los labels creados
+            def eliminar_labels():
+                for label_id in label_ids:
+                    self.canvas.delete(label_id)
                 
+
+                Arkade.asociarTarjetaCliente(self.clienteProceso)
+                FrameTarjetaCinemar().mostrarFrame(self) 
+                print("hola")
+            
+            self.canvas.after(7500, eliminar_labels)
+            
+            
+               
+
         else:
             label = tk.Label(
                         self, 
@@ -1208,35 +1215,112 @@ class FrameSalaDeEspera(FieldFrame):
 #################################################################################################################################
 
 class FrameFuncionalidad3Calificaciones(FieldFrame):
-    
     def __init__(self):
         self._clienteProceso = FieldFrame.getClienteProceso()
         self._peliculasCalificar = self._clienteProceso.getPeliculasDisponiblesParaCalificar()
         self._productosCalificar = self._clienteProceso.getProductosDisponiblesParaCalificar()
-        super().__init__(
+        
 
-           
-            
+        super().__init__ (
             tituloProceso="Calificaciones",
             descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas, en este espacio podras calificar nuestros servicios dependiendo tus gustos y aficiones.(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
             tituloCriterios = 'Criterios para calificar',
-            textEtiquetas= ["Seleccionar pelicula o producto a calificar: "],
+            textEtiquetas= ["Que quieres calificar :","Escoge tu item :" ,  "Califica tu item :"],
             tituloValores = 'Valores ingresados',
             infoElementosInteractuables = [
-                [Cliente.mostrarPeliculaParaCalificar(
-                    peliculasDisponiblesParaCalificar = self._peliculasCalificar), 'Selecionar película'],
-                [Cliente.mostrarProductosParaCalificar(
-                    productosDisponiblesParaCalificar = self._productosCalificar), 'Seleccionar producto'], 
-                [[], 'Ingresa tu valoracion']
+                [["Producto","Pelicula"], 'Seleccionar una opcion'],
+                [[], 'Escoge tu item:'],                         
+                [[], 'Califica tu item:'] 
             ],
+
             habilitado = [False, False, False],
-            botonVolver = True
+            botonVolver = True,
+            frameAnterior = FieldFrame.getFrameMenuPrincipal()
             
-                   
-        )     
+        )
+
+        self._comboBoxItems = self.getElementosInteractivos()[0]
+        self._comboBoxEscogerItem = self.getElementosInteractivos()[1]
+        self._comboBoxCalificarItem = self.getElementosInteractivos()[2]
+
+        self._comboBoxEscogerItem.configure(state = 'disabled')
+        self._comboBoxCalificarItem.configure(state = 'disabled')
+
+        self._comboBoxItems.bind('<<ComboboxSelected>>', self.setMostrarItemParaCalificar)
+        self._comboBoxEscogerItem.bind('<<ComboboxSelected>>', self.setCalificarItem)
+
+
+    def setMostrarItemParaCalificar(self,evento):
+        
+        if self._comboBoxItems.current() == 0:
+
+       
+            self._comboBoxEscogerItem.configure(values = Cliente.mostrarProductosParaCalificar(self._productosCalificar))
+            self._comboBoxEscogerItem.configure(state = 'readonly')
+            self._comboBoxEscogerItem.set(self._infoElementosInteractuables[1][1])
+
+        
+            self._comboBoxCalificarItem.configure(state = 'disabled')
+            self._comboBoxCalificarItem.set(self._infoElementosInteractuables[2][1])
+
+            
+
+        else:
+            
+            self._comboBoxEscogerItem.configure(values = Cliente.mostrarPeliculaParaCalificar(self._peliculasCalificar))
+            self._comboBoxEscogerItem.configure(state = 'readonly')
+            self._comboBoxEscogerItem.set(self._infoElementosInteractuables[1][1])
+
+        
+            self._comboBoxCalificarItem.configure(state = 'disabled')
+            self._comboBoxCalificarItem.set(self._infoElementosInteractuables[2][1])
+
+           
+
+    def setCalificarItem(self,evento):
+
+        calificacionesLista= [1,2,3,4,5]
+        self._comboBoxCalificarItem.configure(values = calificacionesLista)
+        self._comboBoxCalificarItem.configure(state = 'readonly')
+        nombreProductoSeleccionado = self.getValue("Escoge tu item :")
+
+    def funBorrar(self):
+        #Setteamos los valores por defecto de cada comboBox
+        super().funBorrar()
+
+        #Configuramos el estado del comboBox de columnas
+        self._comboBoxEscogerItem.configure(state = 'disabled')  
+        self._comboBoxCalificarItem.configure(state = 'disabled')    
+           
+
+    def funAceptar(self):
+         if self.evaluarExcepciones():
+            #Obtenemos el horario seleccionado
+            horarioString = self._comboBoxHorarios.get()
+
+            #Evaluamos si es un horario en presentación
+            estaEnPresentacion = False
+            if horarioString.__contains__('En vivo:'):
+                horarioSplit = horarioString.split(':', 1)
+                horarioString = horarioSplit[1].lstrip(' ')
+                estaEnPresentacion = True
+
+
+            if self._comboBoxItems.current() == 0: 
+                self._productoSeleccionado = Producto.obtenerProductosPorNombre(nombreProductoSeleccionado, self._clienteProceso.getCineUbicacionActual().getInventarioCine)
+                nombrePeliculaSeleccionada = self.getValue("Escoge tu item :")
+
+            else:
+                indicePeliculaSeleccionada=  self._comboBoxEscogeritem
+                self._formatosPeliSeleccionada = Pelicula.obtenerPeliculasPorNombre(nombrePeliculaSeleccionada, self._clienteProceso.getCineUbicacionActual().getCartelera())    
+
+
+
+        
+     
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
-    
+     
 
 class FrameFuncionalidad5(FieldFrame):
 
@@ -1297,6 +1381,12 @@ def objetosBasePractica2():
     cliente3 = Cliente('Gerson', 23, 98765, TipoDocumento.CC, sucursalCine3)
     cliente4 = Cliente('Juanjo', 18, 987, TipoDocumento.CC, sucursalCine1)
     cliente5 = Cliente('Santiago', 18, 1125274009, TipoDocumento.CC, sucursalCine3)
+
+    producto2b = Producto("Hamburguesa","Grande","comida",0,1,"Normal",sucursalCine2)
+    bono1 = Bono(1234,producto2b,"comida",cliente1)
+    producto1b = Producto("Camisa","XL","souvenir",0,1,"Normal",sucursalCine2)
+    bono2 = Bono(1234,producto1b,"souvenir",cliente1)
+    bono3 = Bono(1234,producto2b,"comida",cliente1)
     
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
@@ -1318,7 +1408,10 @@ def objetosBasePractica2():
     pelicula1_5.crearPeliculas()
     pelicula1_6 = Pelicula("Spy x Familiy Código: Blanco", 19000, "Infantil", timedelta( minutes=90 ), "+5", "2D", sucursalCine1)
     pelicula1_6.crearPeliculas()
-    #cliente5.getPeliculasDisponiblesParaCalificar.add(pelicula1_2)
+    cliente5.getPeliculasDisponiblesParaCalificar().append(pelicula1_2)
+    cliente5.getProductosDisponiblesParaCalificar().append(producto7)
+    cliente5.getPeliculasDisponiblesParaCalificar().append(pelicula1_3)
+    cliente5.getProductosDisponiblesParaCalificar().append(producto5)
 
     salaDeCine2_1 = SalaCine(1, "2D", sucursalCine2)
     salaDeCine2_2 = SalaCine(2, "3D", sucursalCine2)
