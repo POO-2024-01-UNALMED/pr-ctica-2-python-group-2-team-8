@@ -43,10 +43,9 @@ class Cliente():
 
     def mostrarPeliculaParaCalificar(peliculasDisponiblesParaCalificar):
         peliculas = []
-        for i, pelicula in peliculasDisponiblesParaCalificar:
-            if peliculas:
-                peliculas += "\n"
-            peliculas += f"{i}. {pelicula.getNombre()} {pelicula.getTipoDeFormato()}"
+        for  pelicula in peliculasDisponiblesParaCalificar:
+            peliculas.append(f"{pelicula.getNombre()}-{pelicula.getTipoDeFormato()}")
+            
         return peliculas
         
     #Description:Este metodo se encarga de mostrar el historial de comida que cada cliente ha consumido hasta el momento
@@ -55,10 +54,9 @@ class Cliente():
 
     def mostrarProductosParaCalificar(productosDisponiblesParaCalificar):
         pedidos = []
-        for i, producto in productosDisponiblesParaCalificar:
-            if pedidos:
-                pedidos += "\n"
-            pedidos += f"{i}. {producto.getNombre()} {producto.getTamaño()}"
+        for producto in productosDisponiblesParaCalificar:
+           pedidos.append(f" {producto.getNombre()}-{producto.getTamaño()}")
+            
         return pedidos
 
     def verificarCuenta(self):

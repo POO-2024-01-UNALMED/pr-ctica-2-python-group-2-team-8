@@ -1203,27 +1203,96 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
         self._clienteProceso = FieldFrame.getClienteProceso()
         self._peliculasCalificar = self._clienteProceso.getPeliculasDisponiblesParaCalificar()
         self._productosCalificar = self._clienteProceso.getProductosDisponiblesParaCalificar()
+        
 
         super().__init__ (
             tituloProceso="Calificaciones",
             descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas, en este espacio podras calificar nuestros servicios dependiendo tus gustos y aficiones.(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
             tituloCriterios = 'Criterios para calificar',
-            textEtiquetas= ["Seleccionar pelicula: ","Califica tu pelicula:" , "Seleccionar producto:" , "Califica tu producto:"],
+            textEtiquetas= ["Que quieres calificar : ","Escoge tu item :" ,  "Califica tu item :"],
             tituloValores = 'Valores ingresados',
             infoElementosInteractuables = [
-                [Cliente.mostrarPeliculasParaCalificar(
-                    peliculasDisponiblesParaCalificar = self._peliculasCalificar), 'Selecionar película'],
-                [[], 'Califica tu pelicula:'],     
-                [Cliente.mostrarProductosParaCalifcar(
-                    productosDisponiblesParaCalificar = self._productosCalificar), 'Selecionar producto'],     
-                [[], 'Califica tu producto:'], 
-                
+                [["Producto","Pelicula"], 'Seleccionar una opcion'],
+                [[], 'Escoge tu item:'],                         
+                [[], 'Califica tu item:'] 
             ],
+
             habilitado = [False, False, False],
             botonVolver = True,
+            frameAnterior = FieldFrame.getFrameMenuPrincipal()
             
         )
-    
+
+        self._comboBoxItems = self.getElementosInteractivos()[0]
+        self._comboBoxEscogeritem = self.getElementosInteractivos()[1]
+        self._comboBoxCalificarItem = self.getElementosInteractivos()[2]
+
+        self._comboBoxEscogeritem.configure(state = 'disabled')
+        self._comboBoxCalificarItem.configure(state = 'disabled')
+
+        self._comboBoxItems.bind('<<ComboboxSelected>>', self.setMostrarItemParaCalificar)
+        self._comboBoxEscogeritem.bind('<<ComboboxSelected>>', self.setCalificarItem)
+
+
+    def setMostrarItemParaCalificar(self,evento):
+        
+        if self._comboBoxItems.current() == 0:
+
+       
+            self._comboBoxEscogeritem.configure(values = Cliente.mostrarProductosParaCalificar(self._productosCalificar))
+            self._comboBoxEscogeritem.configure(state = 'readonly')
+            self._comboBoxEscogeritem.set(self._infoElementosInteractuables[1][1])
+
+        
+            self._comboBoxCalificarItem.configure(state = 'disabled')
+            self._comboBoxCalificarItem.set(self._infoElementosInteractuables[2][1])
+
+            
+
+        else:
+            
+            self._comboBoxEscogeritem.configure(values = Cliente.mostrarPeliculaParaCalificar(self._peliculasCalificar))
+            self._comboBoxEscogeritem.configure(state = 'readonly')
+            self._comboBoxEscogeritem.set(self._infoElementosInteractuables[1][1])
+
+        
+            self._comboBoxCalificarItem.configure(state = 'disabled')
+            self._comboBoxCalificarItem.set(self._infoElementosInteractuables[2][1])
+
+           
+
+    def setCalificarItem(self,evento):
+
+        calificacionesLista= [1,2,3,4,5]
+        self._comboBoxCalificarItem.configure(values = calificacionesLista)
+        self._comboBoxCalificarItem.configure(state = 'readonly')
+        nombreProductoSeleccionado = self.getValue("Escoge tu item :")
+           
+
+    def funAceptar(self):
+         if self.evaluarExcepciones():
+            #Obtenemos el horario seleccionado
+            horarioString = self._comboBoxHorarios.get()
+
+            #Evaluamos si es un horario en presentación
+            estaEnPresentacion = False
+            if horarioString.__contains__('En vivo:'):
+                horarioSplit = horarioString.split(':', 1)
+                horarioString = horarioSplit[1].lstrip(' ')
+                estaEnPresentacion = True
+
+
+            if self._comboBoxItems.current() == 0: 
+                self._productoSeleccionado = Producto.obtenerProductosPorNombre(nombreProductoSeleccionado, self._clienteProceso.getCineUbicacionActual().getInventarioCine)
+                nombrePeliculaSeleccionada = self.getValue("Escoge tu item :")
+
+            else:
+                indicePeliculaSeleccionada=  self._comboBoxEscogeritem
+                self._formatosPeliSeleccionada = Pelicula.obtenerPeliculasPorNombre(nombrePeliculaSeleccionada, self._clienteProceso.getCineUbicacionActual().getCartelera())    
+
+
+
+        
      
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
@@ -1309,7 +1378,8 @@ def objetosBasePractica2():
     pelicula1_5.crearPeliculas()
     pelicula1_6 = Pelicula("Spy x Familiy Código: Blanco", 19000, "Infantil", timedelta( minutes=90 ), "+5", "2D", sucursalCine1)
     pelicula1_6.crearPeliculas()
-    #cliente5.getPeliculasDisponiblesParaCalificar.add(pelicula1_2)
+    cliente5.getPeliculasDisponiblesParaCalificar().append(pelicula1_2)
+    cliente5.getProductosDisponiblesParaCalificar().append(producto7)
 
     salaDeCine2_1 = SalaCine(1, "2D", sucursalCine2)
     salaDeCine2_2 = SalaCine(2, "3D", sucursalCine2)
