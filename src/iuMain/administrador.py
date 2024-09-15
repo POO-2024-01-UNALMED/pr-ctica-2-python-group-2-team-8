@@ -581,16 +581,21 @@ class FrameZonaJuegos(FieldFrame):
                 self.canvas.after(1500 * (5 - i), lambda lbl=label: label_ids.append(self.canvas.create_window(320, 450, window=lbl)))
 
 
-                #Metodos para eliminar los labels creados
-                def eliminar_labels():
-                    for label_id in label_ids:
-                        self.canvas.delete(label_id)
-                    Arkade.asociarTarjetaCliente(self.clienteProceso)
-                    FrameTarjetaCinemar().mostrarFrame(self)
-
-                # Tiempo total para que los Labels se muestren y luego se eliminen (5 etiquetas * 1.5 segundos = 7.5 segundos)
-                self.canvas.after(7500, eliminar_labels)
+            #Metodos para eliminar los labels creados
+            def eliminar_labels():
+                for label_id in label_ids:
+                    self.canvas.delete(label_id)
                 
+
+                Arkade.asociarTarjetaCliente(self.clienteProceso)
+                FrameTarjetaCinemar().mostrarFrame(self) 
+                print("hola")
+            
+            self.canvas.after(7500, eliminar_labels)
+            
+            
+               
+
         else:
             label = tk.Label(
                         self, 
