@@ -1199,35 +1199,35 @@ class FrameSalaDeEspera(FieldFrame):
 #################################################################################################################################
 
 class FrameFuncionalidad3Calificaciones(FieldFrame):
-    
     def __init__(self):
         self._clienteProceso = FieldFrame.getClienteProceso()
         self._peliculasCalificar = self._clienteProceso.getPeliculasDisponiblesParaCalificar()
         self._productosCalificar = self._clienteProceso.getProductosDisponiblesParaCalificar()
-        super().__init__(
 
-           
-            
+        super().__init__ (
             tituloProceso="Calificaciones",
             descripcionProceso= f"Bienvenido al apartado de califcaciones de productos y peliculas, en este espacio podras calificar nuestros servicios dependiendo tus gustos y aficiones.(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
             tituloCriterios = 'Criterios para calificar',
-            textEtiquetas= ["Seleccionar pelicula o producto a calificar: "],
+            textEtiquetas= ["Seleccionar pelicula: ","Califica tu pelicula:" , "Seleccionar producto:" , "Califica tu producto:"],
             tituloValores = 'Valores ingresados',
             infoElementosInteractuables = [
-                [Cliente.mostrarPeliculaParaCalificar(
+                [Cliente.mostrarPeliculasParaCalificar(
                     peliculasDisponiblesParaCalificar = self._peliculasCalificar), 'Selecionar película'],
-                [Cliente.mostrarProductosParaCalificar(
-                    productosDisponiblesParaCalificar = self._productosCalificar), 'Seleccionar producto'], 
-                [[], 'Ingresa tu valoracion']
+                [[], 'Califica tu pelicula:'],     
+                [Cliente.mostrarProductosParaCalifcar(
+                    productosDisponiblesParaCalificar = self._productosCalificar), 'Selecionar producto'],     
+                [[], 'Califica tu producto:'], 
+                
             ],
             habilitado = [False, False, False],
-            botonVolver = True
+            botonVolver = True,
             
-                   
-        )     
+        )
+    
+     
     #Programar el borrar para que los values de los combobox queden vacíos o investigar forma de que los combobox no desplieguen el menú
     #Hacer que en el comboBox de horarios se muestre un apartado de horario de presentación en vivo, programar método en clase película
-    
+     
 
 class FrameFuncionalidad5(FieldFrame):
 
