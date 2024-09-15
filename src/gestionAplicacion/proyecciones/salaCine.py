@@ -139,7 +139,7 @@ class SalaCine:
         for salaCine in filtroSalasDeCine:
             salaAñadida = False
             for ticket in clienteProceso.getTickets():
-                if ticket.getHorario() == salaCine._horarioPeliculaEnPresentacion and ticket.getSalaCine() is salaCine:
+                if ticket.getHorario() == salaCine._horarioPeliculaEnPresentacion and ticket.getSalaDeCine() is salaCine:
                     salasCineStr.append(f'Recomendada: Sala #{salaCine._numeroSala}')
                     salaAñadida = True
             
@@ -171,7 +171,7 @@ class SalaCine:
 
         for ticket in cliente.getTickets():
 
-            validacionIngresoASala = ( ticket.getSalaCine() is self ) and ( ticket.getPelicula() is self._peliculaEnPresentacion ) and ( self._horarioPeliculaEnPresentacion + self._peliculaEnPresentacion.getDuracion() > self._sucursalUbicacion.getFechaActual )
+            validacionIngresoASala = ( ticket.getSalaDeCine() is self ) and ( ticket.getPelicula() is self._peliculaEnPresentacion ) and ( self._horarioPeliculaEnPresentacion + self._peliculaEnPresentacion.getDuracion() > self._sucursalUbicacion.getFechaActual() )
             
             if validacionIngresoASala : 
 
@@ -184,7 +184,7 @@ class SalaCine:
 
                 break
         
-        if ticketVerificado is not None : cliente.getTickets.remove(ticketVerificado)
+        if ticketVerificado is not None : cliente.getTickets().remove(ticketVerificado)
 
         return validacionIngresoASala
             

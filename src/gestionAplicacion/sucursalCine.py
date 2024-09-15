@@ -299,7 +299,7 @@ class SucursalCine:
                 if cliente.getTipoDocumento().value == tipoDeDocumento:
                     return cliente
                 else:
-                    return 'Error'
+                    return 'Tipo de documento incorrecto'
         
         return None
     
@@ -319,6 +319,35 @@ class SucursalCine:
             if sede._ubicacion == ubicacion:
                 return sede
     
+    def avanzarTiempo(self):
+
+        """
+        :Description: Este método se encarga de avanzar la hora y ejecutar la lógica de negocio en 3 plazos:
+        
+        <ol>
+	    <li>Durante la jornada laboral: Actualiza las salas de cine, ubicando las películas en presentación en sus respectivas salas.</li>
+	    <li>Diariamente: Limpia el array de tickets generados, con el fin de tener únicamente aquellos tickets que pueden usarse para generar descuentos.</li>
+	    <li>Semanalmente: Cambia las películas de sucursal según su rendimiento, distribuye de nuevo las películas en sus salas de cine y crea los horarios de presentación semanal.</li>
+        </ol>
+        """
+
+        SucursalCine._fechaActual += timedelta( seconds = 20 )
+
+        if SucursalCine._fechaActual.date() >= SucursalCine._fechaRevisionLogicaDeNegocio:
+            #Avanzamos la próxima evaluación a la próxima semana
+            SucursalCine._fechaRevisionLogicaDeNegocio = (self._fechaActual + timedelta( weeks = 1 )).date()
+            #Ejecutamos la lógica semanal
+            SucursalCine.logicaSemanalSistemNegocio()
+        
+        if SucursalCine._fechaActual.date() >= SucursalCine._fechaValidacionNuevoDiaDeTrabajo:
+            #Avanzamos la próxima evaluación al día siguiente
+            SucursalCine._fechaRevisionLogicaDeNegocio = (SucursalCine._fechaActual + timedelta( days = 1)).date()
+            #Ejecutamos la lógica diaria
+            SucursalCine.logicaDiariaReservarTicket()
+        
+        if SucursalCine._fechaActual.time() >= SucursalCine._INICIO_HORARIO_LABORAL and SucursalCine._fechaActual.time() < SucursalCine._FIN_HORARIO_LABORAL:
+            SucursalCine.actualizarPeliculasSalasDeCine()
+
     #def obtenerSucursalPorId(cls):
 
     #def obetenerSalaDeCinePorId(self):
@@ -659,6 +688,29 @@ class SucursalCine:
     @classmethod
     def getSucursalesCine(cls):
         return SucursalCine._sucursalesCine
+    
+    @classmethod
+    def getFechaValidacionNuevoDiaDeTrabajo(cls):
+        return SucursalCine._fechaValidacionNuevoDiaDeTrabajo
+    
+    @classmethod
+    def setFechaValidacionNuevoDiaDeTrabajo(cls, fechaValidacionNuevoDiaDeTrabajo):
+        SucursalCine._fechaValidacionNuevoDiaDeTrabajo = fechaValidacionNuevoDiaDeTrabajo
+
+    @classmethod
+    def getFechaRevisionLogicaDeNegocio(cls):
+        return SucursalCine._fechaRevisionLogicaDeNegocio
+    
+    @classmethod
+    def setFechaRevisionLogicaDeNegocio(cls, fechaRevisionLogicaDeNegocio):
+        SucursalCine._fechaRevisionLogicaDeNegocio = fechaRevisionLogicaDeNegocio
+    
+    @classmethod
+    def getFinHorarioLaboral(cls):
+        return SucursalCine._FIN_HORARIO_LABORAL
+
+    def getInicioHorarioLaboral(cls):
+        return SucursalCine._INICIO_HORARIO_LABORAL
     
     def getInventarioCine(self):
         return self._inventarioCine

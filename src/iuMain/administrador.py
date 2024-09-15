@@ -32,7 +32,7 @@ class FieldFrame(tk.Frame):
     _framePasarelaDePagos = None
     _framesFuncionalidades = []
 
-    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = "", tituloValores = "", infoElementosInteractuables = None, habilitado = None, botonVolver = False, desplazarBotonesFila = 0):
+    def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = "", tituloValores = "", infoElementosInteractuables = None, habilitado = None, botonVolver = False, desplazarBotonesFila = 0, frameAnterior = None):
         super().__init__(ventanaLogicaProyecto)
         self._tituloCriterios = tituloCriterios
         self._infoEtiquetas = textEtiquetas
@@ -41,7 +41,7 @@ class FieldFrame(tk.Frame):
         self._habilitado = habilitado
 
         self._elementosInteractivos = []
-        self._frameAnterior = None
+        self._frameAnterior = frameAnterior
         
         tituloFrame = tk.Label(self, text=tituloProceso, font= ("Verdana bold",30), anchor="center")
         tituloFrame.grid(row=0, column=0, columnspan=4, sticky='we')
@@ -166,16 +166,16 @@ class FieldFrame(tk.Frame):
         pass
 
     def funVolver(self):
-        self._frameAnterior.mostrarFrame(self)
+        self._frameAnterior.mostrarFrame()
     
-    def mostrarFrame(self, frameAnterior = None):
+    def mostrarFrame(self):
 
-        self._frameAnterior = frameAnterior
+        for widget in ventanaLogicaProyecto.winfo_children():
 
-        if frameAnterior is not None:
-            frameAnterior.pack_forget()
+            if isinstance(widget, tk.Frame):
+                widget.pack_forget()
+
         self.pack(expand=True)
-        FieldFrame.setFrameMenuPrincipal(self) #<- Genera error al usar el botón volver
     
     @classmethod
     def getClienteProceso(cls):
@@ -227,6 +227,8 @@ class FieldFrame(tk.Frame):
 
         FieldFrame.setClienteProceso(clienteProceso)
 
+        self._frameMenuPrincipal = frameVentanaPrincipal
+
         self.refrescarFramesFuncionalidades()
         
         #Setteamos el frame para los pagos.
@@ -234,12 +236,12 @@ class FieldFrame(tk.Frame):
 
         #Ejecutamos la lógica de la ventana del menú principal
         frameVentanaPrincipal.construirMenu()
-        frameVentanaPrincipal.mostrarFrame(self)
+        frameVentanaPrincipal.mostrarFrame()
     
     def refrescarFramesFuncionalidades(self):
         #Creación Frames funcionalidades
         framesFuncionalidades = [
-            FrameReservarTicket(), # <_ Funcionalidad 1
+            FrameFuncionalidad1(), # <_ Funcionalidad 1
             FrameFuncionalidad2(), # <- Funcionalidad 2
             FrameFuncionalidad3Calificaciones(), # <- Funcionalidad 3
             FrameZonaJuegos(), # <- funcionalidad 4
@@ -248,6 +250,13 @@ class FieldFrame(tk.Frame):
 
         #Setteamos los frames de las funcionalidades al atributo de clase
         FieldFrame.setFramesFuncionalidades(framesFuncionalidades)
+    
+    def getFrameAnterior(self):
+        return self._frameAnterior
+
+class VisualFieldFrame(tk.Frame):
+        def __init__(self):
+            super().__init__(ventanaLogicaProyecto)
 
 ####################################################################################################
 ####################################################################################################
@@ -337,11 +346,11 @@ class FrameFuncionalidad2(FieldFrame):
         if not self.tieneCamposPorDefecto():
             if len(self._sucursalActual.getServicios())>1:
                 if self._elementosInteractivos[0].get() == "Servicio comida":
-                    FrameGeneracionDeProductos(self._sucursalActual.getServicios()[0]).mostrarFrame(self)
+                    FrameGeneracionDeProductos(self._sucursalActual.getServicios()[0]).mostrarFrame()
                 else:
-                    FrameGeneracionDeProductos(self._sucursalActual.getServicios()[1]).mostrarFrame(self)
+                    FrameGeneracionDeProductos(self._sucursalActual.getServicios()[1]).mostrarFrame()
             else:
-                FrameGeneracionDeProductos(self._sucursalActual.getServicios()[0]).mostrarFrame(self)
+                FrameGeneracionDeProductos(self._sucursalActual.getServicios()[0]).mostrarFrame()
         else:
            messagebox.showerror("Error","Por favor seleccione un servicio")
 
@@ -386,7 +395,7 @@ class FrameInicioSesion(FieldFrame):
 
                 if clienteProceso is None:
                     #Si es la primera vez, nos dirigimos al frame de crear usuario para crearlo
-                    FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada).mostrarFrame(self)
+                    FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada).mostrarFrame()
                 elif type(clienteProceso) == str:
                     #Detectamos que el número de documento ya se encuentra asignado a otro cliente
                     messagebox.showerror('Error', 'Hemos detectado que este número de documento se encuentra asociado a otro cliente, por favor verifica el tipo o número de documento digitado.')
@@ -471,14 +480,14 @@ class FrameVentanaPrincipal(FieldFrame):
         menuArchivo.add_command(label="Aplicación", command=self.mostrarDescripcionSistema)
         menuArchivo.add_command(label="Salir", command=self.mostrarVentanaInicio)
 
-        menuProcesosConsultas.add_command(label="Reserva de tiquetes", command = self.ingresarFuncionalidad1)
+        menuProcesosConsultas.add_command(label = "Sistema Proyecciones", command = self.ingresarFuncionalidad1)
         menuProcesosConsultas.add_command(label="Zona de juegos", command=self.ingresarFuncionalidad4)
         menuProcesosConsultas.add_command(label="Calificaciones", command=self.ingresarFuncionalidad3)
         menuProcesosConsultas.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
         menuProcesosConsultas.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
 
         menuAyuda.add_command(label="Acerca de", command=self.mostrarNombreAutores)
-    
+        menuAyuda.bind('<Leave>', self.avanzarDia) #Easter egg para avanzar el tiempo
 
     def mostrarDescripcionSistema(self):
          messagebox.showinfo("Información del Sistema", "En este programa puedes:\n•Comprar Tickets\n•Comprar comida y regalos\n•Usar la zona de juegos\n•Adquirir membresias\n•Calificar nuestros servicios")
@@ -487,23 +496,47 @@ class FrameVentanaPrincipal(FieldFrame):
         ventanaLogicaProyecto.withdraw()
         ventanaInicio.deiconify()
 
-    def ingresarFuncionalidad1(evento):
-        FieldFrame.getFramesFuncionalidades()[0].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+    def ingresarFuncionalidad1(self):
+        FieldFrame.getFramesFuncionalidades()[0].mostrarFrame()
     
-    def ingresarFuncionalidad2(evento):
-        FieldFrame.getFramesFuncionalidades()[1].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+    def ingresarFuncionalidad2(self):
+        FieldFrame.getFramesFuncionalidades()[1].mostrarFrame()
 
-    def ingresarFuncionalidad3(evento):
-        FieldFrame.getFramesFuncionalidades()[2].mostrarFrame(FieldFrame.getFrameMenuPrincipal())    
+    def ingresarFuncionalidad3(self):
+        FieldFrame.getFramesFuncionalidades()[2].mostrarFrame()    
 
-    def ingresarFuncionalidad4(evento): 
-        FieldFrame.getFramesFuncionalidades()[3].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+    def ingresarFuncionalidad4(self): 
+        FieldFrame.getFramesFuncionalidades()[3].mostrarFrame()
 
-    def ingresarFuncionalidad5(evento):
-        FieldFrame.getFramesFuncionalidades()[4].mostrarFrame(FieldFrame.getFrameMenuPrincipal())
+    def ingresarFuncionalidad5(self):
+        FieldFrame.getFramesFuncionalidades()[4].mostrarFrame()
 
     def mostrarNombreAutores(self):
          messagebox.showinfo("Autores de la Aplicación", "• Juan José Gonzalez Morales - Alias: El Juanjo\n• Edinson Andrés Ariza Mendoza - Alias: Pana Andy\n• Rusbel Danilo Jaramillo Hincapie - Alias: El Indigente\n• Gerson Bedoya Hinestroza - Alias: El viejo Gerson\n• Santiago Castro Herrera - Alias: EL LuisMi")
+
+    def avanzarDia(self, evento):
+        #facilitamos el acceso a la sede y creamos una boolean de validación
+        sucursalCineActual = FieldFrame.getClienteProceso().getCineUbicacionActual()
+        noHayHorariosPresentaciones = True
+
+        #Iteramos sobre cada sala de cine, consultando si tiene horarios de películas en presentación
+        for salaCine in sucursalCineActual.getSalasDeCine():
+            if salaCine.tieneHorariosPresentacionHoy():
+                noHayHorariosPresentaciones = False
+                break
+        
+        if noHayHorariosPresentaciones:
+            messagebox.showinfo('Actualización fecha y hora', 'Hemos detectado que han concluido todas las presentaciones del día de hoy, por lo tanto, se pasará al dia siguiente de forma automática. Gracias por su compresión\n')
+            sucursalCineActual.setFechaActual((sucursalCineActual.getFechaActual() + timedelta( days = 1 )).replace(hours = 10, minutes = 0, seconds = 0)) #Inicio de la jornada laboral al otro día
+    
+        sucursalCineActual.avanzarTiempo() #Avanzamos el tiempo y ejecutamos lógica semenal o diaria según el caso
+        self.logicaMembresia()
+        self.refrescarFramesFuncionalidades() #Actualizamos los frames, ya que se han visto modificados por el avance de tiempo
+        print(sucursalCineActual.getFechaActual())
+    
+    def logicaMembresia(self):
+        pass
+
 
 class FrameZonaJuegos(FieldFrame):
     
@@ -548,7 +581,7 @@ class FrameZonaJuegos(FieldFrame):
     #Metodo para el boton ingresar
     def funAceptar(self):
         if FieldFrame.getClienteProceso().verificarCuenta():
-            FrameTarjetaCinemar().mostrarFrame(self)
+            FrameTarjetaCinemar().mostrarFrame()
         else: 
             self.AlertaSinCuenta()
 
@@ -586,7 +619,7 @@ class FrameZonaJuegos(FieldFrame):
                     for label_id in label_ids:
                         self.canvas.delete(label_id)
                     Arkade.asociarTarjetaCliente(self.clienteProceso)
-                    FrameTarjetaCinemar().mostrarFrame(self)
+                    FrameTarjetaCinemar().mostrarFrame()
 
                 # Tiempo total para que los Labels se muestren y luego se eliminen (5 etiquetas * 1.5 segundos = 7.5 segundos)
                 self.canvas.after(7500, eliminar_labels)
@@ -751,17 +784,63 @@ class FrameTarjetaCinemar(FieldFrame):
 
 #################################################################################################################################
 
-class FrameFuncionalidad1():
-    #Crear el frame inical de mi funcionalidad (Crear estándar visual frame para ello)
+class FrameFuncionalidad1(FieldFrame):
+    
+    def __init__(self):
+
+        #Definimos los frames a usar durante el desarrollo de la funcionalidad 1
+        self._framesFuncionalidad1 = [FrameReservarTicket(self), FrameIngresoASalaCine(self), FrameSalaDeEspera(self)]
+        #Facilitamos el acceso al cliente que realiza este proceso
+        self._clienteProceso = FieldFrame.getClienteProceso()
+
+        #Usamos el constructor de FieldFrame
+        super().__init__(
+            tituloProceso = 'Sistema de proyecciones',
+            descripcionProceso = f'(Funcionalidad 1) Desde este apartado podrás ingresar a:\n1. Sistema de reservas de ticket\n2. Salas de cine\n3. Sala de espera\n Para acceder a las salas de cine o a la sala de espera, necesitas al menos un ticket cuyo horario de presentación aún no ha sido presentado y, además, fue comprado en esta sucursal (Fecha Actual : {self._clienteProceso.getCineUbicacionActual().getFechaActual().replace(microsecond = 0)})',
+            tituloCriterios = 'Criterio proceso',
+            textEtiquetas = ['Seleccionar proceso :'],
+            tituloValores = 'Dato proceso',
+            infoElementosInteractuables = [[['Reservar ticket', 'Ingresar a sala de cine', 'Ingresar a sala de espera'], 'Seleccionar proceso']],
+            habilitado = [False],
+            botonVolver = True,
+            frameAnterior = FieldFrame.getFrameMenuPrincipal()
+        )
+
+        #Facilitamos el acceso al elemento interactuable
+        self._comoboBoxProceso = self.getElementosInteractivos()[0]
+    
+    def funAceptar(self):
+        #Evaluamos las excepciones
+        if self.evaluarExcepciones():
+
+            #Confirmamos la elección del usuario
+            confirmarEleccionUsuario = messagebox.askokcancel('Confirmación dato seleccionado', f'Has seleccionado el proceso {self._comoboBoxProceso.get()}, ¿Desea continuar?')
+            if confirmarEleccionUsuario:
+                
+                #Obtenemos el ínidice del criterio seleccionado
+                eleccionUsuario = self._comoboBoxProceso.current()
+                #En caso de que quiera ingresar a sala de cine o sala de espera
+                if eleccionUsuario == 1 or eleccionUsuario == 2:
+                    #Eliminamos los tickets caducados
+                    self._clienteProceso.dropTicketsCaducados()
+                    #Verificamos si tiene tickets disponibles para usar
+                    if len(self._clienteProceso.filtrarTicketsParaSede()) == 0:
+                        #Mostramos mensaje de error y finalizamos la ejecución
+                        messagebox.showerror('Error', 'No tienes tickets reservados o estos no pertenecen a esta sucursal, para acceder a este proceso debes concluir de forma exitosa al menos un proceso de reserva de ticket')
+                        return 
+                
+                #Ingresamos al frame seleccionado por el usuario
+                self._framesFuncionalidad1[eleccionUsuario].mostrarFrame()
+     
+    #Crear el frame inical de mi funcionalidad (Crear estándar visual frame para ello) (Mas o menos hecho)
     #Separar por módulos la lógica de cada funcionalidad
     #Definir lógica de procesos de pago (Con Gerson)
     #Serializar
     #Hacer Testeos
     #Hacer documentación
-    pass
 
 class FrameReservarTicket(FieldFrame):
-    def __init__(self):
+    def __init__(self, frameAnterior):
 
         #Definimos las variables que usaremos en nuestro proceso
         clienteProceso = FieldFrame.getClienteProceso()
@@ -792,7 +871,8 @@ class FrameReservarTicket(FieldFrame):
             ],
             habilitado = [False, False, False],
             botonVolver = True,
-            desplazarBotonesFila = 1
+            desplazarBotonesFila = 1,
+            frameAnterior = frameAnterior
         )
 
         #Creamos un Label que almacenará información extra sobre la película seleccionada
@@ -882,10 +962,10 @@ class FrameReservarTicket(FieldFrame):
 
             if confirmacionUsuario:
                 #Construimos el frame con la información obtenida y lo mostramos
-                FrameSeleccionarAsiento(self._peliculaProceso, self._horarioProceso, estaEnPresentacion).mostrarFrame(self)
+                FrameSeleccionarAsiento(self._peliculaProceso, self._horarioProceso, estaEnPresentacion, self).mostrarFrame()
 
 class FrameSeleccionarAsiento(FieldFrame):
-    def __init__(self, peliculaProceso, horarioProceso, estaEnPresentacion):
+    def __init__(self, peliculaProceso, horarioProceso, estaEnPresentacion, frameAnterior):
         
         #Guardamos la información obtenida del FrameDeReserva
         self._peliculaProceso = peliculaProceso
@@ -905,7 +985,8 @@ class FrameSeleccionarAsiento(FieldFrame):
             tituloValores = 'Datos asiento',
             infoElementosInteractuables = [[Pelicula.filasConAsientosDisponibles(self._asientosPelicula), 'Selecciona la fila' ], [[], 'Selecciona la columna']],
             habilitado = [False, False],
-            botonVolver = True 
+            botonVolver = True,
+            frameAnterior = frameAnterior
         )
 
         #Asociamos los elementos interactivos a variables para facilitar su acceso
@@ -915,26 +996,6 @@ class FrameSeleccionarAsiento(FieldFrame):
         #Asignamos sus respectivo estado y eventos
         self._comboBoxCols.configure(state = 'disabled')
         self._comboBoxFilas.bind('<<ComboboxSelected>>', self.setColumnas)
-
-    """
-        #Creamos el label con información de la ubicación de la pantalla
-        ubicacionPantalla = tk.Label(self, text='Pantalla', font= ("Verdana",12), anchor="center")
-        ubicacionPantalla.grid(column=0, row=len(self._infoEtiquetas) + 4, columnspan=4)
-
-        #Creamos un frame con la información de disponibilidad y número de cada asiento
-        disponibilidadDeAsientos = tk.Frame(self, width=100, height=50)
-        disponibilidadDeAsientos.grid(column=0, row=len(self._infoEtiquetas) + 6, columnspan=4)
-        for i in range(0, len(self._asientosPelicula)):
-            for j in range(0, len(self._asientosPelicula[i])):
-
-                asiento = tk.Entry(ubicacionPantalla, state = 'disabled', width = 5, background='green')
-                asiento.insert(0, f'{i+1}:{j+1}')
-
-                if self._asientosPelicula[i][j] == 1:
-                    asiento.config(background = 'red')
-
-                asiento.grid(row = i, column = j)
-    """
 
     def setColumnas(self, evento):
         self._filaSeleccionada = int(self._comboBoxFilas.get())
@@ -977,7 +1038,7 @@ class FrameSeleccionarAsiento(FieldFrame):
 
 class FrameIngresoASalaCine(FieldFrame):
     
-    def __init__(self):
+    def __init__(self, frameAnterior):
         
         #Facilitamos el acceso al cliente que realiza el proceso de ingreso a la sala de cine
         self._clienteProceso = FieldFrame.getClienteProceso()
@@ -992,14 +1053,15 @@ class FrameIngresoASalaCine(FieldFrame):
         #Usamos el constructor de FieldFrame
         super().__init__(
             tituloProceso = 'Ingreso a sala de cine',
-            descripcionProceso = f'En este apartado puedes acceder a alguna de nuestras salas de cine disponibles haciendo uso de algún ticket reservado previamente.\nInstrucciones de uso:\n1. Se recomendará la sala de cine a la que puedes ingresar en estos momentos.\n2. Tras seleccionar una sala de cine, podrás ver información detallada sobre ella. \n(Fecha actual: {self._clienteProceso.getCineUbicacionActual().getFechaActual()})',
+            descripcionProceso = f'En este apartado puedes acceder a alguna de nuestras salas de cine disponibles haciendo uso de algún ticket reservado previamente.\nInstrucciones de uso:\n1. Se recomendará la sala de cine a la que puedes ingresar en estos momentos.\n2. Tras seleccionar una sala de cine, podrás ver información detallada sobre ella. \n(Fecha actual: {self._clienteProceso.getCineUbicacionActual().getFechaActual().replace(microsecond = 0)})',
             tituloCriterios = 'Criterios sala cine',
             textEtiquetas = ['Seleccionar sala cine: '],
             tituloValores = 'Salas disponibles',
             infoElementosInteractuables = [[infoSalasDeCine, 'Selecciona la sala de cine']],
             habilitado = [False],
             botonVolver = True,
-            desplazarBotonesFila = 1
+            desplazarBotonesFila = 1,
+            frameAnterior = frameAnterior
         )
 
         #Creamos un label para mostrar la información de la sala de cine seleccionada
@@ -1013,7 +1075,7 @@ class FrameIngresoASalaCine(FieldFrame):
     def _setInfoSalaCine(self, evento):
         #Seleccionamos la sala de cine y seteamos la información de la sala de cine en el Label
         self._salaCineSelccionada = self._seleccionarSalaCine()
-        self._labelInfoSalaCine.configure(text = f'Película en presentación: {self._salaCineSelccionada.getPeliculaEnPresentacion().getNombre()}.\nHorario inicio presentación: {self._salaCineSelccionada.getHorarioPeliculaEnPresentacion()}')
+        self._labelInfoSalaCine.configure(text = f'Película en presentación: {self._salaCineSelccionada.getPeliculaEnPresentacion().getNombre()}; Formato: {self._salaCineSelccionada.getPeliculaEnPresentacion().getTipoDeFormato()},\nHorario inicio presentación: {self._salaCineSelccionada.getHorarioPeliculaEnPresentacion()}')
     
     def _seleccionarSalaCine(self):
         #Obtenemos el número de sala de cine
@@ -1038,14 +1100,28 @@ class FrameIngresoASalaCine(FieldFrame):
             if confirmarEleccion:
                 #Validamos si puede ingresar a la sala de cine
                 if self._salaCineSelccionada.verificarTicket(self._clienteProceso):
-                    #Ingresamos al visual frame de sala de cine
-                    pass
+
+                    #Avanzamos la hora respecto a la duración de la película
+                    nuevaHoraActual = self._salaCineSelccionada.getHorarioPeliculaEnPresentacion() + self._salaCineSelccionada.getPeliculaEnPresentacion().getDuracion()
+                    self._clienteProceso.getCineUbicacionActual().setFechaActual(nuevaHoraActual)
+                    self._clienteProceso.getCineUbicacionActual().avanzarTiempo()
+                    
+                    #Mostramos las ventajas emergentes del proceso realizado y nos redirigimos al menú de la funcionalidad 1
+                    messagebox.showinfo('Ingreso exitoso', '¡Disfruta de tu película!')
+                    messagebox.showinfo('Proceso exitoso', 'La película ha finalizado, serás redireccionado al menú principal de la funcionalidad')
+                    
+                    #Actualizamos la lógica de los frames con el nuevo horario seleccionado
+                    self.refrescarFramesFuncionalidades()
+
+                    #Regresa al menú de la funcionalidad 1
+                    self.getFramesFuncionalidades()[0].mostrarFrame()
+
                 else:
                     messagebox.showerror('Error', 'No tienes un ticket válido para ingresar a esta sala de cine')
 
 class FrameSalaDeEspera(FieldFrame):
     
-    def __init__(self):
+    def __init__(self, frameAnterior):
 
         #Facilitamos el acceso a al cliente que está realizando el proceso
         self._clienteProceso = FieldFrame.getClienteProceso()
@@ -1059,14 +1135,18 @@ class FrameSalaDeEspera(FieldFrame):
         super().__init__(
             tituloProceso = 'Sala de espera',
             descripcionProceso = f'En este apartado podrás esperar (Avanzar el tiempo) hasta el horario de presentación de la película asociada a alguno de tus tickets previamente adquiridos en esta sede y cuyo horario sea estrictamente mayor a la fecha actual.\nConsideraciones de uso:\n1. Debes seleciconar un ticket para poder visualizar su información\n(Fecha actual: {self._clienteProceso.getCineUbicacionActual().getFechaActual().replace(microsecond = 0)})',
-            tituloCriterios = 'Criterios Ticket',
+            tituloCriterios = 'Criterio Ticket',
             textEtiquetas = ['Seleccionar ticket :'],
-            tituloValores = 'Datos ticket',
-            infoElementosInteractuables = [ [[f'Horario ticket: {ticket.getHorario()}' for ticket in self._ticketsDisponiblesParaUsarEnSede], 'Seleccionar ticket'] ],
+            tituloValores = 'Dato ticket',
+            infoElementosInteractuables = [ [[f'Horario: {ticket.getHorario()}' for ticket in self._ticketsDisponiblesParaUsarEnSede], 'Seleccionar ticket'] ],
             habilitado = [False],
             botonVolver = True,
-            desplazarBotonesFila = 1
+            desplazarBotonesFila = 1,
+            frameAnterior = frameAnterior
         )
+
+        #Expandimos el comboBox creado para visualizar mejor su contenido
+        self.getElementosInteractivos()[0].grid_configure(sticky='we')
 
         #Creamos y ubicamos el label que mostrará información sobre el ticket seleccionado
         self._labelInfoTicketSeleccionado = tk.Label(self, text='', font= ("Verdana",12), anchor="center")
@@ -1083,7 +1163,7 @@ class FrameSalaDeEspera(FieldFrame):
         self._horarioAvanzarTiempo = ticketSeleccionado.getHorario()
 
         #Actualizamos la información del label de información de ticket seleccionado
-        self._labelInfoTicketSeleccionado.configure(text = f'Película: {ticketSeleccionado.getPelicula().getNombre()}\nSala de cine número: {ticketSeleccionado.getSalaDeCine().getNumeroSala()}')
+        self._labelInfoTicketSeleccionado.configure(text = f'Película: {ticketSeleccionado.getPelicula().getNombre()}; Formato: {ticketSeleccionado.getPelicula().getTipoDeFormato()},\nSala de cine número: {ticketSeleccionado.getSalaDeCine().getNumeroSala()}')
     
     def funBorrar(self):
         #Seteamos los valores por defecto
@@ -1103,12 +1183,13 @@ class FrameSalaDeEspera(FieldFrame):
                 #Avanzamos el tiempo y notificamos al usuario
                 self._clienteProceso.getCineUbicacionActual().setFechaActual(self._horarioAvanzarTiempo)
                 messagebox.showinfo('Avance de tiempo exitoso', f'Fecha actual: {self._horarioAvanzarTiempo}')
+                self._clienteProceso.getCineUbicacionActual().avanzarTiempo()
 
                 #Actualizamos la lógica de los frames con el nuevo horario seleccionado
                 self.refrescarFramesFuncionalidades()
 
-                #Regresa al menú de la funcionalidad 1 (Falta implementarlo)
-                FieldFrame._frameMenuPrincipal.mostrarFrame(self)
+                #Regresa al menú de la funcionalidad 1
+                self.getFramesFuncionalidades()[0].mostrarFrame()
 
 #################################################################################################################################
 
@@ -1156,7 +1237,7 @@ class FrameFuncionalidad5(FieldFrame):
         )
 
     def funAceptar(self):
-        FieldFrame.getFramePasarelaDePagos().mostrarFrame(self)
+        FieldFrame.getFramePasarelaDePagos().mostrarFrame()
 
 class FramePasarelaDePagos(FieldFrame):
 
@@ -1285,6 +1366,11 @@ def objetosBasePractica2():
     #print(len(sucursalCine1.getTarjetasCinemar()), len(sucursalCine2.getTarjetasCinemar()), len(sucursalCine1.getTarjetasCinemar()) ) 
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
+
+    ticket = Ticket(pelicula1_1, datetime(2024, 9, 15, 12, 20, 0), '4-4', sucursalCine1)
+    ticket.setSucursalCompra(sucursalCine1)
+    ticket.setSalaDeCine(salaDeCine1_1)
+    cliente2.getTickets().append(ticket)
 
     #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
 
