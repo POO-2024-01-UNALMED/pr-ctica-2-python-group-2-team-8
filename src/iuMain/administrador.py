@@ -537,6 +537,7 @@ class FrameVentanaPrincipal(FieldFrame):
     def logicaMembresia(self):
         pass
 
+###########################################################################################################################################
 
 class FrameZonaJuegos(FieldFrame):
     
@@ -553,7 +554,8 @@ class FrameZonaJuegos(FieldFrame):
         super().__init__(
             tituloProceso = tituloProceso,
             descripcionProceso = descripcionProceso,
-            botonVolver = botonVolver  
+            botonVolver = botonVolver, 
+            frameAnterior = FieldFrame.getFrameMenuPrincipal() 
         )
 
         #se destruyen todos los widgets creados por el init del padre
@@ -581,7 +583,7 @@ class FrameZonaJuegos(FieldFrame):
     #Metodo para el boton ingresar
     def funAceptar(self):
         if FieldFrame.getClienteProceso().verificarCuenta():
-            FrameTarjetaCinemar().mostrarFrame()
+            FrameEleccion(self).mostrarFrame()
         else: 
             self.AlertaSinCuenta()
 
@@ -621,8 +623,8 @@ class FrameZonaJuegos(FieldFrame):
                 
 
                 Arkade.asociarTarjetaCliente(self.clienteProceso)
-                FrameTarjetaCinemar().mostrarFrame(self) 
-                print("hola")
+                FrameTarjetaCinemar(self).mostrarFrame() 
+                
             
             self.canvas.after(7500, eliminar_labels)
             
@@ -651,7 +653,7 @@ class FrameZonaJuegos(FieldFrame):
 class FrameTarjetaCinemar(FieldFrame):
     
 
-    def __init__(self):
+    def __init__(self, frameAnterior):
 
         self.clienteProceso = FieldFrame.getClienteProceso()
 
@@ -667,7 +669,8 @@ class FrameTarjetaCinemar(FieldFrame):
                     [["salmon", "light sea green", "medium orchid", "pale turquoise", "deep pink", "dodger blue", "light goldenrod yellow"], 'Color de la fuente']
                 ],
                 habilitado = [False, False, False],
-                botonVolver = True
+                botonVolver = True,
+                frameAnterior = frameAnterior
             )
         
         self.widgets = []
@@ -686,7 +689,10 @@ class FrameTarjetaCinemar(FieldFrame):
         self.widgets[9].grid_configure(row=8, column=1)
         self.widgets[10].grid_configure(row=9, column=0, sticky = "we", columnspan = 4)
 
-        self.FrameTarjeta = tk.Frame(self, bg = "black", width=300, height=150)
+        tk.Button(self.widgets[-1], text="Ingresar", fg = "white", bg = "gray",command=self.funIngresar,
+            ).grid(pady = (10,10), padx=(20, 20), column = 4, row = len(self._infoEtiquetas)+3, sticky = 'we')
+
+        self.FrameTarjeta = tk.Frame(self, width=300, height=150)
         self.FrameTarjeta.grid(row =2, rowspan= 3, column= 0, columnspan= 4)
 
         self.canvas = tk.Canvas(self.FrameTarjeta, width=300, height=150)
@@ -697,11 +703,13 @@ class FrameTarjetaCinemar(FieldFrame):
                     (self.clienteProceso._fuenteTarjeta, 16, "bold italic"), (self.clienteProceso._fuenteTarjeta, 12), self.clienteProceso._colorTextoTarjeta)
 
 
-        for widget in self.widgets[-1].winfo_children():
+        for i, widget in enumerate(self.widgets[-1].winfo_children()):
+            
+            if i ==0:
+                widget.config(text = "Aplicar",font= ("courier new", 16, "bold"), width = 8, height = 1, bg = "sky blue", fg = "black")
+            else: widget.config(font= ("courier new", 16, "bold"), width = 8, height = 1, bg = "sky blue", fg = "black")
 
-            widget.config(font= ("Times New Roman", 16, "bold"), width = 9, height = 1, bg = "sky blue", fg = "black")
-
-        tamaños = [24,13,15,15,12,12,12,12,12,12]
+        tamaños = [21,11,15,15,12,12,12,12,12,12]
 
         self.widgets[-1].config(bg = "light blue")
         self.widgets.pop(-1)
@@ -710,10 +718,11 @@ class FrameTarjetaCinemar(FieldFrame):
             if isinstance(w, ttk.Combobox):
                 pass
             else:
-                w.config(font = ("Times New Roman", tamaños[i]), bg = "light blue")
+                w.config(font = ("courier new", tamaños[i]), bg = "light blue")
 
-        self.widgets[2].config(font = ("Times New Roman", 16, "bold"))
-        self.widgets[3].config(font = ("Times New Roman", 16, "bold"))
+        self.widgets[0].config(font = ("courier new", 21, "bold"))
+        self.widgets[2].config(font = ("courier new", 15, "bold"))
+        self.widgets[3].config(font = ("courier new", 15, "bold"))
         
         ventanaLogicaProyecto.config(bg= "light blue")
         self.config(bg= "light blue")   
@@ -747,7 +756,9 @@ class FrameTarjetaCinemar(FieldFrame):
 
                 FrameTarjetaCinemar.crear_tarjeta(self.canvas, self.clienteProceso.getNombre() , self.clienteProceso.getCuenta().getSaldo(), self.clienteProceso._colorFondoTarjeta, 
                     (self.clienteProceso._fuenteTarjeta, 16, "bold italic"), (self.clienteProceso._fuenteTarjeta, 12), self.clienteProceso._colorTextoTarjeta)
-                
+    
+    def funIngresar(self):
+            FrameEleccion(self).mostrarFrame()
 
     def evaluarExcepciones(self):
         try:
@@ -786,6 +797,87 @@ class FrameTarjetaCinemar(FieldFrame):
             x1 = 20 + i * 15  # Posición horizontal inicial y espaciado
             x2 = x1 + 5  # Ancho de la barra
             canvas.create_rectangle(x1, 125, x2, 145, fill="black")
+
+
+class FrameEleccion(FieldFrame):
+
+    def __init__(self, frameAnterior):
+
+        self.clienteProceso = FieldFrame.getClienteProceso()
+
+        super().__init__(
+                tituloProceso = 'Servicios de Arkade',
+                descripcionProceso = 'En este espacio podras escoger si:\n •Ir a jugar\n•Recargar tu tarjeta\n•Personalizar tu tarjeta',
+                tituloCriterios = 'Criterios',
+                textEtiquetas = ['Seleccione proceso a realizar :'], 
+                tituloValores = '      Proceso',
+                infoElementosInteractuables = [
+                    [["Ingresar a los juegos","Recargar tarjeta Cinemar","Personalizar tarjeta Cinemar"], 'Proceso'], 
+                    
+                ],
+                habilitado = [False],
+                botonVolver = True,
+                frameAnterior = frameAnterior
+            )
+        
+        self.widgets = []
+        
+        for widget in self.winfo_children():
+
+            self.widgets.append(widget)
+
+        self.widgets[-1].grid_configure(row=7, column=0, sticky = "we", columnspan = 4) 
+        self.FrameTarjeta = tk.Frame(self, bg ="black", width=300, height=150)
+        self.FrameTarjeta.grid(row = 4, rowspan= 3, column= 0, columnspan= 4)
+
+        self.canvas = tk.Canvas(self.FrameTarjeta, width=300, height=150)
+        self.canvas.pack()
+
+        FrameTarjetaCinemar.crear_tarjeta(self.canvas, self.clienteProceso.getNombre() , self.clienteProceso.getCuenta().getSaldo(), self.clienteProceso._colorFondoTarjeta, 
+                    (self.clienteProceso._fuenteTarjeta, 16, "bold italic"), (self.clienteProceso._fuenteTarjeta, 12), self.clienteProceso._colorTextoTarjeta)
+
+        for widget in self.widgets[-1].winfo_children():
+            
+            widget.config(font= ("courier new", 16, "bold"), bg = "sky blue", fg = "black")
+
+        tamaños = [21,12,15,15,12]
+
+        self.widgets[-1].config(bg = "light blue")
+        self.widgets.pop(-1)
+        
+        
+        for i, w in enumerate(self.widgets):
+            if isinstance(w, ttk.Combobox):
+                w.config(width = 30)
+            else:
+                w.config(font = ("courier new", tamaños[i]), bg = "light blue")
+
+        self.widgets[0].config(font = ("courier new", 21, "bold"))
+        self.widgets[2].config(font = ("courier new", 15, "bold"))
+        self.widgets[3].config(font = ("courier new", 15, "bold"))
+        
+        ventanaLogicaProyecto.config(bg= "light blue")
+        self.config(bg= "light blue")   
+    
+    def funAceptar(self):
+
+        self.valorComoBox = []
+
+        if self.evaluarExcepciones():
+
+            for w in self.widgets:
+                if isinstance(w, ttk.Combobox):
+                    self.valorComoBox.append(w.get())
+            if self.valorComoBox[0] == "Ingresar a los juegos":
+                messagebox.showinfo(title="Información", message="No se ha programado esta opcion")
+            elif self.valorComoBox[0] == "Recargar tarjeta Cinemar":
+                messagebox.showinfo(title="Información", message="No se ha programado esta opcion jiji")
+            elif self.valorComoBox[0] == "Personalizar tarjeta Cinemar":
+                FrameTarjetaCinemar(FrameZonaJuegos()).mostrarFrame() 
+    
+
+
+
 
 #################################################################################################################################
 
