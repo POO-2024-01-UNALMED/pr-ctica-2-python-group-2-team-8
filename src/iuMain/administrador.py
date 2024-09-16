@@ -1648,26 +1648,45 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
            
 
     def funAceptar(self):
-         if self.evaluarExcepciones():
-            #Obtenemos el horario seleccionado
-            horarioString = self._comboBoxHorarios.get()
+          #Evaluamos las excepciones de UI
+        if self.evaluarExcepciones():
 
-            #Evaluamos si es un horario en presentación
-            estaEnPresentacion = False
-            if horarioString.__contains__('En vivo:'):
-                horarioSplit = horarioString.split(':', 1)
-                horarioString = horarioSplit[1].lstrip(' ')
-                estaEnPresentacion = True
+           if self._comboBoxItems.current() == 0:
+
+            self._productoSeleccionado = self._comboBoxEscogerItem.get()
+            self._calificacionProductoSeleccionado = int(self._comboBoxCalificarItem.get())
+            mejorProducto=self._clienteProceso.getCineUbicacionActual().mejorProducto().getNombre()+ self._clienteProceso.getCineUbicacionActual().mejorProducto().getTamaño()
+            peorPelicula=self._clienteProceso.getCineUbicacionActual().peorPelicula().getNombre()+ self._clienteProceso.getCineUbicacionActual().peorPelicula().getTipoDeFormato()
+            confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._productoSeleccionado}; y le has dado una calificacion de: {self._calificacionProductoSeleccionado}')
+            if confirmacionUsuario:
+                
+                confirmacionParaPasarelaDePago = messagebox.askokcancel(f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {mejorProducto}; y  {peorPelicula}' "¿Deseas Continuar?")
+
+                if confirmacionParaPasarelaDePago:
+                   
+                    pass
+                
+                
+
+           else:
+             self._peliculaSeleccionada = self._comboBoxEscogerItem.get()
+             self._calificacionPeliculaSeleccionada = int(self._comboBoxCalificarItem.get())
+             peorProducto=self._clienteProceso.getCineUbicacionActual().peorProducto().getNombre()+ self._clienteProceso.getCineUbicacionActual().peorProducto().getTamaño()
+             mejorPelicula=self._clienteProceso.getCineUbicacionActual().mejorPelicula().getNombre()+ self._clienteProceso.getCineUbicacionActual().mejorPelicula().getTipoDeFormato()
+             confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._peliculaSeleccionada}; y le has dado una calificacion de: {self._calificacionPeliculaSeleccionada}')
+             if confirmacionUsuario:
+                
+                confirmacionParaPasarelaDePago = messagebox.askokcancel('Confirmación datos',f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {peorProducto}; y  {mejorPelicula}' "¿Deseas Continuar?")
+
+                if confirmacionParaPasarelaDePago:
+                    pass
+        
+
+        
+            
 
 
-            if self._comboBoxItems.current() == 0: 
-                self._productoSeleccionado = Producto.obtenerProductosPorNombre(self._nombreProductoSeleccionado, self._clienteProceso.getCineUbicacionActual().getInventarioCine)
-                nombrePeliculaSeleccionada = self.getValue("Escoge tu item :")
-
-            else:
-                indicePeliculaSeleccionada=  self._comboBoxEscogeritem
-                self._formatosPeliSeleccionada = Pelicula.obtenerPeliculasPorNombre(nombrePeliculaSeleccionada, self._clienteProceso.getCineUbicacionActual().getCartelera())    
-
+            
 
 
         
@@ -1700,42 +1719,74 @@ class FrameFuncionalidad5(FieldFrame):
                 FramePasarelaDePagos(self.getFrameMenuPrincipal(), SucursalCine.getTiposDeMembresia()[FrameFuncionalidad5.membresiaSeleccionadaInt - 1].getValorSuscripcionMensual()).mostrarFrame()
 
             else:
+                FrameFuncionalidad5.membresiaSeleccionadaInt = 1
                 messagebox.showinfo(title="Membresia", message= f"""No puedes adquirir esta membresía debido a que no cumples con los criterios establecidos para ello o no hay unidades en el momento\n
                                     Puntos actuales: {FieldFrame.getClienteProceso().getPuntos()}\n
                                     Peliculas vistas: {len(FieldFrame.getClienteProceso().getHistorialDePeliculas())}""")
 
 class FramePasarelaDePagos(FieldFrame):
 
-    def __init__(self, frameSiguiente = None, valorAPagar = 0):
-        clienteProceso = FieldFrame.getClienteProceso()
-        self._pagoCompletado = False
+    def __init__(self, frameSiguiente = None, valorAPagar = 0, *elementosIbuyable):
         self._valorAPagar = valorAPagar
         self._frameSiguiente = frameSiguiente
+        self._elementosIbuyable = elementosIbuyable
+
         super().__init__(
             tituloProceso=f"Métodos de pago",
-            descripcionProceso=f"(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
-            textEtiquetas=["Precio", "Método de pago"],
-            infoElementosInteractuables=[[valorAPagar], [MetodoPago.mostrarMetodosDePago(clienteProceso), "Seleccione una opción:"]],
+            descripcionProceso=f"(Fecha Actual: {self.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {self.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
+            textEtiquetas=["Precio original :", "Método de pago :"],
+            infoElementosInteractuables=[[int(valorAPagar)], [MetodoPago.mostrarMetodosDePago(self.getClienteProceso()), "Seleccione una opción:"]],
             habilitado=[False, False],
-            desplazarBotonesFila=1
+            desplazarBotonesFila=2
         )
+
+        self.getElementosInteractivos()[1].grid_configure(sticky = "we", columnspan = 2)
         
-        self._precioDescuento = tk.Label(self, text=f"", font= ("Verdana bold",30), anchor="center")
+        self._precioDescuento = tk.Label(self, text=f"", font= ("Verdana bold",15), anchor="center")
         self._precioDescuento.grid(column = 0, row = len(self._infoEtiquetas) + 3, columnspan=2, sticky='we')
+        
+        self._metodoSeleccionado = tk.Label(self, text= f"", font= ("Verdana bold",12), anchor="center")
+        self._metodoSeleccionado.grid(column = 0, row = len(self._infoEtiquetas) + 4, columnspan=2, sticky='we')
 
-        print((self.getElementosInteractivos()))
         self._opcionComboBox = self.getElementosInteractivos()[1]
-        self._opcionComboBox.bind("<<ComboboxSelected>>", self.descuentoEnPantalla())
-
-    def descuentoEnPantalla(self):
-        pass
-        #self._precioDescuento.config(text=f"Nuevo valor: {self._valorAPagar * (1 - (self._opcionComboBox.current()))}")
-
-    def realizarPago(self):
-        pass
+        self._opcionComboBox.bind("<<ComboboxSelected>>", self.descuentoEnPantalla)
 
     
+    def descuentoEnPantalla(self, event):
+        self._metodoSeleccionado.config(text=f"Método de pago :{self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getNombre()}, Descuento :{int(self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado() * 100)}%, Máximo saldo:{self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getLimiteMaximoPago()}")
+        self._precioDescuento.config(text=f"Nuevo valor: {self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))}")
+        print(self._precioDescuento)
 
+    def funAceptar(self):
+        if self.evaluarExcepciones():
+
+            if isinstance(self._elementosIbuyable, Servicio):
+                messagebox.showinfo(title="", message= "")
+
+            metodoPagoSeleccionado = self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()]
+            precio = self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))
+            self._valorAPagar = metodoPagoSeleccionado.realizarPago(precio, self.getClienteProceso())
+
+            if (self._valorAPagar > 0):
+                messagebox.showwarning(title="Proceso de pago", message= f"Falta por pagar: {self._valorAPagar}")
+                self.getElementosInteractivos()[0].configure(state="normal")
+                self.setValueEntry("Precio original :", int(self._valorAPagar))
+                self.getElementosInteractivos()[0].configure(state="disabled")
+                self._metodoSeleccionado.configure(text=f"")
+                self._precioDescuento.configure(text=f"")
+                self.getElementosInteractivos()[1].configure(values = MetodoPago.mostrarMetodosDePago(self.getClienteProceso()))
+                self.funBorrar()
+
+            else:
+                mensaje = ""
+                for elementoIbuyable in self._elementosIbuyable:
+                    elementoIbuyable.procesarPagoRealizado(self.getClienteProceso())
+                    mensaje+=elementoIbuyable.factura()
+                messagebox.showinfo(title="Pago realizado", message= f"Pago realizado exitosamente. \n{mensaje}")
+                self._frameSiguiente.mostrarFrame()
+
+
+        
 def objetosBasePractica2():
 
     sucursalCine1 = SucursalCine("Bucaramanga")
@@ -1794,6 +1845,8 @@ def objetosBasePractica2():
     pelicula1_5.crearPeliculas()
     pelicula1_6 = Pelicula("Spy x Familiy Código: Blanco", 19000, "Infantil", timedelta( minutes=90 ), "+5", "2D", sucursalCine1)
     pelicula1_6.crearPeliculas()
+
+    
     cliente5.getPeliculasDisponiblesParaCalificar().append(pelicula1_2)
     cliente5.getProductosDisponiblesParaCalificar().append(producto7)
     cliente5.getPeliculasDisponiblesParaCalificar().append(pelicula1_3)
@@ -1889,7 +1942,6 @@ def objetosBasePractica2():
 
     #print(cliente1.getMembresia().getTipoMembresia())
     #print(MetodoPago.mostrarMetodosDePago(cliente1))
-    print()
 
 
     for sucursal in SucursalCine.getSucursalesCine():
