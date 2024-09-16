@@ -29,7 +29,7 @@ class Servicio (ABC):
         b = []
         for bono in servicio.getBonosCliente():
             n += 1
-            b.append(f"\n{n}. {bono.getProducto().getNombre()} {bono.getProducto().getTamaño()}")
+            b.append(f"\n{bono.getProducto().getNombre()} {bono.getProducto().getTamaño()}")
         return b
 
     def actualizarBonos(self):
@@ -38,11 +38,15 @@ class Servicio (ABC):
                 self.getBonosCliente().append(bono) 
 
     def descuentarPorGenero(self, cine):
-        for producto in self.orden:
+        for producto in self._orden:
             for ticket in cine.getTicketsParaDescuento():
+                print("No ENTRO")
+                print(producto.getGenero(),  ticket.getPelicula().getGenero(),  self.cliente , ticket.getDueno())
                 if producto.getGenero() == ticket.getPelicula().getGenero() and self.cliente == ticket.getDueno():
+                    print("ENTROOOOO")
                     fecha = self._sucursalUbicacion.getFechaActual().date()
                     if fecha == ticket.getHorario().date() and ticket.isDescuento():
+                        print("ENTRO")
                         ticket.setDescuento(False)
                         return producto
         return None

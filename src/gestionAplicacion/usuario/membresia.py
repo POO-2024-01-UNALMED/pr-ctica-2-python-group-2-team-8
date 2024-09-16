@@ -5,13 +5,13 @@ from gestionAplicacion.servicios.producto import Producto
 class Membresia ():
 
     #Inicializador
-    def __init__(self, nombre, categoria, valorSuscripcionMensual, duracionMembresiaDias):
+    def __init__(self, nombre, categoria, valorSuscripcionMensual, duracionMembresiaDias, tipoMembresia = 0):
         self._nombre = nombre
         self._categoria = categoria
         self._descuentoAsociado = 0.0
         self._valorSuscripcionMensual = valorSuscripcionMensual
         self._duracionMembresiaDias = duracionMembresiaDias
-        self._tipoMembresia = 0
+        self._tipoMembresia = tipoMembresia
         SucursalCine.getTiposDeMembresia().append(self)
 
     #Metodos
@@ -30,10 +30,10 @@ class Membresia ():
 
         #Se actualiza el nombre de la membresia.
         if (membresiaActual == None):
-            mensaje = "Bienvenido, " + clienteProceso.getNombre() + ".\nActualmente, no tiene membresía activa en el sistema.\nPor favor, seleccione la membresía que desea adquirir:\n"
+            mensaje = f"Bienvenido, {clienteProceso.getNombre()}.\nActualmente, no tiene membresía activa en el sistema.\nPor favor, seleccione la membresía que desea adquirir:\n"
         else:
             nombreMensajeActual = membresiaActual.getNombre()
-            mensaje = "Bienvenido, " + clienteProceso.getNombre() + ".\nActualmente, su membresía es " + nombreMensajeActual + " de categoría " + membresiaActual.getCategoria() + "\nPor favor, seleccione la membresía que desea adquirir/actualizar:\n"
+            mensaje = f"Bienvenido, {clienteProceso.getNombre()}.\nActualmente, su membresía es {nombreMensajeActual} de categoría {membresiaActual.getCategoria()}.\nPor favor, seleccione la membresía que desea adquirir/actualizar:\n"
 
         return mensaje
 
@@ -90,8 +90,8 @@ class Membresia ():
 
             #Si el cliente ya tiene esta membresia y además, le faltan más de 5 dias para que expire, no se muestra en el menu.
             elif(nombreMembresiaActual == productoMembresia.getNombre() and 
-                    (clienteProceso.getFechaLimiteMembresia() - datetime(6)) > SucursalCine.getFechaActual() and
-                    clienteProceso.getFechaLimiteMembresia() > SucursalCine.getFechaActual()):
+                    (clienteProceso.getFechaLimiteMembresia() - timedelta(days=6)) > sucursalCineProceso.getFechaActual().date() and
+                    clienteProceso.getFechaLimiteMembresia() > sucursalCineProceso.getFechaActual().date()):
                 i+=1
                 continue
 
@@ -187,7 +187,7 @@ class Membresia ():
 
 
     @classmethod
-    def asignarMembresiaNueva(categoriaMembresia):
+    def asignarMembresiaNueva(cls, categoriaMembresia):
         """<b>Description</b>: Este método se encarga de asignar la nueva membresia con un apuntador de Membresia que coincida con la opción seleccionada durante el proceso de compra.
 
 	    <b>param</b>: membresia : Se pide una instancia de tipo de membresia para usarlo como apuntador.
@@ -252,3 +252,15 @@ class Membresia ():
     
     def setTipoMembresia(self, tipoMembresia):
         self._tipoMembresia = tipoMembresia
+
+    def getValorSuscripcionMensual(self):
+        return self._valorSuscripcionMensual
+    
+    def setValorSuscripcionMensual(self, valorSM):
+        self._valorSuscripcionMensual = valorSM
+
+    def getDescuentoAsociado(self):
+        return self._valorSuscripcionMensual
+    
+    def setDescuentoAsociado(self, descuentoAsociado):
+        self._descuentoAsociado = descuentoAsociado

@@ -348,11 +348,21 @@ class SucursalCine:
         if SucursalCine._fechaActual.time() >= SucursalCine._INICIO_HORARIO_LABORAL and SucursalCine._fechaActual.time() < SucursalCine._FIN_HORARIO_LABORAL:
             SucursalCine.actualizarPeliculasSalasDeCine()
 
-    #def obtenerSucursalPorId(cls):
+    @classmethod
+    def obtenerSucursalPorId(cls, idSucursal):
 
-    #def obetenerSalaDeCinePorId(self):
+        for sede in SucursalCine._sucursalesCine:
+            if sede._idSucursal == idSucursal: return sede
 
-    #def obtenerPeliculaPorId(self):
+    def obtenerSalaDeCinePorId(self, idSalaCineSucursal):
+
+        for salaCine in self._salasDeCine:
+            if salaCine.getSalaCineId() == idSalaCineSucursal : return salaCine
+
+    def obtenerPeliculaPorId(self, idPeliculaCartelera):
+
+        for pelicula in self._cartelera:
+            if pelicula.getIdPelicula() == idPeliculaCartelera: return pelicula
 
     @classmethod
     def notificarFechaLimiteMembresia(cls):
@@ -582,9 +592,7 @@ class SucursalCine:
 
     def mostrarServicios(self):
         s = []
-        n = 0
-        for servicio in self._servicios:
-            n = n+1
+        for servicio in self.getServicios():
             s.append("Servicio " + servicio.getNombre())
         return s
 
@@ -638,6 +646,9 @@ class SucursalCine:
 
     def getTarjetasCinemar(self):
         return self._tarjetasCinemar
+
+    def setTarjetasCinemar(self, tarjetasCinemar):
+        self._tarjetasCinemar = tarjetasCinemar
 
     @classmethod
     def getMetodosDePagoDisponibles(cls):

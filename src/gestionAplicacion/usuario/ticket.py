@@ -99,9 +99,10 @@ class Ticket:
         :return String: retorna el codigo 
         """
 
-        return self._pelicula.getTipoDeFormato() + self._dueno.getTipoDocumento()+self._pelicula.getSalaCinePresentacion().getNumeroSala() + "-" + self._pelicula.getGenero()
+        return str(self._pelicula.getTipoDeFormato()) + str(self._dueno.getTipoDocumento().name) + str(self._pelicula.getSalaCinePresentacion().getNumeroSala()) + "-" + str(self._pelicula.getGenero())
 
-    def encontrarGeneroCodigoPelicula(self, codigo):
+    @classmethod
+    def encontrarGeneroCodigoPelicula(cls, codigo):
         """
         Descripción: Este método se encarga de encontrar el género de la película asociada a un código que está contenido dentro del string del mismo.
 
@@ -174,8 +175,8 @@ class Ticket:
     def setSucursalCompra(self, sucursalCompra):
         self._sucursalCompra = sucursalCompra
     
-    def isDescuentos(self):
+    def isDescuento(self):
         return self._descuento
     
-    def setDescuentos(self, descuento):
+    def setDescuento(self, descuento):
         self._descuento = descuento     

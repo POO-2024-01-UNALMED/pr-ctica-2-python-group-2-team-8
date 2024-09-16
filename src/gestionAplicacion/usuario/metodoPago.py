@@ -3,18 +3,21 @@ from gestionAplicacion.sucursalCine import SucursalCine
 class MetodoPago():
 
     #Inicializador
-    def __init__(self, nombre, descuentoAsociado, limiteMaximoPago):
+    def __init__(self, nombre, descuentoAsociado, limiteMaximoPago, tipo = 0):
         self._nombre = nombre
         self._descuentoAsociado = descuentoAsociado
         self._limiteMaximoPago = limiteMaximoPago
-        self._tipo = 0
+        self._tipo = tipo
+
+        if (nombre != "Puntos"):
+            SucursalCine.getMetodosDePagoDisponibles().append(self)
 
 
     #Metodos
 
 
     @classmethod
-    def mostrarMetodosDePago(cls, clienteProceso) -> str:
+    def mostrarMetodosDePago(cls, clienteProceso):
         """
         <b>Description</b>: Este método se encarga de mostrar los métodos de pago disponibles con
 	    sus descuentos. El resultado puede cambiar si el cliente posee membresia y el tipo de esta.
@@ -23,19 +26,22 @@ class MetodoPago():
 	    
         <b>return</b>: <b>string</b> : Se retorna un texto mostrando el nombre de los métodos de pago con sus descuentos.
         """
-        resultado = None
+        resultado = []
         i = 1
 
         #Se recorre la lista de los medios de pagos disponibles en la lista del cliente.
-        for metodoPago in clienteProceso.getMetodosDePago:
-            if (resultado == None):
-                resultado = i + ". " + metodoPago.getNombre() + " - Descuento: " + int(metodoPago.getDescuentoAsociado()*100) + "% - Límite Máximo de pago: " + metodoPago.getLimiteMaximoPago() + "\n"
+        for metodoPago in clienteProceso.getMetodosDePago():
+            if (resultado == []):
+                texto =  f"{i}. {metodoPago.getNombre()} - Descuento: {int(metodoPago.getDescuentoAsociado()*100)}% - Límite Máximo de pago: {metodoPago.getLimiteMaximoPago()}"
+                resultado.append(texto)
             
             else:
-                if (metodoPago.getNombre()=="Puntos"):
-                    resultado = resultado + i + ". " + metodoPago.getNombre() + " - Saldo: " + int(metodoPago.getLimiteMaximoPago())
+                if (metodoPago.getNombre() == "Puntos"):
+                    texto = f"{i}. {metodoPago.getNombre()} - Saldo: {int(metodoPago.getLimiteMaximoPago())}"
+                    resultado.append(texto)
                     continue
-                resultado = resultado + i + ". " + metodoPago.getNombre() + " - Descuento: " + int(metodoPago.getDescuentoAsociado()*100) + "% - Límite Máximo de pago: " + metodoPago.getLimiteMaximoPago()
+                texto = f"{i}. {metodoPago.getNombre()} - Descuento: {int(metodoPago.getDescuentoAsociado()*100)}% - Límite Máximo de pago: {metodoPago.getLimiteMaximoPago()}"
+                resultado.append(texto)
             i+=1
 
         return resultado
@@ -57,7 +63,7 @@ class MetodoPago():
         #Se limpia la lista de métodos de pago, esto en caso de que el cliente haya adquirido una membresia.
         puntos = None
 
-        for metodoPagoCliente in clienteProceso.getMetodosDePago:
+        for metodoPagoCliente in clienteProceso.getMetodosDePago():
             if (metodoPagoCliente.getNombre() == "Puntos"):
                 puntos = metodoPagoCliente
 
@@ -74,8 +80,8 @@ class MetodoPago():
                 puntos = MetodoPago("Puntos", 0.0, clienteProceso.getPuntos(), tipoMembresiaInt)
 
         #Se realiza un ciclo para filtrar los métodos de pago por el tipoMembresia del cliente y se añaden sus lista de métodos de pago.
-        for metodoPago in SucursalCine.getMetodosDePagoDisponibles:
-            if (tipoMembresiaInt == metodoPago.getTipo):
+        for metodoPago in SucursalCine.getMetodosDePagoDisponibles():
+            if (tipoMembresiaInt == metodoPago.getTipo()):
                 clienteProceso.getMetodosDePago().append(metodoPago)
 
         #Una vez se actualizan el arreglo de tipo MetodoPago en cliente, se añaden los puntos a este arreglo.
