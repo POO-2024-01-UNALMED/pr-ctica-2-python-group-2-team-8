@@ -1394,6 +1394,8 @@ def objetosBasePractica2():
     pelicula1_5.crearPeliculas()
     pelicula1_6 = Pelicula("Spy x Familiy Código: Blanco", 19000, "Infantil", timedelta( minutes=90 ), "+5", "2D", sucursalCine1)
     pelicula1_6.crearPeliculas()
+
+    
     cliente5.getPeliculasDisponiblesParaCalificar().append(pelicula1_2)
     cliente5.getProductosDisponiblesParaCalificar().append(producto7)
     cliente5.getPeliculasDisponiblesParaCalificar().append(pelicula1_3)
