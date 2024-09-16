@@ -1659,26 +1659,39 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
            
 
     def funAceptar(self):
-         if self.evaluarExcepciones():
-            #Obtenemos el horario seleccionado
-            horarioString = self._comboBoxHorarios.get()
+          #Evaluamos las excepciones de UI
+        if self.evaluarExcepciones():
 
-            #Evaluamos si es un horario en presentación
-            estaEnPresentacion = False
-            if horarioString.__contains__('En vivo:'):
-                horarioSplit = horarioString.split(':', 1)
-                horarioString = horarioSplit[1].lstrip(' ')
-                estaEnPresentacion = True
+           if self._comboBoxItems.current() == 0:
+
+            self._productoSeleccionado = self._comboBoxEscogerItem.get()
+            self._calificacionProductoSeleccionado = int(self._comboBoxCalificarItem.get())
+            confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._productoSeleccionado}; y le has dado una calificacion de: {self._calificacionProductoSeleccionado}')
+            if confirmacionUsuario:
+                
+                cofirmacionParaPasarelaDePago = messagebox.askokcancel("Como calificaste un item te queremos ofrecer un combo especial personalizado","Esta compuesto por:" + SucursalCine.mejorProducto + SucursalCine.peorPelicula + "¿Desea Continuar?")
+
+                if cofirmacionParaPasarelaDePago:
+                   
+                    pass
+
+           else:
+             self._peliculaSeleccionada = self._comboBoxEscogerItem.get()
+             self._calificacionPeliculaSeleccionada = int(self._comboBoxCalificarItem.get())
+             confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._peliculaSeleccionada}; y le has dado una calificacion de: {self._calificacionPeliculaSeleccionada}')
+             if confirmacionUsuario:
+                
+                cofirmacionParaPasarelaDePago = messagebox.askokcancel("Como calificaste un item te queremos ofrecer un combo especial personalizado","Esta compuesto por:" + SucursalCine.peorProducto + SucursalCine.mejorPelicula + "¿Desea Adquirirlo?")
+
+                if cofirmacionParaPasarelaDePago:
+                    pass
+        
+
+        
+            
 
 
-            if self._comboBoxItems.current() == 0: 
-                self._productoSeleccionado = Producto.obtenerProductosPorNombre(self._nombreProductoSeleccionado, self._clienteProceso.getCineUbicacionActual().getInventarioCine)
-                nombrePeliculaSeleccionada = self.getValue("Escoge tu item :")
-
-            else:
-                indicePeliculaSeleccionada=  self._comboBoxEscogeritem
-                self._formatosPeliSeleccionada = Pelicula.obtenerPeliculasPorNombre(nombrePeliculaSeleccionada, self._clienteProceso.getCineUbicacionActual().getCartelera())    
-
+            
 
 
         
