@@ -1675,7 +1675,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
 
                 if confirmacionParaPasarelaDePago:
                    
-                    pass
+                    FramePasarelaDePagos()
                 
                 
 
@@ -1684,6 +1684,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
              self._calificacionPeliculaSeleccionada = int(self._comboBoxCalificarItem.get())
              peorProducto=self._clienteProceso.getCineUbicacionActual().peorProducto().getNombre()+ self._clienteProceso.getCineUbicacionActual().peorProducto().getTamaño()
              mejorPelicula=self._clienteProceso.getCineUbicacionActual().mejorPelicula().getNombre()+ self._clienteProceso.getCineUbicacionActual().mejorPelicula().getTipoDeFormato()
+             
              confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._peliculaSeleccionada}; y le has dado una calificacion de: {self._calificacionPeliculaSeleccionada}')
              if confirmacionUsuario:
                 
