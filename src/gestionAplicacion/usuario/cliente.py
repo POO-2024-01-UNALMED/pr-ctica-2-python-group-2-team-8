@@ -1,7 +1,10 @@
+from gestionAplicacion.sucursalCine import SucursalCine
+from datetime import timedelta
+
 class Cliente():
     
     def __init__(self, nombre = "", edad = 0 , documento = 0, tipoDocumento = None, cineUbicacionActual = None, membresia = None,
-        cuenta = None, codigosDescuento =[], codigosBonos= [], bonos= []):
+        cuenta = None, codigosDescuento =[], codigosBonos= [], bonos= [], fechaLimiteMembresia = 0, puntos = 0):
 
         self._nombre = nombre
         self._edad = edad
@@ -31,6 +34,8 @@ class Cliente():
         #Atributos Funcionalidad 5
         self._membresia = membresia
         self._metodosDePago = []
+        self._fechaLimiteMembresia = fechaLimiteMembresia
+        self._puntos = puntos
 
 
         self._cineUbicacionActual.getClientes().append(self)
@@ -274,3 +279,21 @@ class Cliente():
     
     def setCuenta(self, cuenta):
         self._cuenta = cuenta
+
+    def getMembresia(self):
+        return self._membresia
+    
+    def setMembresia(self, membresia):
+        self._membresia = membresia
+
+    def getFechaLimiteMembresia(self):
+        return self._fechaLimiteMembresia
+    
+    def setFechaLimiteMembresia(self, fechaLimiteMembresia):
+        self._fechaLimiteMembresia = fechaLimiteMembresia
+
+    def getPuntos(self):
+        return self._puntos
+    
+    def setPuntos(self, puntos):
+        self._puntos = puntos
