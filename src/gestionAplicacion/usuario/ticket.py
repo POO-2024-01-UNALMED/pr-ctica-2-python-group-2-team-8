@@ -175,8 +175,8 @@ class Ticket:
     def setSucursalCompra(self, sucursalCompra):
         self._sucursalCompra = sucursalCompra
     
-    def isDescuentos(self):
+    def isDescuento(self):
         return self._descuento
     
-    def setDescuentos(self, descuento):
+    def setDescuento(self, descuento):
         self._descuento = descuento     

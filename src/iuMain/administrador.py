@@ -33,7 +33,6 @@ class FieldFrame(tk.Frame):
 
     _clienteProceso = None
     _frameMenuPrincipal = None
-    _framePasarelaDePagos = None
     _framesFuncionalidades = []
 
     def __init__(self, tituloProceso='', descripcionProceso='', tituloCriterios = "", textEtiquetas = "", tituloValores = "", infoElementosInteractuables = None, habilitado = None, botonVolver = False, desplazarBotonesFila = 0, frameAnterior = None):
@@ -134,14 +133,6 @@ class FieldFrame(tk.Frame):
     @classmethod
     def getFrameMenuPrincipal(cls):
         return FieldFrame._frameMenuPrincipal
-    
-    @classmethod
-    def setFramePasarelaDePagos(cls, framePasarelaDePagos):
-        FieldFrame._framePasarelaDePagos = framePasarelaDePagos
-
-    @classmethod
-    def getFramePasarelaDePagos(cls):
-        return FieldFrame._framePasarelaDePagos
 
     def funBorrar(self):
         for elementoInteractivo in self._elementosInteractivos:
@@ -234,9 +225,6 @@ class FieldFrame(tk.Frame):
         self._frameMenuPrincipal = frameVentanaPrincipal
 
         self.refrescarFramesFuncionalidades()
-        
-        #Setteamos el frame para los pagos.
-        FieldFrame.setFramePasarelaDePagos(FramePasarelaDePagos())
 
         #Ejecutamos la lógica de la ventana del menú principal
         frameVentanaPrincipal.construirMenu()
@@ -538,6 +526,12 @@ class FrameCrearUsuario(FieldFrame):
                 else:
                     messagebox.showerror('Error', 'La edad mínima para acceder a nuestras instalaciones es de 5 años')
 
+                #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
+                clienteCreado = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual))
+                MetodoPago.asignarMetodosDePago(clienteCreado)
+                self.logicaInicioProcesosFuncionalidades(clienteCreado)
+                
+        
 class FrameVentanaPrincipal(FieldFrame):
 
     def __init__(self):
@@ -1694,31 +1688,64 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
      
 
 class FrameFuncionalidad5(FieldFrame):
-
+    membresiaSeleccionadaInt = 1
+    membresiaSeleccionada = None
     def __init__(self):
         clienteProceso = FieldFrame.getClienteProceso()
         super().__init__(
             tituloProceso=f"Sistema de membresías.",
             descripcionProceso= f"(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)}) \n {Membresia.verificarMembresiaActual(clienteProceso)}",
-            textEtiquetas=[""],
+            textEtiquetas=["Categoria"],
             infoElementosInteractuables= [[Membresia.mostrarCategoria(clienteProceso, clienteProceso.getCineUbicacionActual()), "Seleccione membresía"]],
-            habilitado= [False]
+            habilitado= [False], 
+            botonVolver= True,
+            frameAnterior= FieldFrame.getFrameMenuPrincipal()
         )
 
     def funAceptar(self):
-        FieldFrame.getFramePasarelaDePagos().mostrarFrame()
+        if self.evaluarExcepciones():
+            FrameFuncionalidad5.membresiaSeleccionadaInt = FrameFuncionalidad5.membresiaSeleccionadaInt + self.getElementosInteractivos()[0].current()
+            esValido = Membresia.verificarRestriccionMembresia(FieldFrame.getClienteProceso(), FrameFuncionalidad5.membresiaSeleccionadaInt, FieldFrame.getClienteProceso().getCineUbicacionActual())
+            if (esValido == True):
+                FrameFuncionalidad5.membresiaSeleccionada = Membresia.asignarMembresiaNueva(FrameFuncionalidad5.membresiaSeleccionadaInt)
+                FramePasarelaDePagos(self.getFrameMenuPrincipal(), SucursalCine.getTiposDeMembresia()[FrameFuncionalidad5.membresiaSeleccionadaInt - 1].getValorSuscripcionMensual()).mostrarFrame()
+
+            else:
+                messagebox.showinfo(title="Membresia", message= f"""No puedes adquirir esta membresía debido a que no cumples con los criterios establecidos para ello o no hay unidades en el momento\n
+                                    Puntos actuales: {FieldFrame.getClienteProceso().getPuntos()}\n
+                                    Peliculas vistas: {len(FieldFrame.getClienteProceso().getHistorialDePeliculas())}""")
 
 class FramePasarelaDePagos(FieldFrame):
 
-    def __init__(self):
-        
+    def __init__(self, frameSiguiente = None, valorAPagar = 0):
+        clienteProceso = FieldFrame.getClienteProceso()
+        self._pagoCompletado = False
+        self._valorAPagar = valorAPagar
+        self._frameSiguiente = frameSiguiente
         super().__init__(
             tituloProceso=f"Métodos de pago",
             descripcionProceso=f"(Fecha Actual: {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {FieldFrame.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})",
-            textEtiquetas=[""],
-            infoElementosInteractuables=[None],
-            habilitado=[False]
+            textEtiquetas=["Precio", "Método de pago"],
+            infoElementosInteractuables=[[valorAPagar], [MetodoPago.mostrarMetodosDePago(clienteProceso), "Seleccione una opción:"]],
+            habilitado=[False, False],
+            desplazarBotonesFila=1
         )
+        
+        self._precioDescuento = tk.Label(self, text=f"", font= ("Verdana bold",30), anchor="center")
+        self._precioDescuento.grid(column = 0, row = len(self._infoEtiquetas) + 3, columnspan=2, sticky='we')
+
+        print((self.getElementosInteractivos()))
+        self._opcionComboBox = self.getElementosInteractivos()[1]
+        self._opcionComboBox.bind("<<ComboboxSelected>>", self.descuentoEnPantalla())
+
+    def descuentoEnPantalla(self):
+        pass
+        #self._precioDescuento.config(text=f"Nuevo valor: {self._valorAPagar * (1 - (self._opcionComboBox.current()))}")
+
+    def realizarPago(self):
+        pass
+
+    
 
 def objetosBasePractica2():
 
@@ -1758,7 +1785,6 @@ def objetosBasePractica2():
     producto1b = Producto("Camisa","XL","souvenir",0,1,"Normal",sucursalCine2)
     bono2 = Bono(1234,producto1b,"souvenir",cliente1)
     bono3 = Bono(1234,producto2b,"comida",cliente1)
-    
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
     salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)
@@ -1824,11 +1850,11 @@ def objetosBasePractica2():
     pelicula3_6 = Pelicula("BNHA temporada 7 movie", 12000, "Acción", timedelta( minutes=60 ), "+12", "2D", sucursalCine3)
     pelicula3_6.crearPeliculas()
 
-    membresia1 = Membresia("Básico", 1, 5000, 10)
-    membresia2 = Membresia("Heróico", 2, 10000, 15)
-    membresia3 = Membresia("Global", 3, 15000, 20)
-    membresia4 = Membresia("Challenger", 4, 25000, 25)
-    membresia5 = Membresia("Radiante", 5, 30000, 30)
+    membresia1 = Membresia("Básico", 1, 5000, 10, 1)
+    membresia2 = Membresia("Heróico", 2, 10000, 15, 1)
+    membresia3 = Membresia("Global", 3, 15000, 20, 1)
+    membresia4 = Membresia("Challenger", 4, 25000, 25, 2)
+    membresia5 = Membresia("Radiante", 5, 30000, 30, 2)
 
     metodoPago1 = MetodoPago("Bancolombia", 0.10, 200000)
     metodoPago2 = MetodoPago("AV Villas", 0.05, 120000)
@@ -1841,7 +1867,41 @@ def objetosBasePractica2():
     game4 = Arkade("Hang Man", 30000.0, "Comedia");
     game5 = Arkade("Hang Man", 7500.0, "Drama");
 
+        #Para descuento con pelicula
+    ticket2 = Ticket(pelicula2_6, datetime(2024, 9, 16, 12, 20, 0), '4-4', sucursalCine2)
+    ticket2.setDueno(cliente1)
+    ticket2.setSucursalCompra(sucursalCine2)
+    ticket2.setSalaDeCine(salaDeCine2_4)
+    cliente1.getTickets().append(ticket2)
+    sucursalCine2.getTicketsParaDescuento().append(ticket2)
+
     Membresia.stockMembresia(SucursalCine.getSucursalesCine())
+
+    #cliente1.setMembresia(membresia5)
+    
+    MetodoPago.metodoPagoPorTipo(metodoPago1)
+    MetodoPago.metodoPagoPorTipo(metodoPago2)
+    MetodoPago.metodoPagoPorTipo(metodoPago3)
+    MetodoPago.metodoPagoPorTipo(metodoPago4)
+
+    MetodoPago.asignarMetodosDePago(cliente1)
+    MetodoPago.asignarMetodosDePago(cliente2)
+    MetodoPago.asignarMetodosDePago(cliente3)
+    MetodoPago.asignarMetodosDePago(cliente4)
+    MetodoPago.asignarMetodosDePago(cliente5)
+
+
+
+    #La mala para el que hizo eso me hizo estar buscando esto por media hora .l. atentamente Rusbel
+    #cliente1.setCineUbicacionActual(sucursalCine1)
+    
+    for metodoPago in SucursalCine.getMetodosDePagoDisponibles():
+        print(metodoPago.getNombre(), metodoPago.getTipo(), metodoPago.getDescuentoAsociado())
+
+    #print(cliente1.getMembresia().getTipoMembresia())
+    #print(MetodoPago.mostrarMetodosDePago(cliente1))
+    print()
+
 
     for sucursal in SucursalCine.getSucursalesCine():
         for i in range (10):
