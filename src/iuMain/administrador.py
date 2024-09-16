@@ -21,7 +21,7 @@ from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
 from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
-from excepciones.iuExceptions import iuExceptions, iuEmptyValues, iuDefaultValues
+from excepciones.iuExceptions import UiExceptions, UiEmptyValues, UiDefaultValues
 from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
 from gestionAplicacion.servicios.arkade import Arkade
 from gestionAplicacion.usuario.ticket import Ticket
@@ -145,15 +145,15 @@ class FieldFrame(tk.Frame):
         try:
             valoresVacios = self.tieneCamposVacios()
             if len(valoresVacios) > 0:
-                raise iuEmptyValues(valoresVacios)
+                raise UiEmptyValues(valoresVacios)
 
             valoresPorDefecto = self.tieneCamposPorDefecto()
             if len(valoresPorDefecto) > 0:
-                raise iuDefaultValues(valoresPorDefecto)
+                raise UiDefaultValues(valoresPorDefecto)
             
             return True
         
-        except iuExceptions as e:
+        except UiExceptions as e:
             messagebox.showerror('Error', e.mostrarMensaje())
             return False
     
@@ -207,9 +207,6 @@ class FieldFrame(tk.Frame):
 
         for elemento in self._elementosInteractivos:
 
-            if isinstance(elemento, tk.Entry) and self._infoElementosInteractuables[self._elementosInteractivos.index(elemento)] == None:
-                continue
-
             if elemento.get() == '':
                 camposVacios.append(self._infoEtiquetas[self._elementosInteractivos.index(elemento)])
         
@@ -245,10 +242,6 @@ class FieldFrame(tk.Frame):
     
     def getFrameAnterior(self):
         return self._frameAnterior
-
-class VisualFieldFrame(tk.Frame):
-        def __init__(self):
-            super().__init__(ventanaLogicaProyecto)
 
 ####################################################################################################
 ####################################################################################################
@@ -476,10 +469,6 @@ class FrameCrearUsuario(FieldFrame):
     #Construimos el frame usando FieldFrame
     def __init__(self, tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada):
 
-        #self._imagenFramePrincipal = tk.PhotoImage(file = 'src/iuMain/imagenes/fachadaCine.png')
-        #self._labelImagen = tk.Label(self, image = self._imagenFramePrincipal)
-        #self._labelImagen.grid(row=0, column=0)
-
         super().__init__(
             tituloProceso = 'Crear Usuario', 
             descripcionProceso = 'Hemos detectado que es la primera vez que visitas nuestras sucursales, te invitamos a diligenciar el siguiente formulario de registro',
@@ -493,7 +482,7 @@ class FrameCrearUsuario(FieldFrame):
         #Guardamos los valores obtenidos en el inicio de sesión en vars de instancia
         self._tipoDocumentoCliente = tipoDocumentoSeleccionado
         self._numDocumentoCliente = numDocumentoSeleccionado
-        self._ubicacionSucursalActual = sucursalSeleccionada
+        self._sucursalActual = sucursalSeleccionada
         
     def funAceptar(self):
 
@@ -518,7 +507,7 @@ class FrameCrearUsuario(FieldFrame):
                     #Verificamos que la edad ingresada sea apropiada para el documento seleccionado
                     if (self._tipoDocumentoCliente == TipoDocumento.CC.value and edadCliente >= 18) or (self._tipoDocumentoCliente == TipoDocumento.TI.value and edadCliente < 18) or (self._tipoDocumentoCliente == TipoDocumento.CE.value and edadCliente >= 18):
                         #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
-                        self.logicaInicioProcesosFuncionalidades(Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual)))
+                        self.logicaInicioProcesosFuncionalidades(Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, self._sucursalActual))
                     
                     else: 
                         messagebox.showerror('Error', 'Debes seleccionar una edad apropiada para el documento seleccionado anteriormente')
@@ -527,7 +516,7 @@ class FrameCrearUsuario(FieldFrame):
                     messagebox.showerror('Error', 'La edad mínima para acceder a nuestras instalaciones es de 5 años')
 
                 #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
-                clienteCreado = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, SucursalCine.obtenerSucursalPorUbicacion(self._ubicacionSucursalActual))
+                clienteCreado = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, self._sucursalActual)
                 MetodoPago.asignarMetodosDePago(clienteCreado)
                 self.logicaInicioProcesosFuncionalidades(clienteCreado)
                 
@@ -563,7 +552,7 @@ class FrameVentanaPrincipal(FieldFrame):
         menuArchivo.add_command(label="Aplicación", command=self.mostrarDescripcionSistema)
         menuArchivo.add_command(label="Salir", command=self.mostrarVentanaInicio)
 
-        menuProcesosConsultas.add_command(label = "Sistema Proyecciones", command = self.ingresarFuncionalidad1)
+        menuProcesosConsultas.add_command(label = "Sistema proyecciones", command = self.ingresarFuncionalidad1)
         menuProcesosConsultas.add_command(label="Zona de juegos", command=self.ingresarFuncionalidad4)
         menuProcesosConsultas.add_command(label="Calificaciones", command=self.ingresarFuncionalidad3)
         menuProcesosConsultas.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
@@ -847,11 +836,11 @@ class FrameTarjetaCinemar(FieldFrame):
         try:
             valoresPorDefecto = self.tieneCamposPorDefecto()
             if len(valoresPorDefecto) == 3:
-                raise iuDefaultValues(valoresPorDefecto)
+                raise UiDefaultValues(valoresPorDefecto)
             
             return True
         
-        except iuExceptions as e:
+        except UiExceptions as e:
             messagebox.showerror('Error', e.mostrarMensaje())
             return False
 
@@ -1208,11 +1197,11 @@ class FrameFuncionalidad1(FieldFrame):
 
                 #En caso de que quiera ingresar a sala de cine o sala de espera
                 if eleccionUsuario == 1 or eleccionUsuario == 2:
-                    
+                    mensajeError = 'No tienes tickets reservados o estos no pertenecen a esta sucursal, para acceder a este proceso debes concluir de forma exitosa al menos un proceso de reserva de ticket' if eleccionUsuario == 0 else 'No tienes tickets reservados para un horario en presentación distinto al actual o estos no pertenecen a esta sucursal, para acceder a este proceso debes concluir de forma exitosa al menos un proceso de reserva de ticket'
                     #Verificamos si tiene tickets disponibles para usar
                     if len(ticketsParaUsar) == 0:
                         #Mostramos mensaje de error y finalizamos la ejecución
-                        messagebox.showerror('Error', 'No tienes tickets reservados o estos no pertenecen a esta sucursal, para acceder a este proceso debes concluir de forma exitosa al menos un proceso de reserva de ticket')
+                        messagebox.showerror('Error', mensajeError)
                         return 
                 
                 #Ingresamos al frame seleccionado por el usuario
@@ -1413,7 +1402,7 @@ class FrameSeleccionarAsiento(FieldFrame):
 
                 if cofirmacionParaPasarelaDePago:
                     #Construimos el ticket en cuestión
-                    ticketProceso = Ticket(self._peliculaProceso, self._horarioProceso, f'{self._filaSeleccionada}-{self._columnaSeleccionada}', clienteProceso.getCineUbicacionActual())
+                    ticketProceso = Ticket(self._peliculaProceso, self._horarioProceso, f'{self._filaSeleccionada}-{self._columnaSeleccionada}', self._estaEnPresentacion, clienteProceso.getCineUbicacionActual())
 
                     #Notificamos al cliente en caso de recibir el descuento
                     if ticketProceso.getPrecio() != self._peliculaProceso.getPrecio():
@@ -1868,7 +1857,7 @@ def objetosBasePractica2():
     game5 = Arkade("Hang Man", 7500.0, "Drama");
 
         #Para descuento con pelicula
-    ticket2 = Ticket(pelicula2_6, datetime(2024, 9, 16, 12, 20, 0), '4-4', sucursalCine2)
+    ticket2 = Ticket(pelicula2_6, datetime(2024, 9, 16, 12, 20, 0), '1-4', False, sucursalCine2)
     ticket2.setDueno(cliente1)
     ticket2.setSucursalCompra(sucursalCine2)
     ticket2.setSalaDeCine(salaDeCine2_4)
@@ -1911,13 +1900,8 @@ def objetosBasePractica2():
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
-    ticket = Ticket(pelicula1_2, datetime(2024, 9, 16, 12, 20, 0), '4-4', sucursalCine1)
-    ticket.setSucursalCompra(sucursalCine1)
-    ticket.setSalaDeCine(salaDeCine1_1)
-    #ticket.setDueno(cliente4) #prueba para la funcionalidad 4
-    cliente2.getTickets().append(ticket)
-    ticket.setDueno(cliente2)
-    sucursalCine1.getTicketsDisponibles().append(ticket)
+    ticket = Ticket(pelicula1_2, datetime(2024, 9, 16, 12, 20, 0), '4-4', False, sucursalCine1)
+    ticket.procesarPagoRealizado(cliente2)
 
     cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
     cliente4.setCodigosDescuento([ticket.generarCodigoTicket()])
@@ -2107,6 +2091,7 @@ def ventanaDeInicio():
 if __name__ == '__main__':
 
     #Creamos los objetos de la lógica del proyecto
+    
     objetosBasePractica2()
     #Deserializador.deserializar()
 

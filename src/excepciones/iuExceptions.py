@@ -1,4 +1,6 @@
-class iuExceptions(Exception):
+from abc import ABC, abstractmethod
+
+class UiExceptions(Exception, ABC):
     def __init__(self, mensaje):
         super().__init__(mensaje)
         self._mensaje = mensaje
@@ -6,7 +8,7 @@ class iuExceptions(Exception):
     def mostrarMensaje(self):
         return self._mensaje
     
-    def _formatearCriterios(self, criterios):
+    def formatearCriterios(self, criterios):
         criteriosFormateados = ''
 
         for i in range (0,len(criterios)):
@@ -17,27 +19,31 @@ class iuExceptions(Exception):
                 criteriosFormateados += ' y ' + criterios[i].strip(':')
 
         return criteriosFormateados
-            
-class iuDefaultValues(iuExceptions):
-    def __init__(self, *criterios):
-        super().__init__(self._crearMensaje(*criterios))
     
-    def _crearMensaje(self, criterios):
+    @abstractmethod
+    def crearMensaje(self):
+        pass
+            
+class UiDefaultValues(UiExceptions):
+    def __init__(self, *criterios):
+        super().__init__(self.crearMensaje(*criterios))
+    
+    def crearMensaje(self, criterios):
         if len(criterios) == 1:
 
             return f'El campo {criterios[0].strip(':')} tiene un valor por defecto'
         
         elif len(criterios) > 1:
 
-            criteriosFormateados = self._formatearCriterios(criterios)
+            criteriosFormateados = self.formatearCriterios(criterios)
 
             return f'Los campos:{criteriosFormateados} tienen valores por defecto'
 
-class iuEmptyValues(iuExceptions):
+class UiEmptyValues(UiExceptions):
     def __init__(self, *criterios):
-        super().__init__(self._crearMensaje(*criterios))
+        super().__init__(self.crearMensaje(*criterios))
     
-    def _crearMensaje(self, criterios):
+    def crearMensaje(self, criterios):
         if len(criterios) == 1:
             
             return f'El campo {criterios[0].strip(':')} está vacío'
