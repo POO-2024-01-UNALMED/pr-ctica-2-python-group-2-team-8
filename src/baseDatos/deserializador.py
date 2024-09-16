@@ -99,7 +99,7 @@ class Deserializador:
             
             #A cada bono le setteamos el cliente que le corresponde
             for bono in sede.getBonosCreados():
-                bono.setCliente(SucursalCine.buscarCliente(bono.getCliente().getDocumento(), bono.getCliente().getTipoDocumento()))
+                pass#bono.setCliente(SucursalCine.buscarCliente(bono.getCliente().getDocumento(), bono.getCliente().getTipoDocumento()))
         
         #A cada cliente le eliminamos los ticktes que tienen ya que los volveremos a settear más adelante
         for cliente in sedeBase.getClientes():
@@ -117,6 +117,7 @@ class Deserializador:
             #Reasignamos los datos del ticket
             else:
                 ticket.setDueno(SucursalCine.buscarCliente(ticket.getDueno().getDocumento(), ticket.getDueno().getTipoDocumento().value))
+                ticket.getDueno().getTickets().append(ticket)
                 ticket.setSucursalCompra(SucursalCine.obtenerSucursalPorId(ticket.getSucursalCompra().getIdSucursal()))
                 ticket.setPelicula(ticket.getSucursalCompra().obtenerPeliculaPorId(ticket.getPelicula().getIdPelicula()))
                 ticket.setSalaDeCine(ticket.getPelicula().getSalaCinePresentacion())
@@ -134,3 +135,4 @@ class Deserializador:
                 if ticket.getSucursalCompra() is sede and ticket.getHorario().date() == sedeBase.getFechaActual().date():
                     sede.getTicketsParaDescuento().append(ticket)
         
+       

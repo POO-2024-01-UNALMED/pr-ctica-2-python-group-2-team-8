@@ -461,6 +461,8 @@ class FrameInicioSesion(FieldFrame):
 
             #Obtenemos la sucursal seleciconada
             sucursalSeleccionada = self.getValue('Seleccionar Sucursal :')
+            indiceSucursal = self.getElementosInteractivos()[2].current()
+            sucursalProceso = SucursalCine.getSucursalesCine()[indiceSucursal]
             
             #Confirmamos las elecciones hechas por el usuario
             confirmacionUsuario = messagebox.askokcancel('Confirmación de datos', f'Los datos ingresados son:\nTipo de documento: {tipoDocumentoSeleccionado}\nNúmero de documento: {numDocumentoSeleccionado}\nSucursal seleccionada: {sucursalSeleccionada}')
@@ -471,13 +473,14 @@ class FrameInicioSesion(FieldFrame):
 
                 if clienteProceso is None:
                     #Si es la primera vez, nos dirigimos al frame de crear usuario para crearlo
-                    FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalSeleccionada).mostrarFrame()
+                    FrameCrearUsuario(tipoDocumentoSeleccionado, numDocumentoSeleccionado, sucursalProceso).mostrarFrame()
                 elif type(clienteProceso) == str:
                     #Detectamos que el número de documento ya se encuentra asignado a otro cliente
                     messagebox.showerror('Error', 'Hemos detectado que este número de documento se encuentra asociado a otro cliente, por favor verifica el tipo o número de documento digitado.')
                 else:
                     #En caso de que no, ingresamos al menú principal de nuestro cine
                     messagebox.showinfo('Inicio de sesión exitoso', f'{clienteProceso.getNombre()}, Bienvenid@ a cinemar sede {sucursalSeleccionada}')
+                    clienteProceso.setCineUbicacionActual(sucursalProceso)
                     self.logicaInicioProcesosFuncionalidades(clienteProceso)
 
 class FrameCrearUsuario(FieldFrame):
@@ -1170,10 +1173,13 @@ class FrameFuncionalidad1(FieldFrame):
     
     def __init__(self):
 
-        #Definimos los frames a usar durante el desarrollo de la funcionalidad 1
-        self._framesFuncionalidad1 = [FrameReservarTicket(self), FrameIngresoASalaCine(self), FrameSalaDeEspera(self)]
         #Facilitamos el acceso al cliente que realiza este proceso
         self._clienteProceso = FieldFrame.getClienteProceso()
+        #Ejecutamos la lógica de avance de tiempo antes de construir los frames
+        self._clienteProceso.getCineUbicacionActual().avanzarTiempo()
+        #Definimos los frames a usar durante el desarrollo de la funcionalidad 1
+        self._framesFuncionalidad1 = [FrameReservarTicket(self), FrameIngresoASalaCine(self), FrameSalaDeEspera(self)]
+        
 
         #Usamos el constructor de FieldFrame
         super().__init__(
@@ -1848,7 +1854,7 @@ def objetosBasePractica2():
     ticket = Ticket(pelicula1_2, datetime(2024, 9, 16, 12, 20, 0), '4-4', sucursalCine1)
     ticket.setSucursalCompra(sucursalCine1)
     ticket.setSalaDeCine(salaDeCine1_1)
-    ticket.setDueno(cliente4) #prueba para la funcionalidad 4
+    #ticket.setDueno(cliente4) #prueba para la funcionalidad 4
     cliente2.getTickets().append(ticket)
     ticket.setDueno(cliente2)
     sucursalCine1.getTicketsDisponibles().append(ticket)
