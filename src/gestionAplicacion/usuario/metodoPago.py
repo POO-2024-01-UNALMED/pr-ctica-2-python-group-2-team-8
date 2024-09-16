@@ -158,6 +158,7 @@ class MetodoPago():
         
         #Se verifica si el cliente tiene membresia para realizar la acumulación de puntos
         membresia = clienteProceso.getMembresia()
+        tipoMembresia = 0
         if (membresia != None and self.getNombre != "Puntos"):
             tipoMembresia = clienteProceso.getMembresia().getTipoMembresia()
             puntos = None
@@ -176,7 +177,7 @@ class MetodoPago():
 
         #En caso de que el cliente no pudo cubrir la totalidad del pago y se haya llegado al limite de ese método de pago,
 		#la acumulación de puntos solo se hara sobre el primer precio calculado luego del descuento. Los siguientes pagos ya estan cubiertos.
-        if (len(clienteProceso.getMetodoPago()) == totalMetodosDePagoPorTipo):
+        if (len(clienteProceso.getMetodosDePago()) == totalMetodosDePagoPorTipo):
             if (tipoMembresia == 1):
                 puntos.setLimiteMaximoPago(puntos.getLimiteMaximoPago() + (precio * (1- self.getDescuentoAsociado)) * 0.05)
             elif (tipoMembresia == 2):

@@ -4,7 +4,7 @@ from datetime import timedelta
 class Cliente():
     
     def __init__(self, nombre = "", edad = 0 , documento = 0, tipoDocumento = None, cineUbicacionActual = None, membresia = None,
-        cuenta = None, codigosDescuento =[], codigosBonos= [], bonos= [], fechaLimiteMembresia = 0, puntos = 0):
+        cuenta = None, codigosDescuento =[], codigosBonos= [], bonos= []):
 
         self._nombre = nombre
         self._edad = edad
@@ -34,8 +34,8 @@ class Cliente():
         #Atributos Funcionalidad 5
         self._membresia = membresia
         self._metodosDePago = []
-        self._fechaLimiteMembresia = fechaLimiteMembresia
-        self._puntos = puntos
+        self._fechaLimiteMembresia = 0
+        self._puntos = 0
 
 
         self._cineUbicacionActual.getClientes().append(self)
