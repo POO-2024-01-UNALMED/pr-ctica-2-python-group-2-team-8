@@ -268,7 +268,10 @@ class VisualFieldFrame(tk.Frame):
 
 class FrameReclamoDeBonos(FieldFrame):
     def __init__(self, servicio):
+
+        self._servicio=servicio
         servicio.actualizarBonos()
+
         super().__init__(
             tituloProceso = "Bonos",
             descripcionProceso = "En este apartado podras reclamar los bonos que tenes asociados",
@@ -276,6 +279,40 @@ class FrameReclamoDeBonos(FieldFrame):
             infoElementosInteractuables = [[servicio.mostrarBonos(servicio), "Seleccione un Producto"]],
             habilitado = [False],
         )
+
+        tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("Verdana bold",20), anchor="center")
+        tituloV.grid(column=2, row=2, padx = (10,10), pady = (10,10))
+
+        labelCriterio = tk.Label(self, text = servicio.mostrarOrden(),anchor="w", font= ("Verdana",10))
+        labelCriterio.grid(row=3, column=2, sticky="w")
+
+        agregarb = tk.Button(self,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.agregar,
+        width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 2, row = 4,)
+
+    def agregar(self):
+        condicion = True
+        if not self.tieneCamposPorDefecto():
+            nombreProducto = self._elementosInteractivos[0].get()
+            for pro in self._servicio.getBonosCliente():
+                nombrep = f"\n{pro.getProducto().getNombre()} {pro.getProducto().getTamaño()}"
+                if nombrep == nombreProducto:
+                    if len(self._servicio.getOrden()) !=0:
+                        for p in self._servicio.getOrden():
+                            nombre = f"\n{p.getNombre()} {p.getTamaño()}"
+                            if nombre == nombreProducto and condicion:
+                                condicion=False
+                                self._servicio.agregarOrden(pro.getProducto())
+                                self._servicio.setBonosCliente([])
+                                self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
+                                FrameReclamoDeBonos(self._servicio).mostrarFrame()
+            if condicion:
+                condicion=False
+                self._servicio.agregarOrden(pro.getProducto())
+                self._servicio.setBonosCliente([])
+                self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
+                FrameReclamoDeBonos(self._servicio).mostrarFrame()
+        else:
+            messagebox.showerror("Error","Por favor llenar todos los campos")
 
 class FrameGeneracionDeProductos(FieldFrame):
     def __init__(self, servicio):
@@ -322,7 +359,6 @@ class FrameGeneracionDeProductos(FieldFrame):
 
     def funAceptar(self):
         FrameReclamoDeBonos(self._servicio).mostrarFrame()
-
     def mostrar(self):
         labelCriterio = tk.Label(self, text = self._servicio.mostrarOrden(),anchor="w", font= ("Verdana",10))
         labelCriterio.grid(row=3, column=2,rowspan=2, sticky="w")

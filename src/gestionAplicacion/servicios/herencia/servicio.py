@@ -29,7 +29,7 @@ class Servicio (ABC):
         b = []
         for bono in servicio.getBonosCliente():
             n += 1
-            b.append(f"\n{n}. {bono.getProducto().getNombre()} {bono.getProducto().getTamaño()}")
+            b.append(f"\n{bono.getProducto().getNombre()} {bono.getProducto().getTamaño()}")
         return b
 
     def actualizarBonos(self):
