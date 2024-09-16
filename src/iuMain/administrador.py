@@ -1666,24 +1666,30 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
 
             self._productoSeleccionado = self._comboBoxEscogerItem.get()
             self._calificacionProductoSeleccionado = int(self._comboBoxCalificarItem.get())
+            mejorProducto=self._clienteProceso.getCineUbicacionActual().mejorProducto()
+            peorPelicula=self._clienteProceso.getCineUbicacionActual().peorPelicula()
             confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._productoSeleccionado}; y le has dado una calificacion de: {self._calificacionProductoSeleccionado}')
             if confirmacionUsuario:
                 
-                cofirmacionParaPasarelaDePago = messagebox.askokcancel("Como calificaste un item te queremos ofrecer un combo especial personalizado","Esta compuesto por:" + SucursalCine.mejorProducto + SucursalCine.peorPelicula + "¿Desea Continuar?")
+                confirmacionParaPasarelaDePago = messagebox.askokcancel(f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {mejorProducto}; y  {peorPelicula}' "¿Deseas Continuar?")
 
-                if cofirmacionParaPasarelaDePago:
+                if confirmacionParaPasarelaDePago:
                    
                     pass
+                
+                
 
            else:
              self._peliculaSeleccionada = self._comboBoxEscogerItem.get()
              self._calificacionPeliculaSeleccionada = int(self._comboBoxCalificarItem.get())
+             peorProducto=self._clienteProceso.getCineUbicacionActual().peorProducto()
+             mejorPelicula=self._clienteProceso.getCineUbicacionActual().mejorPelicula()
              confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._peliculaSeleccionada}; y le has dado una calificacion de: {self._calificacionPeliculaSeleccionada}')
              if confirmacionUsuario:
                 
-                cofirmacionParaPasarelaDePago = messagebox.askokcancel("Como calificaste un item te queremos ofrecer un combo especial personalizado","Esta compuesto por:" + SucursalCine.peorProducto + SucursalCine.mejorPelicula + "¿Desea Adquirirlo?")
+                confirmacionParaPasarelaDePago = messagebox.askokcancel('Confirmación datos',f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {peorProducto}; y  {mejorPelicula}' "¿Deseas Continuar?")
 
-                if cofirmacionParaPasarelaDePago:
+                if confirmacionParaPasarelaDePago:
                     pass
         
 

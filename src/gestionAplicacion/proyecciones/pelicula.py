@@ -386,16 +386,14 @@ class Pelicula:
 #el fin de efectuar la actualización y solicitud de actualización de las salas de cine.
 
 
-    def seleccionarHorarioMasLejano(self,horario: datetime):
+    def seleccionarHorarioMasLejano(self):
         horariosPelicula = None
         isAsientosDisponibles = False
 
-        horarios = self.filtrarHorariosPelicula()
-        if len(horarios) > 0:
-            for horario in horarios:
-                isAsientosDisponibles = self.isDisponibilidadAsientoSalaVirtual(horario)
-                if isAsientosDisponibles:
-                    horarios_pelicula = horario
+        for horario in self.filtrarHorariosPelicula():
+          isAsientosDisponibles = self.isDisponibilidadAsientoSalaVirtual(horario)
+        if isAsientosDisponibles:
+           horariosPelicula = horario
 
         return horariosPelicula
         
