@@ -7,6 +7,7 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 import tkinter as tk
+import random
 from gestionAplicacion.servicios.bono import *
 from tkinter import ttk, messagebox
 from datetime import datetime, time, timedelta
@@ -786,26 +787,26 @@ class FrameTarjetaCinemar(FieldFrame):
         for i, widget in enumerate(self.widgets[-1].winfo_children()):
             
             if i ==0:
-                widget.config(text = "Aplicar",font= ("courier new", 16, "bold"), width = 8, height = 1, bg = "sky blue", fg = "black")
-            else: widget.config(font= ("courier new", 16, "bold"), width = 8, height = 1, bg = "sky blue", fg = "black")
+                widget.config(text = "Aplicar",font= ("courier new", 16, "bold"), width = 8, height = 1, bg = "#87CEFA", fg = "black")
+            else: widget.config(font= ("courier new", 16, "bold"), width = 8, height = 1, bg = "#87CEFA", fg = "black")
 
         tamaños = [21,11,15,15,12,12,12,12,12,12]
 
-        self.widgets[-1].config(bg = "light blue")
+        self.widgets[-1].config(bg = "#F0F8FF")
         self.widgets.pop(-1)
         
         for i, w in enumerate(self.widgets):
             if isinstance(w, ttk.Combobox):
                 pass
             else:
-                w.config(font = ("courier new", tamaños[i]), bg = "light blue")
+                w.config(font = ("courier new", tamaños[i]), bg = "#F0F8FF")
 
         self.widgets[0].config(font = ("courier new", 21, "bold"))
         self.widgets[2].config(font = ("courier new", 15, "bold"))
         self.widgets[3].config(font = ("courier new", 15, "bold"))
         
-        ventanaLogicaProyecto.config(bg= "light blue")
-        self.config(bg= "light blue")   
+        ventanaLogicaProyecto.config(bg= "#F0F8FF")
+        self.config(bg= "#F0F8FF")   
 
     def funAceptar(self):
 
@@ -918,11 +919,11 @@ class FrameEleccion(FieldFrame):
 
         for widget in self.widgets[-1].winfo_children():
             
-            widget.config(font= ("courier new", 16, "bold"), bg = "sky blue", fg = "black")
+            widget.config(font= ("courier new", 16, "bold"), bg = "#87CEFA", fg = "black")
 
         tamaños = [21,12,15,15,12]
 
-        self.widgets[-1].config(bg = "light blue")
+        self.widgets[-1].config(bg = "#F0F8FF")
         self.widgets.pop(-1)
         
         
@@ -930,14 +931,14 @@ class FrameEleccion(FieldFrame):
             if isinstance(w, ttk.Combobox):
                 w.config(width = 30)
             else:
-                w.config(font = ("courier new", tamaños[i]), bg = "light blue")
+                w.config(font = ("courier new", tamaños[i]), bg = "#F0F8FF")
 
         self.widgets[0].config(font = ("courier new", 21, "bold"))
         self.widgets[2].config(font = ("courier new", 15, "bold"))
         self.widgets[3].config(font = ("courier new", 15, "bold"))
         
-        ventanaLogicaProyecto.config(bg= "light blue")
-        self.config(bg= "light blue")   
+        ventanaLogicaProyecto.config(bg= "#F0F8FF")
+        self.config(bg= "#F0F8FF")   
     
     def funAceptar(self):
 
@@ -995,11 +996,11 @@ class FrameEleccionJuego(FieldFrame):
 
         for widget in self.widgets[-1].winfo_children():
             
-            widget.config(font= ("courier new", 16, "bold"), bg = "sky blue", fg = "black")
+            widget.config(font= ("courier new", 16, "bold"), bg = "#87CEFA", fg = "black")
 
         tamaños = [21,12,15,15,12,9,12,9,12,9]
 
-        self.widgets[-1].config(bg = "light blue")
+        self.widgets[-1].config(bg = "#F0F8FF")
         self.widgets.pop(-1)
         
         
@@ -1008,19 +1009,19 @@ class FrameEleccionJuego(FieldFrame):
                 pass
                 #w.config(width=30)
             else:
-                w.config(font = ("courier new", tamaños[i]), bg = "light blue")
+                w.config(font = ("courier new", tamaños[i]), bg = "#F0F8FF")
 
         self.widgets[0].config(font = ("courier new", 21, "bold"))
         self.widgets[2].config(font = ("courier new", 15, "bold"))
         self.widgets[3].config(font = ("courier new", 15, "bold"))
         
-        ventanaLogicaProyecto.config(bg= "light blue")
-        self.config(bg= "light blue")
+        ventanaLogicaProyecto.config(bg= "#F0F8FF")
+        self.config(bg= "#F0F8FF")
 
-        labelrelleno = tk.Label(self, text="", bg="light blue")
+        labelrelleno = tk.Label(self, text="", bg="#F0F8FF")
         labelrelleno.grid(row=7, column=0, columnspan=3)
 
-        self.labelPrecio = tk.Label(self, text="", font=("Courier New", 15, "bold italic"), bg="light blue")
+        self.labelPrecio = tk.Label(self, text="", font=("Courier New", 15, "bold italic"), bg="#F0F8FF")
         self.labelPrecio.grid(row=8, column=0, columnspan=3)
 
         self.comboBoxCategorias = self.getElementosInteractivos()[1]
@@ -1103,10 +1104,12 @@ class FrameEleccionJuego(FieldFrame):
     def funAceptar(self):
         if self.evaluarExcepciones():
              precio = 0
-
+             indice = 0
+             generoJuego = ""
              for genero in self.generosJuegos:
                 if genero == self.comboBoxCategorias.get():
                     indice = self.generosJuegos.index(genero)
+                    generoJuego = genero
                     precio = SucursalCine.getJuegos()[indice].getValorServicio()
                     break
              if isinstance(self.interactuableCodigosDescuento, ttk.Combobox):
@@ -1115,7 +1118,7 @@ class FrameEleccionJuego(FieldFrame):
                         self.clienteProceso.getCuenta().hacerPago(precio)
                         messagebox.showinfo("Nuevo Saldo", f"El nuevo saldo de tu tarjeta es : {self.clienteProceso.getCuenta().getSaldo()}$")
                         
-                        #Linea para llamar al frame del juego
+                        FrameJuego(SucursalCine.getJuegos()[indice].getPalabras(), generoJuego, False).mostrarFrame()#Linea para llamar al frame del juego
                     else: 
                         respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
                         if respuesta:
@@ -1130,7 +1133,7 @@ class FrameEleccionJuego(FieldFrame):
                             self.clienteProceso.getCuenta().hacerPago(precio)
                             self.clienteProceso.getCodigosDescuento().remove(self.interactuableCodigosDescuento.get())
                             messagebox.showinfo("Nuevo Saldo", f"El nuevo saldo de tu tarjeta es : {self.clienteProceso.getCuenta().getSaldo()}$")
-                            #Linea para llamar al frame del juego
+                            FrameJuego(SucursalCine.getJuegos()[indice].getPalabras(), generoJuego, True).mostrarFrame()#Linea para llamar al frame del juego
                             
 
                          else: 
@@ -1147,7 +1150,7 @@ class FrameEleccionJuego(FieldFrame):
                         self.clienteProceso.getCuenta().hacerPago(precio)
                         messagebox.showinfo("Nuevo Saldo", f"El nuevo saldo de tu tarjeta es : {self.clienteProceso.getCuenta().getSaldo()}$")
                         
-                        #Linea para llamar al frame del juego
+                        FrameJuego(SucursalCine.getJuegos()[indice].getPalabras(), generoJuego, False).mostrarFrame()#Linea para llamar al frame del juego
                  else: 
                     respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
                     if respuesta:
@@ -1156,6 +1159,294 @@ class FrameEleccionJuego(FieldFrame):
                     else:
                         print('Dijo que no')
         
+class FrameJuego(tk.Frame):
+
+    
+
+    def __init__(self, palabras, genero, redimioCodigo):
+        super().__init__(ventanaLogicaProyecto)
+
+        self.clienteProceso = FieldFrame.getClienteProceso()
+        self.frameAnterior = FrameEleccionJuego(FrameEleccion(FrameZonaJuegos()))
+        self.redimioCodigo = redimioCodigo
+        self.tipoBono = ""
+        self.bonoCliente = None
+
+        # Selecciona una palabra aleatoria de la lista
+        self.palabras = palabras
+        self.palabra_secreta = random.choice(self.palabras)
+        self.letras_adivinadas = ["_" for _ in self.palabra_secreta]
+        self.intentos_restantes = 6
+        self.letras_usadas = set()  # Conjunto para almacenar las letras que ya se han clicado
+        
+        #self.grid(row=0, column=0, sticky="nsew")
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        # Título del juego
+        self.lbl_titulo = tk.Label(self, text=f"Hangman de {genero}", font=("courier new", 28, "bold italic"), pady=10, bg= "#F0F8FF")
+        self.lbl_titulo.grid(row=0, column=0)
+
+        # Etiqueta descripcion del juego
+        self.lbl_descripcion = tk.Label(self, text=f"Bienvenido a nuestro juego, clickea sobre las letras de abajo para descubrir la palabra secreta relacionada con la categoria: {genero}, si le das a volver tendrás que volver a pagar con tu tarjeta si quieres ingresar de nuevo", font=("courier new", 12, "bold italic"), pady=10, bg= "#F0F8FF", wraplength= 460)
+        self.lbl_descripcion.grid(row=1, column=0)
+
+        # Etiqueta para mostrar la palabra secreta
+        self.lbl_palabra = tk.Label(self, text=" ".join(self.letras_adivinadas), font=("courier new", 24, "bold italic"), pady=20, bg= "#F0F8FF")
+        self.lbl_palabra.grid(row=2, column=0)
+
+        # Etiqueta para mostrar los intentos restantes
+        self.lbl_intentos = tk.Label(self, text=f"Intentos restantes: {self.intentos_restantes}", font=("courier new", 16, "bold italic"), bg="#F0F8FF")
+        self.lbl_intentos.grid(row=3, column=0)
+
+        # Crear botones para las letras en mayúsculas y organizarlos en dos filas
+        self.frame_botones = tk.Frame(self)
+        self.frame_botones.grid(row=4, column=0, pady=20)
+
+        letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+        # Colocar las primeras 13 letras en la primera fila
+        for i, letra in enumerate(letras[:13]):
+            btn = tk.Button(self.frame_botones, text=letra, font=("courier new", 11, "bold italic"), width=4, command=lambda l=letra: self.comprobar_letra(l), bg="#87CEFA")
+            btn.grid(row=0, column=i)
+
+        # Colocar las últimas 13 letras en la segunda fila
+        for i, letra in enumerate(letras[13:]):
+            btn = tk.Button(self.frame_botones, text=letra, font=("courier new", 11, "bold italic"), width=4, command=lambda l=letra: self.comprobar_letra(l), bg = "#87CEFA")
+            btn.grid(row=1, column=i)
+
+        self.botonVolver = tk.Button(self, text= "Volver", font=("courier new", 18, "bold italic"),bg="#87CEFA", command= self.funVolver)
+        self.botonVolver.grid(row=5, column=0)
+
+        ventanaLogicaProyecto.config(bg= "#F0F8FF")
+        self.config(bg="#F0F8FF")
+
+        # Reiniciar el juego al inicio
+        self.reiniciar_juego()
+
+    def actualizar_palabra(self):
+        """Actualiza la visualización de la palabra en el juego."""
+        self.lbl_palabra.config(text=" ".join(self.letras_adivinadas), font = ("Courier new", 20, "bold italic"))
+
+    def comprobar_letra(self,letra):
+        """Comprueba si la letra está en la palabra secreta."""
+        global intentos_restantes
+        
+        # Si la letra ya fue usada, mostrar un mensaje
+        if letra in self.letras_usadas:
+            messagebox.showinfo("Advertencia", f"Ya has clicado la letra '{letra}'. Intenta con otra.")
+            return
+        
+        # Añadir la letra al conjunto de letras usadas
+        self.letras_usadas.add(letra)
+        
+        if letra in self.palabra_secreta:
+            for idx, char in enumerate(self.palabra_secreta):
+                if char == letra:
+                    self.letras_adivinadas[idx] = letra
+            self.actualizar_palabra()
+            
+            # Comprueba si ganó
+            if "_" not in self.letras_adivinadas:
+                eleccionUsuario = messagebox.askyesno("Puntuación", f"¡Ganaste! La palabra era: {self.palabra_secreta}, tu puntuacion es: {Arkade.getPuntuacionMaxima()}/10.0 ¿Deseas volver a jugar?" )
+                
+                if eleccionUsuario:
+                    self.funVolver(10.0)
+                else:
+                    if self.redimioCodigo:
+                        self.tipoBono = "Comida"
+                    else:
+                        self.tipoBono = "Souvenir"
+
+                    if self.tipoBono == "Comida":
+                        self.bonoCliente = Bono.generarBonoComidaJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)
+                    elif self.tipoBono == "Souvenir": 
+                        self.bonoCliente = Bono.generarBonoSouvenirJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)
+                    
+                    if self.bonoCliente is None:
+                        messagebox.showinfo("Sin productos", f"No te podemos generar un bono de tipo {self.tipoBono} ya que no hay productos en nuestro inventario")
+                        frameVentanaPrincipal.mostrarFrame()
+                    else:
+                        FrameBono(self.tipoBono, self.bonoCliente ).mostrarFrame()
+        else:
+            self.intentos_restantes -= 1
+            self.lbl_intentos.config(text=f"Intentos restantes: {self.intentos_restantes}")
+            
+            if self.intentos_restantes == 0:
+                puntuacionAleatoria = round(random.uniform(0, 10), 2)
+                eleccionUsuario = messagebox.askyesno("Puntuación", f"Perdiste. La palabra era: {self.palabra_secreta}, tu puntuacion es: {puntuacionAleatoria}/10.0 ¿Deseas volver a jugar?" )
+                if eleccionUsuario:
+                    self.funVolver()
+                else:
+                    frameVentanaPrincipal.mostrarFrame()
+
+    def reiniciar_juego(self):
+        """Reinicia el juego con una nueva palabra y restablece los intentos."""
+        
+        self.palabra_secreta = random.choice(self.palabras)
+        self.letras_adivinadas = ["_" for _ in self.palabra_secreta]
+        self.intentos_restantes = 6
+        self.letras_usadas = set()  # Reiniciar el conjunto de letras usadas
+        self.actualizar_palabra()
+        self.lbl_intentos.config(text=f"Intentos restantes: {self.intentos_restantes}")
+
+    def mostrarFrame(self):
+
+        for widget in ventanaLogicaProyecto.winfo_children():
+
+            if isinstance(widget, tk.Frame):
+                widget.pack_forget()
+
+        self.pack(expand=True)
+    
+    def funVolver(self, puntuacion = 0):
+        if puntuacion == 10.0:
+            if self.redimioCodigo:
+                
+                eleccion = messagebox.askyesno("Perdidad de bono de Comida", "Recuerda que redimiste un codigo y obtuviste la puntuacion máxima, si vuelves no obtendras un Bono de comida, ¿Aun asi quieres volver?")
+
+                if eleccion:
+                    self.frameAnterior.mostrarFrame()
+                else:
+                    if self.redimioCodigo:
+                        self.tipoBono = "Comida"
+                    else:
+                        self.tipoBono = "Souvenir"
+
+                    if self.tipoBono == "Comida":
+                        self.bonoCliente = Bono.generarBonoComidaJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)
+                    elif self.tipoBono == "Souvenir": 
+                        self.bonoCliente = Bono.generarBonoSouvenirJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)
+                    
+                    if self.bonoCliente is None:
+                        messagebox.showinfo("Sin productos", f"No te podemos generar un bono de tipo {self.tipoBono} ya que no hay productos en nuestro inventario")
+                        frameVentanaPrincipal.mostrarFrame()
+                    else:
+                        FrameBono(self.tipoBono, self.bonoCliente).mostrarFrame()
+            else:
+                eleccion= messagebox.askyesno("Perdidad de bono de Souvenir", "Recuerda que obtuviste la puntuacion máxima, si vuelves no obtendras un Bono de Souvenir, ¿Aun asi quieres volver?")
+
+                if eleccion:
+                    self.frameAnterior.mostrarFrame()
+                else:
+                    if self.redimioCodigo:
+                        self.tipoBono = "Comida"
+                    else:
+                        self.tipoBono = "Souvenir"
+
+                    if self.tipoBono == "Comida":
+                        self.bonoCliente = Bono.generarBonoComidaJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)
+                    elif self.tipoBono == "Souvenir": 
+                        self.bonoCliente = Bono.generarBonoSouvenirJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)
+                    
+                    if self.bonoCliente is None:
+                        messagebox.showinfo("Sin productos", f"No te podemos generar un bono de tipo {self.tipoBono} ya que no hay productos en nuestro inventario")
+                        frameVentanaPrincipal.mostrarFrame()
+                    else:
+                        FrameBono(self.tipoBono, self.bonoCliente).mostrarFrame()
+        else:
+            self.frameAnterior.mostrarFrame()
+        
+class FrameBono(FieldFrame):
+
+    def __init__(self, tipoBono, bono):
+        
+        self.clienteProceso = FieldFrame.getClienteProceso()
+        self.tipoBono = tipoBono
+        self.bonoCliente = bono
+
+        """if redimioCodigo:
+            self.tipoBono = "Comida"
+        else:
+            self.tipoBono = "Souvenir"
+
+        if self.tipoBono == "Comida":
+            self.bonoCliente = Bono.generarBonoComidaJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)
+        elif self.tipoBono == "Souvenir": 
+            self.bonoCliente = Bono.generarBonoSouvenirJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)"""
+
+
+        super().__init__(
+            tituloProceso = f'Bono de {self.tipoBono}',
+            descripcionProceso = f'Te has ganado el siguiente bono de {self.tipoBono} por obetner la puntuacion máxima, puedes reclamarlo en nuestro lugar de servicios. Seleccione el proceso a realizar\n',
+            tituloCriterios = 'Criterio',
+            textEtiquetas = ['Seleccionar proceso :'],
+            tituloValores = 'Dato proceso',
+            infoElementosInteractuables = [[['Ir a la ventana principal', 'Ir a la zona de servicios', 'Volver a seleccionar juego', 'Recargar Tarjeta Cinemar', 'Personalizar Tarjeta Cinemar'], '                     Proceso']],
+            habilitado = [False],
+            botonVolver = False,
+
+        )
+
+        self.widgets = []
+        
+        for widget in self.winfo_children():
+
+            self.widgets.append(widget)
+            
+
+        self.widgets[2].grid_configure(row=5, column=0)
+        self.widgets[3].grid_configure(row=5, column=1)
+        self.widgets[4].grid_configure(row=6, column=0)
+        self.widgets[5].grid_configure(row=6, column=1)
+        self.widgets[6].grid_configure(row=7, column=1)
+        self.widgets[7].grid_configure(row=7, column=0)
+        #self.widgets[5].grid_configure(row=7, column=0, sticky = "we", columnspan = 4)
+
+        self.FrameBono = tk.Frame(self, width=300, height=150, bg = "black")
+        self.FrameBono.grid(row =2, rowspan= 3, column= 0, columnspan= 4)
+
+        # Crear canvas de 300x150 con el fondo rosa claro
+        self.canvas = tk.Canvas(self.FrameBono, width=300, height=150, bg="black", highlightthickness=2, highlightbackground="dark gray")
+        self.canvas.pack()
+
+        # Llamar al método para modificar el canvas
+        self.crearTarjeta()
+
+        tamaños = [21,11,15,15,12,12,15,15]
+        
+        for i, w in enumerate(self.widgets):
+            if isinstance(w, ttk.Combobox):
+                w.config(width=25)
+            else:
+                w.config(font = ("courier new", tamaños[i]), bg = "#F0F8FF")
+
+        self.widgets[0].config(font = ("courier new", 21, "bold"))
+        self.widgets[2].config(font = ("courier new", 15, "bold"))
+        self.widgets[3].config(font = ("courier new", 15, "bold"))
+        self.widgets[-1].config(fg = "black", bg = '#87CEFA', font = ("courier new", 15, "bold"))
+        self.widgets[-2].config(fg = "black", bg = '#87CEFA', font = ("courier new", 15, "bold"))
+        
+        ventanaLogicaProyecto.config(bg= "#F0F8FF")
+        self.config(bg= "#F0F8FF") 
+
+
+    def crearTarjeta(self):
+        # Dibujar el borde del rectángulo (la tarjeta) con borde negro
+        self.canvas.create_rectangle(15, 15, 290, 140, outline="dark gray", width=2, fill="#ADD8E6")
+
+        # Agregar título "Bono" con color de fondo
+        self.canvas.create_text(150, 30, text="Bono", font=("courier new", 16, "bold italic"), fill="#333")
+        
+        # Generar valores aleatorios para producto y código
+        producto = self.bonoCliente.getProducto().getNombre() if self.bonoCliente is not None else print("No hay error")
+        codigo = self.bonoCliente.getCodigo() if self.bonoCliente is not None else print("No hay error x2")
+
+        # Agregar apartado "Producto" con color de fondo
+        self.canvas.create_text(80, 70, text="Producto:", font=("courier new", 12), fill="#333")
+        self.canvas.create_rectangle(140, 60, 250, 80, outline="black", fill="#E6E6FA")
+        self.canvas.create_text(195, 70, text=producto, font=("courier new", 10), fill="#333")
+
+        # Agregar apartado "Código" con color de fondo
+        self.canvas.create_text(80, 110, text="Código:", font=("courier new", 12), fill="#333")
+        self.canvas.create_rectangle(140, 100, 250, 120, outline="black", fill="#E6E6FA")
+        self.canvas.create_text(195, 110, text=codigo, font=("courier new", 10), fill="#333")   
+
+
+
+
 
 
 #################################################################################################################################
@@ -1856,11 +2147,11 @@ def objetosBasePractica2():
     metodoPago3 = MetodoPago("Banco Agrario", 0.15, 300000)
     metodoPago4 = MetodoPago("Efectivo", 0, 5000000)
 
-    game1 = Arkade("Hang Man", 15000.0, "Acción");
-    game2 = Arkade("Hang Man", 20000.0, "Terror");
-    game3 = Arkade("Hang Man", 10000.0, "Tecnología");
-    game4 = Arkade("Hang Man", 30000.0, "Comedia");
-    game5 = Arkade("Hang Man", 7500.0, "Drama");
+    game1 = Arkade("Hang Man", 15000.0, "Acción", ["KILL", "BOOM", "ARMA", "SPEED", "ARMA"]);
+    game2 = Arkade("Hang Man", 20000.0, "Terror", ["BOO", "GHOST", "EVIL", "DEVIL", "ZOMBIE"]);
+    game3 = Arkade("Hang Man", 10000.0, "Tecnología", ["PYTHON", "POO", "CLASE", "GUZMAN", "ATRIBUTO"]);
+    game4 = Arkade("Hang Man", 30000.0, "Comedia", ["RISA", "FUNNY", "JAJAJA", "CHISTE", "BROMA"]);
+    game5 = Arkade("Hang Man", 7500.0, "Drama", ["MUJER", "LLORAR", "ACTUACION", "FINGIR", "PROBLEMA"]);
 
     Membresia.stockMembresia(SucursalCine.getSucursalesCine())
 

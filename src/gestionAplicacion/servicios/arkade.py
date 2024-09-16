@@ -6,11 +6,12 @@ class Arkade:
   PUNTUACION_MAXIMA = 10.0 #Atributo de clase Constante
   
   #Inicializador
-  def __init__(self,nombreServicio= None,valorServicio = 0 ,generoServicio= None):
+  def __init__(self,nombreServicio= None,valorServicio = 0 ,generoServicio= None, palabras = []):
 
     self._nombreServicio = nombreServicio
     self._valorServicio = valorServicio         #Atributos y encapsulamiento
     self._generoServicio = generoServicio
+    self._palabras = palabras
     SucursalCine.getJuegos().append(self)
 
   @classmethod
@@ -118,6 +119,9 @@ class Arkade:
 
   def getGeneroServicio(self):
     return self._generoServicio
+  
+  def getPalabras(self):
+    return self._palabras
 
   # Metodos set
   def setNombreServicio(self, nombreServicio):
@@ -128,3 +132,6 @@ class Arkade:
 
   def setGeneroServicio(self, generoServicio):
     self._generoServicio = generoServicio
+  
+  def setPalabras(self, palabras):
+    self._palabras = palabras
