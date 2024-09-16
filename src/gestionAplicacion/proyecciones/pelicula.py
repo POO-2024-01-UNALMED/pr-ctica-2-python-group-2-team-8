@@ -495,5 +495,10 @@ class Pelicula:
         return self._strikeCambio
     
     def setStrikeCambio(self, strikeCambio):
-        self._strikeCambio = strikeCambio   
+        self._strikeCambio = strikeCambio
 
+    def getSucursalCartelera(self):
+        return self._sucursalCartelera
+
+    def setSucursalCartelera(self, sucursalCartelera):
+        self._sucursalCartelera = sucursalCartelera

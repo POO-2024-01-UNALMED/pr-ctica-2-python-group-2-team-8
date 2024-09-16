@@ -25,6 +25,8 @@ from excepciones.iuExceptions import iuExceptions, iuEmptyValues, iuDefaultValue
 from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
 from gestionAplicacion.servicios.arkade import Arkade
 from gestionAplicacion.usuario.ticket import Ticket
+from baseDatos.serializador import Serializador
+from baseDatos.deserializador import Deserializador
 
 class FieldFrame(tk.Frame):
 
@@ -1062,7 +1064,7 @@ class FrameReservarTicket(FieldFrame):
 
             #Evaluamos si es un horario en presentación
             estaEnPresentacion = False
-            if horarioString.__contains__('En vivo:'):
+            if 'En vivo:' in horarioString:
                 horarioSplit = horarioString.split(':', 1)
                 horarioString = horarioSplit[1].lstrip(' ')
                 estaEnPresentacion = True
@@ -1374,7 +1376,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
         calificacionesLista= [1,2,3,4,5]
         self._comboBoxCalificarItem.configure(values = calificacionesLista)
         self._comboBoxCalificarItem.configure(state = 'readonly')
-        nombreProductoSeleccionado = self.getValue("Escoge tu item :")
+        self._nombreProductoSeleccionado = self.getValue("Escoge tu item :")
 
     def funBorrar(self):
         #Setteamos los valores por defecto de cada comboBox
@@ -1399,7 +1401,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
 
 
             if self._comboBoxItems.current() == 0: 
-                self._productoSeleccionado = Producto.obtenerProductosPorNombre(nombreProductoSeleccionado, self._clienteProceso.getCineUbicacionActual().getInventarioCine)
+                self._productoSeleccionado = Producto.obtenerProductosPorNombre(self._nombreProductoSeleccionado, self._clienteProceso.getCineUbicacionActual().getInventarioCine)
                 nombrePeliculaSeleccionada = self.getValue("Escoge tu item :")
 
             else:
@@ -1566,10 +1568,12 @@ def objetosBasePractica2():
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
-    ticket = Ticket(pelicula1_2, datetime(2024, 9, 15, 12, 20, 0), '4-4', sucursalCine1)
+    ticket = Ticket(pelicula1_2, datetime(2024, 9, 16, 12, 20, 0), '4-4', sucursalCine1)
     ticket.setSucursalCompra(sucursalCine1)
     ticket.setSalaDeCine(salaDeCine1_1)
     cliente2.getTickets().append(ticket)
+    ticket.setDueno(cliente2)
+    sucursalCine1.getTicketsDisponibles().append(ticket)
 
     #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
 
@@ -1744,6 +1748,9 @@ def ventanaDeInicio():
             mensaje.pack(anchor= "s", expand= True)
 
     def CerrarVentana():
+        #Serializamos
+        Serializador.serializar()
+        #Destruimos la ventana
         ventanaInicio.destroy()
 
     #Opciones de el menu de inicio
@@ -1755,6 +1762,7 @@ if __name__ == '__main__':
 
     #Creamos los objetos de la lógica del proyecto
     objetosBasePractica2()
+    #Deserializador.deserializar()
 
     #Creacion de la ventana de inicio 
     ventanaInicio = tk.Tk()
