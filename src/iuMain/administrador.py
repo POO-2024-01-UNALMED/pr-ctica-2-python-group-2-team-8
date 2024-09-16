@@ -391,6 +391,11 @@ class FrameGeneracionDeProductos(FieldFrame):
                 self.funBorrar()
 
     def funAceptar(self):
+        if len(self._servicio.getOrden()) > 0:
+            productoDescuento = self._servicio.descuentarPorGenero(self._clienteProceso.getCineUbicacionActual())
+            if productoDescuento != None:
+                messagebox.showinfo("Descuento","🎉🎉Felicidades obtuviste un descuento 🎉🎉 \n Por comprar un producto del mismo genero que el tiket que compraste")
+                productoDescuento.setPrecio(productoDescuento.getPrecio()*0.9)
         FrameReclamoDeBonos(self._servicio).mostrarFrame()
     def mostrar(self):
         self._labelCriterio.configure(text = self._servicio.mostrarOrden())
@@ -1636,6 +1641,11 @@ def objetosBasePractica2():
     ticket.setSucursalCompra(sucursalCine1)
     ticket.setSalaDeCine(salaDeCine1_1)
     cliente2.getTickets().append(ticket)
+
+    ticket2 = Ticket(pelicula2_6, datetime(2024, 9, 15, 12, 20, 0), '4-4', sucursalCine2)
+    ticket2.setSucursalCompra(sucursalCine2)
+    ticket2.setSalaDeCine(salaDeCine2_4)
+    cliente1.getTickets().append(ticket2)
 
     #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
 
