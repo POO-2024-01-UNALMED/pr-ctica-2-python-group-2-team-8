@@ -632,7 +632,7 @@ class SucursalCine:
     def setCartelera(self, cartelera):
         self._cartelera = cartelera
     
-    def getCantidadTicketsGenerados(self):
+    def getCantidadTicketsCreados(self):
         return self._cantidadTicketsCreados
 
     def setCantidadTicketsCreados(self, cantidadTicketsCreados):

@@ -3,8 +3,7 @@ from datetime import timedelta
 
 class Cliente():
     
-    def __init__(self, nombre = "", edad = 0 , documento = 0, tipoDocumento = None, cineUbicacionActual = None, membresia = None,
-        cuenta = None, codigosDescuento =[], codigosBonos= [], bonos= []):
+    def __init__(self, nombre = "", edad = 0 , documento = 0, tipoDocumento = None, cineUbicacionActual = None):
 
         self._nombre = nombre
         self._edad = edad
@@ -23,16 +22,16 @@ class Cliente():
         self._productosDisponiblesParaCalificar = []
 
         #Atributos Funcionalidad 4
-        self._cuenta = cuenta
-        self._codigosDescuento = codigosDescuento
-        self._codigosBonos = codigosBonos
-        self._bonos = bonos
+        self._cuenta = None
+        self._codigosDescuento = []
+        self._codigosBonos = []
+        self._bonos = []
         self._colorFondoTarjeta = "white"  #blanco por defecto
         self._fuenteTarjeta = "Times New Roman"
         self._colorTextoTarjeta = "black"
 
         #Atributos Funcionalidad 5
-        self._membresia = membresia
+        self._membresia = None
         self._metodosDePago = []
         self._fechaLimiteMembresia = 0
         self._puntos = 0
