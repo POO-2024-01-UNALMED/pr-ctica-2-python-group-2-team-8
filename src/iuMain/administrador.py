@@ -27,6 +27,7 @@ from gestionAplicacion.servicios.arkade import Arkade
 from gestionAplicacion.usuario.ticket import Ticket
 from baseDatos.serializador import Serializador
 from baseDatos.deserializador import Deserializador
+from gestionAplicacion.servicios.bono import Bono
 
 class FieldFrame(tk.Frame):
 
@@ -270,7 +271,10 @@ class VisualFieldFrame(tk.Frame):
 
 class FrameReclamoDeBonos(FieldFrame):
     def __init__(self, servicio):
+
+        self._servicio=servicio
         servicio.actualizarBonos()
+
         super().__init__(
             tituloProceso = "Bonos",
             descripcionProceso = "En este apartado podras reclamar los bonos que tenes asociados",
@@ -278,6 +282,47 @@ class FrameReclamoDeBonos(FieldFrame):
             infoElementosInteractuables = [[servicio.mostrarBonos(servicio), "Seleccione un Producto"]],
             habilitado = [False],
         )
+
+        tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("Verdana bold",20), anchor="center")
+        tituloV.grid(column=2, row=2, padx = (10,10), pady = (10,10))
+
+        labelCriterio = tk.Label(self, text = servicio.mostrarOrden(),anchor="w", font= ("Verdana",10))
+        labelCriterio.grid(row=3, column=2, sticky="w")
+
+        agregarb = tk.Button(self,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.agregar,
+        width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 2, row = 4,)
+
+    def agregar(self):
+        condicion = True
+        if self.evaluarExcepciones():
+            nombreProducto = self._elementosInteractivos[0].get()
+            for pro in self._servicio.getBonosCliente():
+                nombrep = f"\n{pro.getProducto().getNombre()} {pro.getProducto().getTamaño()}"
+                if nombrep == nombreProducto:
+                    if len(self._servicio.getOrden()) !=0:
+                        for p in self._servicio.getOrden():
+                            nombre = f"\n{p.getNombre()} {p.getTamaño()}"
+                            if nombre == nombreProducto and condicion:
+                                if messagebox.askokcancel("Dialogo de confirmacion","Preciona aceptar para agregar el producto a la compra o presiona cancelar para descontarlo de la compra"):
+                                    condicion=False
+                                    self._servicio.agregarOrden(pro.getProducto())
+                                    self._servicio.setBonosCliente([])
+                                    self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
+                                    FrameReclamoDeBonos(self._servicio).mostrarFrame()
+                                else:
+                                    condicion=False
+                                    for i in range(0,len(self._servicio.getOrden())):
+                                        if p == self._servicio.getOrden()[i]:
+                                            self._servicio.getOrden()[i].setPrecio(self._servicio.getOrden()[i].getPrecio()-(self._servicio.getOrden()[i].getPrecio()/self._servicio.getOrden()[i].getCantidad()))
+                                            self._servicio.setBonosCliente([])
+                                            self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
+                                            FrameReclamoDeBonos(self._servicio).mostrarFrame()
+            if condicion:
+                condicion=False
+                self._servicio.agregarOrden(pro.getProducto())
+                self._servicio.setBonosCliente([])
+                self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
+                FrameReclamoDeBonos(self._servicio).mostrarFrame()
 
 class FrameGeneracionDeProductos(FieldFrame):
     def __init__(self, servicio):
@@ -298,11 +343,18 @@ class FrameGeneracionDeProductos(FieldFrame):
         tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("Verdana bold",20), anchor="center")
         tituloV.grid(column=2, row=2, padx = (10,10), pady = (10,10))
 
-        agregarb = tk.Button(self,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.agregar,
+        self._labelCriterio = tk.Label(self, text = "",anchor="w", font= ("Verdana",10))
+        self._labelCriterio.grid(row=3, column=2,rowspan=2, sticky="w")
+
+        self._agregarb = tk.Button(self,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command = self.agregar,
         width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 2, row = 5,)
+
+        self._eliminarb=None
+
+        self.getElementosInteractivos()[0].grid_configure(sticky="we")
         
     def agregar(self):
-        if not self.tieneCamposPorDefecto():
+        if self.evaluarExcepciones():
             nombreProducto = self._elementosInteractivos[0].get()
             n = 0
             for productos in self._servicio.getInventario():
@@ -311,23 +363,45 @@ class FrameGeneracionDeProductos(FieldFrame):
                     if productos.getCantidad() >= int(self._elementosInteractivos[1].get()):
                         self._servicio.agregarOrden(self._servicio.hacerPedido(n ,int(self._elementosInteractivos[1].get()) ,self._clienteProceso.getCineUbicacionActual()))
                         self.mostrar()
-                        eliminarb = tk.Button(self,text="Eliminar producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.agregar,
-                            width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = 6)
+                        self._eliminarb = tk.Button(self,text="Eliminar producto", font = ("Verdana", 12), fg = "white", bg = "gray",command = self.eliminar,
+            width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = 6)
                         break
                     else:
                         messagebox.showerror("Error",f"No hay suficiente cantidad de {productos.getNombre()} {productos.getTamaño()}, solo hay: {productos.getCantidad()}")
                         break
                 n+=1
             self.funBorrar()
-        else:
-           messagebox.showerror("Error","Por favor llenar todos los campos")
+    
+    def eliminar(self):
+        if self.evaluarExcepciones():
+            producto = self._servicio.hacerPedido(self.getElementosInteractivos()[0].current() ,int(self._elementosInteractivos[1].get()),self._clienteProceso.getCineUbicacionActual())
+            cantidad = int(self._elementosInteractivos[1].get())
+            print("Entro F")
+            for p in self._servicio.getOrden():
+                print("Entro FFF")
+                if p.getNombre() == producto.getNombre() and p.getCantidad()>=cantidad and p.getTamaño() == producto.getTamaño():
+                    print("Entro F12")
+                    if p.getCantidad()==cantidad:
+                        print("Entro F121")
+                        self._servicio.getOrden().remove(p)
+                        self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].setCantidad( self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].getCantidad() + (cantidad*2))
+                    else:
+                        print("Entro F122")
+                        p.setCantidad(p.getCantidad()-cantidad)
+                        p.setPrecio(p.getPrecio()-(self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].getPrecio()*cantidad))
+                        self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].setCantidad( self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].getCantidad() + (cantidad*2))
+                self.mostrar()
+                self.funBorrar()
 
     def funAceptar(self):
+        if len(self._servicio.getOrden()) > 0:
+            productoDescuento = self._servicio.descuentarPorGenero(self._clienteProceso.getCineUbicacionActual())
+            if productoDescuento != None:
+                messagebox.showinfo("Descuento","🎉🎉Felicidades obtuviste un descuento 🎉🎉 \n Por comprar un producto del mismo genero que el tiket que compraste")
+                productoDescuento.setPrecio(productoDescuento.getPrecio()*0.9)
         FrameReclamoDeBonos(self._servicio).mostrarFrame()
-
     def mostrar(self):
-        labelCriterio = tk.Label(self, text = self._servicio.mostrarOrden(),anchor="w", font= ("Verdana",10))
-        labelCriterio.grid(row=3, column=2,rowspan=2, sticky="w")
+        self._labelCriterio.configure(text = self._servicio.mostrarOrden())
 
     
 class FrameFuncionalidad2(FieldFrame):
@@ -347,7 +421,7 @@ class FrameFuncionalidad2(FieldFrame):
         
 
     def funAceptar(self):
-        if not self.tieneCamposPorDefecto():
+        if self.evaluarExcepciones():
             if len(self._sucursalActual.getServicios())>1:
                 if self._elementosInteractivos[0].get() == "Servicio comida":
                     FrameGeneracionDeProductos(self._sucursalActual.getServicios()[0]).mostrarFrame()
@@ -355,8 +429,6 @@ class FrameFuncionalidad2(FieldFrame):
                     FrameGeneracionDeProductos(self._sucursalActual.getServicios()[1]).mostrarFrame()
             else:
                 FrameGeneracionDeProductos(self._sucursalActual.getServicios()[0]).mostrarFrame()
-        else:
-           messagebox.showerror("Error","Por favor seleccione un servicio")
 
 class FrameInicioSesion(FieldFrame):
 
@@ -694,7 +766,7 @@ class FrameTarjetaCinemar(FieldFrame):
             self.widgets.append(widget)
 
         self.widgets[2].grid_configure(row=5, column=0)
-        self.widgets[3].grid_configure(row=5, column=2)
+        self.widgets[3].grid_configure(row=5, column=1)
         self.widgets[4].grid_configure(row=6, column=0)
         self.widgets[5].grid_configure(row=6, column=1)
         self.widgets[6].grid_configure(row=7, column=0)
@@ -824,9 +896,9 @@ class FrameEleccion(FieldFrame):
                 descripcionProceso = 'En este espacio podras escoger si:\n •Ir a jugar\n•Recargar tu tarjeta\n•Personalizar tu tarjeta',
                 tituloCriterios = 'Criterios',
                 textEtiquetas = ['Seleccione proceso a realizar :'], 
-                tituloValores = '      Proceso',
+                tituloValores = ' Proceso',
                 infoElementosInteractuables = [
-                    [["Ingresar a los juegos","Recargar tarjeta Cinemar","Personalizar tarjeta Cinemar"], 'Proceso'], 
+                    [["Ingresar a los juegos","Recargar tarjeta Cinemar","Personalizar tarjeta Cinemar"], '                          Proceso'], 
                     
                 ],
                 habilitado = [False],
@@ -883,7 +955,7 @@ class FrameEleccion(FieldFrame):
                 if isinstance(w, ttk.Combobox):
                     self.valorComoBox.append(w.get())
             if self.valorComoBox[0] == "Ingresar a los juegos":
-                messagebox.showinfo(title="Información", message="No se ha programado esta opcion")
+                FrameEleccionJuego(self).mostrarFrame()
             elif self.valorComoBox[0] == "Recargar tarjeta Cinemar":
                 messagebox.showinfo(title="Información", message="No se ha programado esta opcion jiji")
             elif self.valorComoBox[0] == "Personalizar tarjeta Cinemar":
@@ -891,6 +963,205 @@ class FrameEleccion(FieldFrame):
     
 
 
+class FrameEleccionJuego(FieldFrame):
+
+    def __init__(self, frameAnterior):
+
+        self.clienteProceso = FieldFrame.getClienteProceso()
+        
+        self.codigosDescuentoCliente = [self.clienteProceso.getCodigosDescuento()[:] , "                Codigo"] if len(self.clienteProceso.getCodigosDescuento()) != 0 else ['   😞Sin Codigos😞']
+        
+        if len(self.codigosDescuentoCliente) == 2 and "Ninguno" not in self.codigosDescuentoCliente[0]:
+            self.codigosDescuentoCliente[0].insert(0, "Ninguno")
+        self.generosJuegos = list(map(lambda game: game.getGeneroServicio(), SucursalCine.getJuegos()))
+        
+
+        super().__init__(
+                tituloProceso = 'Juegos y categorias disponibles\n',
+                descripcionProceso = 'En este espacio podrás escoger tu juego favorito y su categoria, ademas podrá redimir codigos de descuento(Solo aplica el descuento si juegas un juego de igual categoria al codigo que redimas)',
+                tituloCriterios = 'Criterios',
+                textEtiquetas = ['Unico Juego :', 'Seleccione la Categoria : ', 'Seleccione Codigo a redimir :'], 
+                tituloValores = 'Juegos y Categorias',
+                infoElementosInteractuables = [
+                    ['      Hang Man'], 
+                    [self.generosJuegos, "               Categoria"],
+                    self.codigosDescuentoCliente
+                ],
+                habilitado = [False, False, False],
+                botonVolver = True,
+                frameAnterior = frameAnterior
+            )
+
+        self.widgets = []
+        
+        
+        for widget in self.winfo_children():
+
+            self.widgets.append(widget)
+
+        for widget in self.widgets[-1].winfo_children():
+            
+            widget.config(font= ("courier new", 16, "bold"), bg = "sky blue", fg = "black")
+
+        tamaños = [21,12,15,15,12,9,12,9,12,9]
+
+        self.widgets[-1].config(bg = "light blue")
+        self.widgets.pop(-1)
+        
+        
+        for i, w in enumerate(self.widgets):
+            if isinstance(w, ttk.Combobox):
+                pass
+                #w.config(width=30)
+            else:
+                w.config(font = ("courier new", tamaños[i]), bg = "light blue")
+
+        self.widgets[0].config(font = ("courier new", 21, "bold"))
+        self.widgets[2].config(font = ("courier new", 15, "bold"))
+        self.widgets[3].config(font = ("courier new", 15, "bold"))
+        
+        ventanaLogicaProyecto.config(bg= "light blue")
+        self.config(bg= "light blue")
+
+        labelrelleno = tk.Label(self, text="", bg="light blue")
+        labelrelleno.grid(row=7, column=0, columnspan=3)
+
+        self.labelPrecio = tk.Label(self, text="", font=("Courier New", 15, "bold italic"), bg="light blue")
+        self.labelPrecio.grid(row=8, column=0, columnspan=3)
+
+        self.comboBoxCategorias = self.getElementosInteractivos()[1]
+        self.comboBoxCategorias.bind('<<ComboboxSelected>>', self.mostrarLabelPrecio)
+
+        self.interactuableCodigosDescuento = self.getElementosInteractivos()[2]
+
+        
+        if isinstance(self.interactuableCodigosDescuento, ttk.Combobox):
+            self.interactuableCodigosDescuento.bind('<<ComboboxSelected>>', self.mostrarLabelPrecioDescuento)
+        
+
+    def mostrarLabelPrecio(self, event):
+            
+        self.precio = 0
+
+        for genero in self.generosJuegos:
+            if genero == self.comboBoxCategorias.get():
+                indice = self.generosJuegos.index(genero)
+                self.precio = SucursalCine.getJuegos()[indice].getValorServicio()
+                break
+        self.labelPrecio.config(text= f"Precio: {self.precio}$")
+
+        if isinstance(self.interactuableCodigosDescuento, ttk.Combobox) and self.interactuableCodigosDescuento.get() != "                Codigo" and self.interactuableCodigosDescuento.get() != "Ninguno":
+            PrecionConDescuento = self.precio-self.precio*0.2
+            if self.comboBoxCategorias.get() == Ticket.encontrarGeneroCodigoPelicula(self.interactuableCodigosDescuento.get()):
+                    self.labelPrecio.config(text= f"Precio Anterior: {self.precio}$ -> Precio con Descuento: {PrecionConDescuento}$", font=("Courier New", 13, "bold italic"))
+    
+    def mostrarLabelPrecioDescuento(self, event):
+        texto_label = ""
+
+        
+        if self.comboBoxCategorias.get() != "               Categoria":
+            PrecionConDescuento = self.precio-self.precio*0.2
+            if self.interactuableCodigosDescuento.get() != "Ninguno":
+                if self.comboBoxCategorias.get() == Ticket.encontrarGeneroCodigoPelicula(self.interactuableCodigosDescuento.get()):
+                    self.labelPrecio.config(text= f"Precio Anterior: {self.precio}$ -> Precio con Descuento: {PrecionConDescuento}$", font=("Courier New", 13, "bold italic"))
+                else:
+                    self.labelPrecio.config(text= f"Precio: {self.precio}$")
+            else:
+                self.labelPrecio.config(text= f"Precio: {self.precio}$")
+    
+    def funBorrar(self):
+
+        for elementoInteractivo in self._elementosInteractivos:
+            if isinstance(elementoInteractivo, ttk.Combobox):
+                self.setValueComboBox(elementoInteractivo)
+            else:
+                elementoInteractivo.delete("0","end")
+        
+        self.labelPrecio.config(text= "")
+
+    def tieneCamposPorDefecto(self):
+
+        camposPorDefecto = []
+        if isinstance(self.interactuableCodigosDescuento, ttk.Combobox):
+            for i in range(1, len(self._infoElementosInteractuables)):
+
+                valorPorDefecto = '' if self._infoElementosInteractuables[i] == None else self._infoElementosInteractuables[i][1]
+
+                if self.getValue(self._infoEtiquetas[i]) == valorPorDefecto:
+                    camposPorDefecto.append(self._infoEtiquetas[i])
+            
+            return camposPorDefecto
+        else:
+            for i in range(1, len(self._infoElementosInteractuables)-1):
+
+                valorPorDefecto = '' if self._infoElementosInteractuables[i] == None else self._infoElementosInteractuables[i][1]
+
+                if self.getValue(self._infoEtiquetas[i]) == valorPorDefecto:
+                    camposPorDefecto.append(self._infoEtiquetas[i])
+            
+            return camposPorDefecto
+
+    def funVolver(self):
+        FrameEleccion(FrameZonaJuegos()).mostrarFrame()
+
+
+
+    def funAceptar(self):
+        if self.evaluarExcepciones():
+             precio = 0
+
+             for genero in self.generosJuegos:
+                if genero == self.comboBoxCategorias.get():
+                    indice = self.generosJuegos.index(genero)
+                    precio = SucursalCine.getJuegos()[indice].getValorServicio()
+                    break
+             if isinstance(self.interactuableCodigosDescuento, ttk.Combobox):
+                 if self.interactuableCodigosDescuento.get() == "Ninguno":
+                    if self.clienteProceso.getCuenta().getSaldo() >= precio:
+                        self.clienteProceso.getCuenta().hacerPago(precio)
+                        messagebox.showinfo("Nuevo Saldo", f"El nuevo saldo de tu tarjeta es : {self.clienteProceso.getCuenta().getSaldo()}$")
+                        
+                        #Linea para llamar al frame del juego
+                    else: 
+                        respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
+                        if respuesta:
+                            #Linea para llamar al frame de recargar tarjeta
+                            print('Dijo que si')
+                        else:
+                            print('Dijo que no')
+                 else:
+                     if self.comboBoxCategorias.get() == Ticket.encontrarGeneroCodigoPelicula(self.interactuableCodigosDescuento.get()):
+                         precio = precio -precio*0.2 
+                         if self.clienteProceso.getCuenta().getSaldo() >= precio:
+                            self.clienteProceso.getCuenta().hacerPago(precio)
+                            self.clienteProceso.getCodigosDescuento().remove(self.interactuableCodigosDescuento.get())
+                            messagebox.showinfo("Nuevo Saldo", f"El nuevo saldo de tu tarjeta es : {self.clienteProceso.getCuenta().getSaldo()}$")
+                            #Linea para llamar al frame del juego
+                            
+
+                         else: 
+                            respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
+                            if respuesta:
+                                #Linea para llamar al frame de recargar tarjeta
+                                print('Dijo que si')
+                            else:
+                                print('Dijo que no')
+                     else:
+                         messagebox.showerror("Error", "Has seleccionado un codigo con genero diferente al juego, por lo que no puedes redimirlo")
+             else:
+                 if self.clienteProceso.getCuenta().getSaldo() >= precio:
+                        self.clienteProceso.getCuenta().hacerPago(precio)
+                        messagebox.showinfo("Nuevo Saldo", f"El nuevo saldo de tu tarjeta es : {self.clienteProceso.getCuenta().getSaldo()}$")
+                        
+                        #Linea para llamar al frame del juego
+                 else: 
+                    respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
+                    if respuesta:
+                        #Linea para llamar al frame de recargar tarjeta
+                        print('Dijo que si')
+                    else:
+                        print('Dijo que no')
+        
 
 
 #################################################################################################################################
@@ -1558,6 +1829,12 @@ def objetosBasePractica2():
     metodoPago3 = MetodoPago("Banco Agrario", 0.15, 300000)
     metodoPago4 = MetodoPago("Efectivo", 0, 5000000)
 
+    game1 = Arkade("Hang Man", 15000.0, "Acción");
+    game2 = Arkade("Hang Man", 20000.0, "Terror");
+    game3 = Arkade("Hang Man", 10000.0, "Tecnología");
+    game4 = Arkade("Hang Man", 30000.0, "Comedia");
+    game5 = Arkade("Hang Man", 7500.0, "Drama");
+
     Membresia.stockMembresia(SucursalCine.getSucursalesCine())
 
     for sucursal in SucursalCine.getSucursalesCine():
@@ -1571,11 +1848,14 @@ def objetosBasePractica2():
     ticket = Ticket(pelicula1_2, datetime(2024, 9, 16, 12, 20, 0), '4-4', sucursalCine1)
     ticket.setSucursalCompra(sucursalCine1)
     ticket.setSalaDeCine(salaDeCine1_1)
+    ticket.setDueno(cliente4) #prueba para la funcionalidad 4
     cliente2.getTickets().append(ticket)
     ticket.setDueno(cliente2)
     sucursalCine1.getTicketsDisponibles().append(ticket)
 
-    #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
+    cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
+    cliente4.setCodigosDescuento([ticket.generarCodigoTicket()])
+    cliente4.getCuenta().setSaldo(500000)
 
 
 def ventanaDeInicio(): 
