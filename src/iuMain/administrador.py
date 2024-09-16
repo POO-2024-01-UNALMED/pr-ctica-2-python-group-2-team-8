@@ -25,6 +25,7 @@ from excepciones.iuExceptions import iuExceptions, iuEmptyValues, iuDefaultValue
 from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
 from gestionAplicacion.servicios.arkade import Arkade
 from gestionAplicacion.usuario.ticket import Ticket
+from gestionAplicacion.servicios.bono import Bono
 
 class FieldFrame(tk.Frame):
 
@@ -692,7 +693,7 @@ class FrameTarjetaCinemar(FieldFrame):
             self.widgets.append(widget)
 
         self.widgets[2].grid_configure(row=5, column=0)
-        self.widgets[3].grid_configure(row=5, column=2)
+        self.widgets[3].grid_configure(row=5, column=1)
         self.widgets[4].grid_configure(row=6, column=0)
         self.widgets[5].grid_configure(row=6, column=1)
         self.widgets[6].grid_configure(row=7, column=0)
@@ -822,9 +823,9 @@ class FrameEleccion(FieldFrame):
                 descripcionProceso = 'En este espacio podras escoger si:\n •Ir a jugar\n•Recargar tu tarjeta\n•Personalizar tu tarjeta',
                 tituloCriterios = 'Criterios',
                 textEtiquetas = ['Seleccione proceso a realizar :'], 
-                tituloValores = '      Proceso',
+                tituloValores = ' Proceso',
                 infoElementosInteractuables = [
-                    [["Ingresar a los juegos","Recargar tarjeta Cinemar","Personalizar tarjeta Cinemar"], 'Proceso'], 
+                    [["Ingresar a los juegos","Recargar tarjeta Cinemar","Personalizar tarjeta Cinemar"], '                          Proceso'], 
                     
                 ],
                 habilitado = [False],
@@ -881,7 +882,7 @@ class FrameEleccion(FieldFrame):
                 if isinstance(w, ttk.Combobox):
                     self.valorComoBox.append(w.get())
             if self.valorComoBox[0] == "Ingresar a los juegos":
-                messagebox.showinfo(title="Información", message="No se ha programado esta opcion")
+                FrameEleccionJuego(self).mostrarFrame()
             elif self.valorComoBox[0] == "Recargar tarjeta Cinemar":
                 messagebox.showinfo(title="Información", message="No se ha programado esta opcion jiji")
             elif self.valorComoBox[0] == "Personalizar tarjeta Cinemar":
@@ -889,6 +890,205 @@ class FrameEleccion(FieldFrame):
     
 
 
+class FrameEleccionJuego(FieldFrame):
+
+    def __init__(self, frameAnterior):
+
+        self.clienteProceso = FieldFrame.getClienteProceso()
+        
+        self.codigosDescuentoCliente = [self.clienteProceso.getCodigosDescuento()[:] , "                Codigo"] if len(self.clienteProceso.getCodigosDescuento()) != 0 else ['   😞Sin Codigos😞']
+        
+        if len(self.codigosDescuentoCliente) == 2 and "Ninguno" not in self.codigosDescuentoCliente[0]:
+            self.codigosDescuentoCliente[0].insert(0, "Ninguno")
+        self.generosJuegos = list(map(lambda game: game.getGeneroServicio(), SucursalCine.getJuegos()))
+        
+
+        super().__init__(
+                tituloProceso = 'Juegos y categorias disponibles\n',
+                descripcionProceso = 'En este espacio podrás escoger tu juego favorito y su categoria, ademas podrá redimir codigos de descuento(Solo aplica el descuento si juegas un juego de igual categoria al codigo que redimas)',
+                tituloCriterios = 'Criterios',
+                textEtiquetas = ['Unico Juego :', 'Seleccione la Categoria : ', 'Seleccione Codigo a redimir :'], 
+                tituloValores = 'Juegos y Categorias',
+                infoElementosInteractuables = [
+                    ['      Hang Man'], 
+                    [self.generosJuegos, "               Categoria"],
+                    self.codigosDescuentoCliente
+                ],
+                habilitado = [False, False, False],
+                botonVolver = True,
+                frameAnterior = frameAnterior
+            )
+
+        self.widgets = []
+        
+        
+        for widget in self.winfo_children():
+
+            self.widgets.append(widget)
+
+        for widget in self.widgets[-1].winfo_children():
+            
+            widget.config(font= ("courier new", 16, "bold"), bg = "sky blue", fg = "black")
+
+        tamaños = [21,12,15,15,12,9,12,9,12,9]
+
+        self.widgets[-1].config(bg = "light blue")
+        self.widgets.pop(-1)
+        
+        
+        for i, w in enumerate(self.widgets):
+            if isinstance(w, ttk.Combobox):
+                pass
+                #w.config(width=30)
+            else:
+                w.config(font = ("courier new", tamaños[i]), bg = "light blue")
+
+        self.widgets[0].config(font = ("courier new", 21, "bold"))
+        self.widgets[2].config(font = ("courier new", 15, "bold"))
+        self.widgets[3].config(font = ("courier new", 15, "bold"))
+        
+        ventanaLogicaProyecto.config(bg= "light blue")
+        self.config(bg= "light blue")
+
+        labelrelleno = tk.Label(self, text="", bg="light blue")
+        labelrelleno.grid(row=7, column=0, columnspan=3)
+
+        self.labelPrecio = tk.Label(self, text="", font=("Courier New", 15, "bold italic"), bg="light blue")
+        self.labelPrecio.grid(row=8, column=0, columnspan=3)
+
+        self.comboBoxCategorias = self.getElementosInteractivos()[1]
+        self.comboBoxCategorias.bind('<<ComboboxSelected>>', self.mostrarLabelPrecio)
+
+        self.interactuableCodigosDescuento = self.getElementosInteractivos()[2]
+
+        
+        if isinstance(self.interactuableCodigosDescuento, ttk.Combobox):
+            self.interactuableCodigosDescuento.bind('<<ComboboxSelected>>', self.mostrarLabelPrecioDescuento)
+        
+
+    def mostrarLabelPrecio(self, event):
+            
+        self.precio = 0
+
+        for genero in self.generosJuegos:
+            if genero == self.comboBoxCategorias.get():
+                indice = self.generosJuegos.index(genero)
+                self.precio = SucursalCine.getJuegos()[indice].getValorServicio()
+                break
+        self.labelPrecio.config(text= f"Precio: {self.precio}$")
+
+        if isinstance(self.interactuableCodigosDescuento, ttk.Combobox) and self.interactuableCodigosDescuento.get() != "                Codigo" and self.interactuableCodigosDescuento.get() != "Ninguno":
+            PrecionConDescuento = self.precio-self.precio*0.2
+            if self.comboBoxCategorias.get() == Ticket.encontrarGeneroCodigoPelicula(self.interactuableCodigosDescuento.get()):
+                    self.labelPrecio.config(text= f"Precio Anterior: {self.precio}$ -> Precio con Descuento: {PrecionConDescuento}$", font=("Courier New", 13, "bold italic"))
+    
+    def mostrarLabelPrecioDescuento(self, event):
+        texto_label = ""
+
+        
+        if self.comboBoxCategorias.get() != "               Categoria":
+            PrecionConDescuento = self.precio-self.precio*0.2
+            if self.interactuableCodigosDescuento.get() != "Ninguno":
+                if self.comboBoxCategorias.get() == Ticket.encontrarGeneroCodigoPelicula(self.interactuableCodigosDescuento.get()):
+                    self.labelPrecio.config(text= f"Precio Anterior: {self.precio}$ -> Precio con Descuento: {PrecionConDescuento}$", font=("Courier New", 13, "bold italic"))
+                else:
+                    self.labelPrecio.config(text= f"Precio: {self.precio}$")
+            else:
+                self.labelPrecio.config(text= f"Precio: {self.precio}$")
+    
+    def funBorrar(self):
+
+        for elementoInteractivo in self._elementosInteractivos:
+            if isinstance(elementoInteractivo, ttk.Combobox):
+                self.setValueComboBox(elementoInteractivo)
+            else:
+                elementoInteractivo.delete("0","end")
+        
+        self.labelPrecio.config(text= "")
+
+    def tieneCamposPorDefecto(self):
+
+        camposPorDefecto = []
+        if isinstance(self.interactuableCodigosDescuento, ttk.Combobox):
+            for i in range(1, len(self._infoElementosInteractuables)):
+
+                valorPorDefecto = '' if self._infoElementosInteractuables[i] == None else self._infoElementosInteractuables[i][1]
+
+                if self.getValue(self._infoEtiquetas[i]) == valorPorDefecto:
+                    camposPorDefecto.append(self._infoEtiquetas[i])
+            
+            return camposPorDefecto
+        else:
+            for i in range(1, len(self._infoElementosInteractuables)-1):
+
+                valorPorDefecto = '' if self._infoElementosInteractuables[i] == None else self._infoElementosInteractuables[i][1]
+
+                if self.getValue(self._infoEtiquetas[i]) == valorPorDefecto:
+                    camposPorDefecto.append(self._infoEtiquetas[i])
+            
+            return camposPorDefecto
+
+    def funVolver(self):
+        FrameEleccion(FrameZonaJuegos()).mostrarFrame()
+
+
+
+    def funAceptar(self):
+        if self.evaluarExcepciones():
+             precio = 0
+
+             for genero in self.generosJuegos:
+                if genero == self.comboBoxCategorias.get():
+                    indice = self.generosJuegos.index(genero)
+                    precio = SucursalCine.getJuegos()[indice].getValorServicio()
+                    break
+             if isinstance(self.interactuableCodigosDescuento, ttk.Combobox):
+                 if self.interactuableCodigosDescuento.get() == "Ninguno":
+                    if self.clienteProceso.getCuenta().getSaldo() >= precio:
+                        self.clienteProceso.getCuenta().hacerPago(precio)
+                        messagebox.showinfo("Nuevo Saldo", f"El nuevo saldo de tu tarjeta es : {self.clienteProceso.getCuenta().getSaldo()}$")
+                        
+                        #Linea para llamar al frame del juego
+                    else: 
+                        respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
+                        if respuesta:
+                            #Linea para llamar al frame de recargar tarjeta
+                            print('Dijo que si')
+                        else:
+                            print('Dijo que no')
+                 else:
+                     if self.comboBoxCategorias.get() == Ticket.encontrarGeneroCodigoPelicula(self.interactuableCodigosDescuento.get()):
+                         precio = precio -precio*0.2 
+                         if self.clienteProceso.getCuenta().getSaldo() >= precio:
+                            self.clienteProceso.getCuenta().hacerPago(precio)
+                            self.clienteProceso.getCodigosDescuento().remove(self.interactuableCodigosDescuento.get())
+                            messagebox.showinfo("Nuevo Saldo", f"El nuevo saldo de tu tarjeta es : {self.clienteProceso.getCuenta().getSaldo()}$")
+                            #Linea para llamar al frame del juego
+                            
+
+                         else: 
+                            respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
+                            if respuesta:
+                                #Linea para llamar al frame de recargar tarjeta
+                                print('Dijo que si')
+                            else:
+                                print('Dijo que no')
+                     else:
+                         messagebox.showerror("Error", "Has seleccionado un codigo con genero diferente al juego, por lo que no puedes redimirlo")
+             else:
+                 if self.clienteProceso.getCuenta().getSaldo() >= precio:
+                        self.clienteProceso.getCuenta().hacerPago(precio)
+                        messagebox.showinfo("Nuevo Saldo", f"El nuevo saldo de tu tarjeta es : {self.clienteProceso.getCuenta().getSaldo()}$")
+                        
+                        #Linea para llamar al frame del juego
+                 else: 
+                    respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
+                    if respuesta:
+                        #Linea para llamar al frame de recargar tarjeta
+                        print('Dijo que si')
+                    else:
+                        print('Dijo que no')
+        
 
 
 #################################################################################################################################
@@ -1374,7 +1574,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
         calificacionesLista= [1,2,3,4,5]
         self._comboBoxCalificarItem.configure(values = calificacionesLista)
         self._comboBoxCalificarItem.configure(state = 'readonly')
-        nombreProductoSeleccionado = self.getValue("Escoge tu item :")
+        self.nombreProductoSeleccionado = self.getValue("Escoge tu item :")
 
     def funBorrar(self):
         #Setteamos los valores por defecto de cada comboBox
@@ -1399,7 +1599,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
 
 
             if self._comboBoxItems.current() == 0: 
-                self._productoSeleccionado = Producto.obtenerProductosPorNombre(nombreProductoSeleccionado, self._clienteProceso.getCineUbicacionActual().getInventarioCine)
+                self._productoSeleccionado = Producto.obtenerProductosPorNombre(self.nombreProductoSeleccionado, self._clienteProceso.getCineUbicacionActual().getInventarioCine)
                 nombrePeliculaSeleccionada = self.getValue("Escoge tu item :")
 
             else:
@@ -1556,6 +1756,12 @@ def objetosBasePractica2():
     metodoPago3 = MetodoPago("Banco Agrario", 0.15, 300000)
     metodoPago4 = MetodoPago("Efectivo", 0, 5000000)
 
+    game1 = Arkade("Hang Man", 15000.0, "Acción");
+    game2 = Arkade("Hang Man", 20000.0, "Terror");
+    game3 = Arkade("Hang Man", 10000.0, "Tecnología");
+    game4 = Arkade("Hang Man", 30000.0, "Comedia");
+    game5 = Arkade("Hang Man", 7500.0, "Drama");
+
     Membresia.stockMembresia(SucursalCine.getSucursalesCine())
 
     for sucursal in SucursalCine.getSucursalesCine():
@@ -1569,9 +1775,12 @@ def objetosBasePractica2():
     ticket = Ticket(pelicula1_2, datetime(2024, 9, 15, 12, 20, 0), '4-4', sucursalCine1)
     ticket.setSucursalCompra(sucursalCine1)
     ticket.setSalaDeCine(salaDeCine1_1)
+    ticket.setDueno(cliente4) #prueba para la funcionalidad 4
     cliente2.getTickets().append(ticket)
 
-    #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
+    cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
+    cliente4.setCodigosDescuento([ticket.generarCodigoTicket()])
+    cliente4.getCuenta().setSaldo(500000)
 
 
 def ventanaDeInicio(): 

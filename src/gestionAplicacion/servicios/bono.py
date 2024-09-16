@@ -1,6 +1,6 @@
 import random
 from gestionAplicacion.servicios.producto import Producto
-from iuMain.administrador import *
+#from iuMain.administrador import *
 
 class Bono:
   
