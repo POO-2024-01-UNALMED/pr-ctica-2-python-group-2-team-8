@@ -592,9 +592,7 @@ class SucursalCine:
 
     def mostrarServicios(self):
         s = []
-        n = 0
-        for servicio in self._servicios:
-            n = n+1
+        for servicio in self.getServicios():
             s.append("Servicio " + servicio.getNombre())
         return s
 

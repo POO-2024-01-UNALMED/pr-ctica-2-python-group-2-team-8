@@ -1779,7 +1779,6 @@ def objetosBasePractica2():
     producto1b = Producto("Camisa","XL","souvenir",0,1,"Normal",sucursalCine2)
     bono2 = Bono(1234,producto1b,"souvenir",cliente1)
     bono3 = Bono(1234,producto2b,"comida",cliente1)
-    
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
     salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)
@@ -1862,6 +1861,14 @@ def objetosBasePractica2():
     game4 = Arkade("Hang Man", 30000.0, "Comedia");
     game5 = Arkade("Hang Man", 7500.0, "Drama");
 
+        #Para descuento con pelicula
+    ticket2 = Ticket(pelicula2_6, datetime(2024, 9, 16, 12, 20, 0), '4-4', sucursalCine2)
+    ticket2.setDueno(cliente1)
+    ticket2.setSucursalCompra(sucursalCine2)
+    ticket2.setSalaDeCine(salaDeCine2_4)
+    cliente1.getTickets().append(ticket2)
+    sucursalCine2.getTicketsParaDescuento().append(ticket2)
+
     Membresia.stockMembresia(SucursalCine.getSucursalesCine())
 
     #cliente1.setMembresia(membresia5)
@@ -1878,7 +1885,9 @@ def objetosBasePractica2():
     MetodoPago.asignarMetodosDePago(cliente5)
 
 
-    cliente1.setCineUbicacionActual(sucursalCine1)
+
+    #La mala para el que hizo eso me hizo estar buscando esto por media hora .l. atentamente Rusbel
+    #cliente1.setCineUbicacionActual(sucursalCine1)
     
     for metodoPago in SucursalCine.getMetodosDePagoDisponibles():
         print(metodoPago.getNombre(), metodoPago.getTipo(), metodoPago.getDescuentoAsociado())
