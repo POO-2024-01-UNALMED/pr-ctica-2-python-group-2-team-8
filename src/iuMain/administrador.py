@@ -1770,6 +1770,10 @@ class FramePasarelaDePagos(FieldFrame):
 
     def funAceptar(self):
         if self.evaluarExcepciones():
+
+            if isinstance(self._elementosIbuyable, Servicio):
+                messagebox.showinfo(title="", message= "")
+
             metodoPagoSeleccionado = self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()]
             precio = self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))
             self._valorAPagar = metodoPagoSeleccionado.realizarPago(precio, self.getClienteProceso())
