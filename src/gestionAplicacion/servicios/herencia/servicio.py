@@ -39,14 +39,14 @@ class Servicio (ABC):
 
     def descuentarPorGenero(self, cine):
         for producto in self._orden:
-            print("NO ENTROOOOO")
             for ticket in cine.getTicketsParaDescuento():
-                print("NO ENTROOOOO")
+                print("No ENTRO")
+                print(producto.getGenero(),  ticket.getPelicula().getGenero(),  self.cliente , ticket.getDueno())
                 if producto.getGenero() == ticket.getPelicula().getGenero() and self.cliente == ticket.getDueno():
                     print("ENTROOOOO")
                     fecha = self._sucursalUbicacion.getFechaActual().date()
                     if fecha == ticket.getHorario().date() and ticket.isDescuento():
-                        print("NO ENTROOOOO")
+                        print("ENTRO")
                         ticket.setDescuento(False)
                         return producto
         return None

@@ -168,7 +168,7 @@ class Pelicula:
 
     #def mostrarAsientosSalaVirtual(self, fecha):
 
-    def modificarSalaVIrtual(self, horario, fila, columna):
+    def modificarSalaVirtual(self, horario, fila, columna):
 
         """
         :Description: Este método se encarga de cambiar la disponibilidad del asiento, seleccionado por el cliente, de la sala 
@@ -183,13 +183,16 @@ class Pelicula:
         """
 
         self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)][fila - 1][columna - 1] = 1
+        print(self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)])
 
-    def isDisponibilidadAsientoSalaVirtual(self, horario, fila, columna):
+    def isDisponibilidadAsientoSalaVirtual(self, horario, fila = 100, columna = 100):
 
         """
-        :Description : Este método se encarga revisar la desponibilidad de un asiento determinado de la sala de cine virtual.
+        :Description : Este método se encarga revisar la disponibilidad de un asiento determinado de la sala de cine virtual
+        o de evaluar si existe algún asiento disponible en los asientos asociados al horario.
 	    
         :param horario: Recibe la fecha seleccionada por el cliente para obtener su índice de sala virtual y así acceder a sus asientos ( De tipo datetime ).
+        En caso de dejar por defecto el valor de la fila y la columna estaríamos evaluando únicamente la existencia de algún asiento disponible.
 	    
         :param fila: Recibe el número de la fila seleccionada por el cliente (De tipo int).
 	    
@@ -198,23 +201,15 @@ class Pelicula:
         :return boolean: Este método retorna un boolean que representa la disponibilidad del asiento selccionado por el cliente.
         """
         
-        return self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)][fila - 1][columna - 1] == 0
-
-    def isDisponibilidadAlgunAsientoSalaVirtual(self, horario):
-
-        """
-        :Description: Este método se encarga de evaluar si la película dado un horario tiene algún asiento disponible.
-	    
-        :param horario: Este método recibe como parámetro un horario (De tipo datetime) del cuál accederá a su matriz de asientos.
-	    
-        :return boolean: Este método retorna un boolean que representa si tiene asientos disponibles en ese horario.
-        """
-
-        for filaAsientos in self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)]:
-            for asiento in filaAsientos:
-                if asiento == 0: return True
+        if fila == 100 and columna == 100:
+            for filaAsientos in self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)]:
+                for asiento in filaAsientos:
+                    if asiento == 0: return True
         
-        return False
+            return False
+        
+        else:
+            return self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)][fila - 1][columna - 1] == 0
 
     def filtrarHorariosPelicula(self):
 
@@ -230,7 +225,7 @@ class Pelicula:
 
         for horario in self._horariosPresentacion:
             if horario > self._sucursalCartelera.getFechaActual():
-                if self.isDisponibilidadAlgunAsientoSalaVirtual(horario):
+                if self.isDisponibilidadAsientoSalaVirtual(horario):
                     filtroHorariosProxPresentaciones.append(horario)
             
             if len(filtroHorariosProxPresentaciones) == 7 : break
@@ -386,16 +381,14 @@ class Pelicula:
 #el fin de efectuar la actualización y solicitud de actualización de las salas de cine.
 
 
-    def seleccionarHorarioMasLejano(self,horario: datetime):
+    def seleccionarHorarioMasLejano(self):
         horariosPelicula = None
         isAsientosDisponibles = False
 
-        horarios = self.filtrarHorariosPelicula()
-        if len(horarios) > 0:
-            for horario in horarios:
-                isAsientosDisponibles = self.isDisponibilidadAsientoSalaVirtual(horario)
-                if isAsientosDisponibles:
-                    horarios_pelicula = horario
+        for horario in self.filtrarHorariosPelicula():
+          isAsientosDisponibles = self.isDisponibilidadAlgunAsientoSalaVirtual(horario)
+        if isAsientosDisponibles:
+           horariosPelicula = horario
 
         return horariosPelicula
         

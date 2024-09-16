@@ -592,9 +592,7 @@ class SucursalCine:
 
     def mostrarServicios(self):
         s = []
-        n = 0
-        for servicio in self._servicios:
-            n = n+1
+        for servicio in self.getServicios():
             s.append("Servicio " + servicio.getNombre())
         return s
 
@@ -634,7 +632,7 @@ class SucursalCine:
     def setCartelera(self, cartelera):
         self._cartelera = cartelera
     
-    def getCantidadTicketsGenerados(self):
+    def getCantidadTicketsCreados(self):
         return self._cantidadTicketsCreados
 
     def setCantidadTicketsCreados(self, cantidadTicketsCreados):

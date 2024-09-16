@@ -1,19 +1,21 @@
 import math
+from gestionAplicacion.usuario.ibuyable import Ibuyable
 
-class Ticket:
+class Ticket(Ibuyable):
     
 #Attributes
 ################################################
 
     _cantidadTicketsCreados = 0
 
-    def __init__(self, pelicula, horario, numeroAsiento, sucursalCompra):
+    def __init__(self, pelicula, horario, numeroAsiento, compraEnPresentacion, sucursalCompra):
         self._pelicula = pelicula
         self._horario = horario
         self._numeroAsiento = numeroAsiento
         self._sucursalCompra = sucursalCompra
         self._precio = self._clienteSuertudo()
         self._salaDeCine = pelicula.getSalaCinePresentacion()
+        self._compraEnPresentacion = compraEnPresentacion
 
         self._idTicket = 0
         self._dueno = None
@@ -31,7 +33,7 @@ class Ticket:
         :return float: Retorna un float que corresponde al precio del ticket en caso de aplicarse o no el descuento.
         """
         
-        if math.sqrt(self._sucursalCompra.getCantidadTicketsGenerados()) % 1 == 0:
+        if math.sqrt(self._sucursalCompra.getCantidadTicketsCreados()) % 1 == 0:
             if self._pelicula.getTipoDeFormato() == "4D" or self._pelicula.getTipoDeFormato() == "3D":
                 return self._pelicula.getPrecio() * 0.5
             else:
@@ -60,18 +62,41 @@ class Ticket:
         #Implementar solución para las importaciones circulares
         #cliente.getMetodosDePagoDisponibles[0].asignarMetodosDePago(cliente)
 
+        #Implementamos la lógica luego de comprar un ticket
+
+        #Añadimos el ticket a la lista de tickets del cliente y le setteamos su dueño
         cliente.getTickets().append(self)
         self._dueno = cliente
 
+        #Aumentamos la cantidad de tickets creados para aplicar los descuentos
         self._sucursalCompra.setCantidadTicketsCreados(self._sucursalCompra.getCantidadTicketsCreados() + 1)
 
+        #Setteamos su identificador único
         Ticket._cantidadTicketsCreados += 1
         self._idTicket = Ticket._cantidadTicketsCreados
 
+        #Añadimos el ticket a la lista de tickets disponibles
         self._sucursalCompra.getTicketsDisponibles().append(self)
 
+        #Modificamos la disponibilidad de asientos
+        asientoCliente = self._numeroAsiento.split('-')
+        filaAsiento = int(asientoCliente[0])
+        columnaAsiento = int(asientoCliente[1])
+
+        #Modificamos el asiento seleccionado por el cliente, accediendo a estos por medio del horario seleccionado
+        self._pelicula.modificarSalaVirtual(self._horario, filaAsiento, columnaAsiento)
+
+        #En caso de que la compra haya sido realizada en un horario en presentación, modificamos la disponibilidad del asiento en la sala
+        if self._compraEnPresentacion:
+            self._salaDeCine.getAsientos()[filaAsiento][columnaAsiento].setDisponibilidad(False)
+
+        print(self._pelicula, self._pelicula.getTipoDeFormato())
+        print(self._horario)
+        print(self._pelicula.getAsientosSalasVirtuales()[self._pelicula.getHorariosPresentacion().index(self._horario)])
+
         #Proceso para funcionalidad 2
-        #Añadir lógica descuento (Rusbel)
+        if self._horario.date() == self._sucursalCompra.getFechaActual().date():
+            self._sucursalCompra.getTicketsParaDescuento().append(self)
 
         #Proceso para funcionalidad 4
         codigoArkade = self.generarCodigoTicket()
@@ -175,8 +200,8 @@ class Ticket:
     def setSucursalCompra(self, sucursalCompra):
         self._sucursalCompra = sucursalCompra
     
-    def isDescuentos(self):
+    def isDescuento(self):
         return self._descuento
     
-    def setDescuentos(self, descuento):
+    def setDescuento(self, descuento):
         self._descuento = descuento     
