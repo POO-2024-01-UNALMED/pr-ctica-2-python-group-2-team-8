@@ -2524,38 +2524,34 @@ def ventanaDeInicio():
 
     imagenes1 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel1.png"),
-        #tk.PhotoImage(file="src/iuMain/imagenes/san1.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/a3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Juanjo1.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/a5.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/san1.png"),
     ]
 
     imagenes2 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel2.png"),
-        #tk.PhotoImage(file="src/iuMain/imagenes/san2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/b3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Juanjo2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/b5.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/san2.png"),
     ]
 
     imagenes3 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel3.png"),
-        #tk.PhotoImage(file="src/iuMain/imagenes/san3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/c3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Juanjo3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/c5.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/san3.png"),
     ]
 
     imagenes4 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel4.png"),
-        #tk.PhotoImage(file="src/iuMain/imagenes/san4.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/d3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Juanjo4.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/d5.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/san4.png"),
     ]
 
     label1 = tk.Label(frameInferiorDerechoP6, image=imagenes1[0], bd = 3, relief="solid")
