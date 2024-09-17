@@ -330,7 +330,7 @@ class SucursalCine:
         </ol>
         """
 
-        SucursalCine._fechaActual += timedelta( days = 1, seconds = 20 )
+        SucursalCine._fechaActual += timedelta( seconds = 20 )
         
         if SucursalCine._fechaActual.date() >= SucursalCine._fechaRevisionLogicaDeNegocio:
             #Avanzamos la próxima evaluación a la próxima semana
