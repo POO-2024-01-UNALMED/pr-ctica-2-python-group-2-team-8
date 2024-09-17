@@ -90,10 +90,6 @@ class Ticket(Ibuyable):
         if self._compraEnPresentacion:
             self._salaDeCine.getAsientos()[filaAsiento][columnaAsiento].setDisponibilidad(False)
 
-        print(self._pelicula, self._pelicula.getTipoDeFormato())
-        print(self._horario)
-        print(self._pelicula.getAsientosSalasVirtuales()[self._pelicula.getHorariosPresentacion().index(self._horario)])
-
         #Proceso para funcionalidad 2
         if self._horario.date() == self._sucursalCompra.getFechaActual().date():
             self._sucursalCompra.getTicketsParaDescuento().append(self)
@@ -113,7 +109,7 @@ class Ticket(Ibuyable):
 	    luego de realizar una compra.
         """
 
-        return	f"========= Factura Ticket =========\nNombre dueño : {self._dueno.getNombre()}\nDocumento : {self._dueno.getDocumento()}\nPelicula : {self._pelicula.getNombre()}\nNúmero de sala : {self._salaDeCine.getNumeroSala()}\nNúmero de asiento : {self._numeroAsiento}\nFecha Presentación: {self._horario.date()}\nHora Presentación: {self._horario.time()}\nValor ticket (IVA incluido): {self._precio}\nFecha de compra: {self._sucursalCompra.getFechaActual().date()} {self._sucursalCompra.getFechaActual().time()}\nSucursal : {self._sucursalCompra.getLugar()}"
+        return	f"========= Factura Ticket =========\nNombre dueño : {self._dueno.getNombre()}\nDocumento : {self._dueno.getDocumento()}\nPelicula : {self._pelicula.getNombre()}\nNúmero de sala : {self._salaDeCine.getNumeroSala()}\nNúmero de asiento : {self._numeroAsiento}\nFecha Presentación: {self._horario.date()}\nHora Presentación: {self._horario.time()}\nValor ticket (IVA incluido): {self._precio}\nFecha de compra: {self._sucursalCompra.getFechaActual().date()} {self._sucursalCompra.getFechaActual().time()}\nSucursal : {self._sucursalCompra.getUbicacion()}"
 
     def generarCodigoTicket(self):
 

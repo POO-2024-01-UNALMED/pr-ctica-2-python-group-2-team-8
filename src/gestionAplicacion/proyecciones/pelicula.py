@@ -183,7 +183,6 @@ class Pelicula:
         """
 
         self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)][fila - 1][columna - 1] = 1
-        print(self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)])
 
     def isDisponibilidadAsientoSalaVirtual(self, horario, fila = 100, columna = 100):
 
