@@ -22,7 +22,7 @@ from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
 from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
-from excepciones.iuExceptions import UiExceptions, UiEmptyValues, UiDefaultValues
+from src.excepciones.uiExceptions import UiExceptions, UiEmptyValues, UiDefaultValues
 from excepciones.pagosExceptions import PagosExceptions, PagoSinCompletar, CerrarPago
 from excepciones.errorAplicacion import ErrorAplicacion
 from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
@@ -2823,8 +2823,8 @@ if __name__ == '__main__':
 
     #Creamos los objetos de la lógica del proyecto
     
-    Deserializador.deserializar()
-    #objetosBasePractica2()
+    #Deserializador.deserializar()
+    objetosBasePractica2()
     #Creacion de la ventana de inicio 
     ventanaInicio = tk.Tk()
     ventanaInicio.title("Ventana de Inicio Cinemar")
