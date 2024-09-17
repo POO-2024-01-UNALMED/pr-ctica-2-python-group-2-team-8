@@ -124,7 +124,7 @@ class Deserializador:
 
         #Eliminamos los tickets caducados
         for ticket in ticketsAElimiinar:
-            SucursalCine.getTicketsDisponibles().remove(ticket)
+            sedeBase.getTicketsDisponibles().remove(ticket)
         
         #Eliminamos los tickets para descuento el día de hoy
         for sede in SucursalCine.getSucursalesCine():
@@ -134,5 +134,17 @@ class Deserializador:
             for ticket in sedeBase.getTicketsDisponibles():
                 if ticket.getSucursalCompra() is sede and ticket.getHorario().date() == sedeBase.getFechaActual().date():
                     sede.getTicketsParaDescuento().append(ticket)
+
+        #Se itera sobre las membresias para actualizar los apuntadores a los clientes que han adquirido la membresia.
+        for membresia in SucursalCine.getTiposDeMembresia():
+            clienteTemp = []
+            #Se obtiene los nuevos apuntadores para el arreglo de clientes en Membresia
+            for cliente in membresia.getClientes():
+                clienteTemp.append(SucursalCine.buscarCliente(cliente.getDocumento(), cliente.getTipoDocumento().value))
+            membresia.setClientes(clienteTemp)
+
+            #Una vez actualizado el arreglo de clientes, se actualizan los apuntadores de Membresia que tiene cada cliente.
+            for cliente in membresia.getClientes():
+                cliente.setMembresia(membresia)
         
        

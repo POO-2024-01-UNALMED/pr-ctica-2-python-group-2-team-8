@@ -1,13 +1,10 @@
 from abc import ABC, abstractmethod
+from excepciones.errorAplicacion import ErrorAplicacion
 
-class PagosExceptions(Exception, ABC):
+class PagosExceptions(ErrorAplicacion, ABC):
     
     def __init__(self, mensaje):
         super().__init__(mensaje)
-        self._mensaje = mensaje
-    
-    def mostrarMensaje(self):
-        return self._mensaje
 
 class PagoSinCompletar(PagosExceptions):
 
