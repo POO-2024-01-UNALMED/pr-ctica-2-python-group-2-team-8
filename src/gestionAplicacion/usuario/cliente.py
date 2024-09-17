@@ -35,6 +35,7 @@ class Cliente():
         self._metodosDePago = []
         self._fechaLimiteMembresia = 0
         self._puntos = 0
+        self._origenMembresia = 0
 
 
         self._cineUbicacionActual.getClientes().append(self)
@@ -296,3 +297,9 @@ class Cliente():
     
     def setPuntos(self, puntos):
         self._puntos = puntos
+
+    def getOrigenMembresia(self):
+        return self._origenMembresia
+    
+    def setOrigenMembresia(self, origenMembresia):
+        self._origenMembresia = origenMembresia

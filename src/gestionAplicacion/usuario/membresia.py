@@ -1,8 +1,10 @@
 from gestionAplicacion.sucursalCine import SucursalCine
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta, date
 from gestionAplicacion.servicios.producto import Producto
+from gestionAplicacion.usuario.ibuyable import Ibuyable
+from gestionAplicacion.usuario.metodoPago import MetodoPago
 
-class Membresia ():
+class Membresia (Ibuyable):
 
     #Inicializador
     def __init__(self, nombre, categoria, valorSuscripcionMensual, duracionMembresiaDias, tipoMembresia = 0):
@@ -12,6 +14,7 @@ class Membresia ():
         self._valorSuscripcionMensual = valorSuscripcionMensual
         self._duracionMembresiaDias = duracionMembresiaDias
         self._tipoMembresia = tipoMembresia
+        self._clientes = []
         SucursalCine.getTiposDeMembresia().append(self)
 
     #Metodos
@@ -49,7 +52,6 @@ class Membresia ():
             categoria = membresia.getCategoria()
             descuento = 0.05
             descuento+=0.05*categoria
-
             membresia.setDescuentoAsociado(descuento)
 
 
@@ -88,13 +90,6 @@ class Membresia ():
                 i+=1
                 continue
 
-            #Si el cliente ya tiene esta membresia y además, le faltan más de 5 dias para que expire, no se muestra en el menu.
-            elif(nombreMembresiaActual == productoMembresia.getNombre() and 
-                    (clienteProceso.getFechaLimiteMembresia() - timedelta(days=6)) > sucursalCineProceso.getFechaActual().date() and
-                    clienteProceso.getFechaLimiteMembresia() > sucursalCineProceso.getFechaActual().date()):
-                i+=1
-                continue
-
             elif(productoMembresia.getNombre() == "Challenger" or productoMembresia.getNombre() == "Radiante"):
                     if (productoMembresia.getNombre() == "Challenger"):
                         texto = f"Categoría {i}. {productoMembresia.getNombre()}. Requisitos: {int(productoMembresia.getPrecio())} puntos y peliculas vistas: 10"
@@ -126,7 +121,7 @@ class Membresia ():
         puntos = 0.0
         for metodoPago in clienteProceso.getMetodosDePago():
             if (metodoPago.getNombre() == "Puntos"):
-                puntos = metodoPago
+                puntos = metodoPago.getLimiteMaximoPago()
                 break
             else:
                 puntos = clienteProceso.getPuntos()
@@ -155,7 +150,7 @@ class Membresia ():
 
         #En caso de realizar la renovación de la misma membresia.
         elif (clienteProceso.getMembresia() != None and
-              (clienteProceso.getFechaLimiteMembresia() - datetime(6))> SucursalCine.getFechaActual and
+              (clienteProceso.getFechaLimiteMembresia() - timedelta(days=6)) < sucursalCineProceso.getFechaActual().date() and
               clienteProceso.getMembresia().getCategoria() == categoriaSeleccionada):
             if (categoriaSeleccionada == 1):
                 esValido = True
@@ -222,6 +217,7 @@ class Membresia ():
             #Por cada membresia, se crea un producto de este tipo y se añade al inventario de la sucursal.
             for membresia in SucursalCine.getTiposDeMembresia():
                 membresiaSucursal = Producto(nombre=membresia.getNombre(), cantidad=i, tipoProducto="Membresia", precio=puntos, sucursalSede=sucursalCine)
+                sucursalCine.getInventarioCine().append(membresiaSucursal)
                 puntos+=5000
                 i-=10
             #Se reinicia el contador de cantidad y puntos cada vez que se itere a una nueva sucursal de la lista.
@@ -264,3 +260,67 @@ class Membresia ():
     
     def setDescuentoAsociado(self, descuentoAsociado):
         self._descuentoAsociado = descuentoAsociado
+
+    def getClientes(self):
+        return self._clientes
+    
+    def setClientes(self, clientes):
+        self._clientes = clientes
+
+    #Métodos de Ibuyable
+    def procesarPagoRealizado(self, clienteProceso):
+        #Se asigna la referencia de la membresia adquirida en el cliente y se actualizan sus métodos de pago.
+        isPrimerMembresia = False
+
+        #Si el cliente no tiene membresia al momento de la compra, se le asigna y se cambia el boolean.
+        if (clienteProceso.getMembresia() == None):
+            clienteProceso.setMembresia(self)
+            clienteProceso.setOrigenMembresia(clienteProceso.getCineUbicacionActual().getIdSucursal())
+            clienteProceso.setFechaLimiteMembresia(clienteProceso.getCineUbicacionActual().getFechaActual().date() + timedelta(self._duracionMembresiaDias))
+            isPrimerMembresia = True
+
+        #Si el cliente va a cambiar a otra membresia, se vuelve el stock a la sucursal original y luego se asigna la sucursal donde realizó el pago.
+        elif(clienteProceso.getMembresia().getNombre() != (self.getNombre())):
+            for sucursalCine in SucursalCine.getSucursalesCine():
+                if (sucursalCine.getIdSucursal() == clienteProceso.getOrigenMembresia()):
+                    for producto in sucursalCine.getInventarioCine():
+                        if (producto.getNombre() == clienteProceso.getMembresia().getNombre()):
+                            producto.setCantidad(producto.getCantidad() + 1)
+                            break
+                    break
+            clienteProceso.setMembresia(self)
+            clienteProceso.setOrigenMembresia(clienteProceso.getCineUbicacionActual().getIdSucursal())
+            clienteProceso.setFechaLimiteMembresia(clienteProceso.getFechaLimiteMembresia() + timedelta(self._duracionMembresiaDias))
+            isPrimerMembresia = False
+
+        #En caso de tener una membresia se puede renovar y no se resta el stock de su inventario por lo que ya esta asignada.
+        else:
+            clienteProceso.setFechaLimiteMembresia(clienteProceso.getFechaLimiteMembresia() + timedelta(self._duracionMembresiaDias))
+            clienteProceso.getMembresia().getClientes().remove(clienteProceso)
+
+        #Se va al inventario del cine para restar la cantidad de membresias si el cliente no esta renovando.
+        if (self.getNombre() == clienteProceso.getMembresia().getNombre() and isPrimerMembresia == False):
+            for productoMembresia in clienteProceso.getCineUbicacionActual().getInventarioCine():
+                if (productoMembresia.getNombre() == self.getNombre()):
+                    productoMembresia.setCantidad(productoMembresia.getCantidad() - 1)
+                    break
+        
+        #Al adquirir la membresia, se crea y asigna un método de pago único que permite acumular puntos canjeables con compras en el cine.
+        MetodoPago.asignarMetodosDePago(clienteProceso)
+
+        #Se pasa la referencia de la membresia al cliente que lo compró y se agrega este último al array de clientes en Membresia
+        self.getClientes().append(clienteProceso)
+
+    def factura(self):
+        factura = (
+            "                          CINEMAR \n"
+            "==================== Factura de Membresia ====================\n"
+            f" Nombre dueño: {self.getClientes()[-1].getNombre()}\n"
+            f" Fecha de compra: {datetime.today()}\n"
+            f" Membresia: {self.getNombre()}\n"
+            f" Categoría: {self.getCategoria()}\n"
+            f" Tipo: {self.getTipoMembresia()}\n"
+            f" Total pagado aplicando descuentos : ${Ibuyable.getPrecioTotal(Ibuyable)}\n"
+            "===========================================================\n"
+        )
+        return factura
