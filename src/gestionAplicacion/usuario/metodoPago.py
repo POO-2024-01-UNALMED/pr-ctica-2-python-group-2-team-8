@@ -1,16 +1,16 @@
-from gestionAplicacion.sucursalCine import SucursalCine
-
 class MetodoPago():
 
     #Inicializador
-    def __init__(self, nombre, descuentoAsociado, limiteMaximoPago, tipo = 0):
+    def __init__(self, nombre, descuentoAsociado, limiteMaximoPago, sucursalCine, tipo = 0):
         self._nombre = nombre
         self._descuentoAsociado = descuentoAsociado
         self._limiteMaximoPago = limiteMaximoPago
         self._tipo = tipo
+        self._sucursalCine = sucursalCine
 
         if (nombre != "Puntos"):
-            SucursalCine.getMetodosDePagoDisponibles().append(self)
+            print(self._sucursalCine)
+            self._sucursalCine.getMetodosDePagoDisponibles().append(self)
 
 
     #Metodos
@@ -77,10 +77,10 @@ class MetodoPago():
             tipoMembresiaInt = tipoMembresia.getTipoMembresia()
             if (puntos == None):
                 clienteProceso.setPuntos(2500)
-                puntos = MetodoPago("Puntos", 0.0, clienteProceso.getPuntos(), tipoMembresiaInt)
+                puntos = MetodoPago("Puntos", 0.0, clienteProceso.getPuntos(), clienteProceso.getCineUbicacionActual(), tipoMembresiaInt)
 
         #Se realiza un ciclo para filtrar los métodos de pago por el tipoMembresia del cliente y se añaden sus lista de métodos de pago.
-        for metodoPago in SucursalCine.getMetodosDePagoDisponibles():
+        for metodoPago in clienteProceso.getCineUbicacionActual().getMetodosDePagoDisponibles():
             if (tipoMembresiaInt == metodoPago.getTipo()):
                 clienteProceso.getMetodosDePago().append(metodoPago)
 
@@ -107,7 +107,7 @@ class MetodoPago():
             tipo = metodoPago.getTipo() + i
             descuentoAsociado = metodoPago.getDescuentoAsociado() + 0.05 * tipo
             limiteMaximoPago = metodoPago.getLimiteMaximoPago() + 25000 * tipo
-            MetodoPago(nombre, descuentoAsociado, limiteMaximoPago, tipo)
+            MetodoPago(nombre, descuentoAsociado, limiteMaximoPago, metodoPago._sucursalCine, tipo)
 
 
     @classmethod
@@ -146,43 +146,48 @@ class MetodoPago():
             valorAPagar = 0
 
         #Cuando el método usado sea efectivo, no se pasará a usados y no se acumularan los puntos por la logica de negocios gracias a los convenios.
-        if (self.getNombre == "Efectivo"):
+        if (self.getNombre() == "Efectivo"):
             return valorAPagar
         
         #Cuando el método sea Puntos, se realiza el descuento de esos puntos en el saldo.
-        if (self.getNombre == "Puntos"):
+        if (self.getNombre() == "Puntos"):
             self.setLimiteMaximoPago(self.getLimiteMaximoPago() - precio)
-            if (self.getLimiteMaximoPago < 0):
+            if (self.getLimiteMaximoPago() < 0):
                 self.setLimiteMaximoPago(0)
             return valorAPagar
         
         #Se verifica si el cliente tiene membresia para realizar la acumulación de puntos
         membresia = clienteProceso.getMembresia()
         tipoMembresia = 0
-        if (membresia != None and self.getNombre != "Puntos"):
+        if (membresia != None and self.getNombre() != "Puntos"):
             tipoMembresia = clienteProceso.getMembresia().getTipoMembresia()
             puntos = None
             for metodoPago in clienteProceso.getMetodosDePago():
-                if (metodoPago.getNombre == "Puntos"):
+                if (metodoPago.getNombre() == "Puntos"):
                     puntos = metodoPago
+                    print("Entroo")
+                    print(puntos.getNombre())
                     break
 
         #Partimos de 1 para contar el método de pago puntos
         totalMetodosDePagoPorTipo = 1
 
         #Se realiza un ciclo para contar los métodos de pago por el tipoMembresia del cliente
-        for metodoPago in SucursalCine.getMetodosDePagoDisponibles():
-            if (tipoMembresia == metodoPago.getTipo):
+        for metodoPago in self._sucursalCine.getMetodosDePagoDisponibles():
+            if (tipoMembresia == metodoPago.getTipo()):
                 totalMetodosDePagoPorTipo+=1
+
+        print(totalMetodosDePagoPorTipo)
 
         #En caso de que el cliente no pudo cubrir la totalidad del pago y se haya llegado al limite de ese método de pago,
 		#la acumulación de puntos solo se hara sobre el primer precio calculado luego del descuento. Los siguientes pagos ya estan cubiertos.
         if (len(clienteProceso.getMetodosDePago()) == totalMetodosDePagoPorTipo):
             if (tipoMembresia == 1):
-                puntos.setLimiteMaximoPago(puntos.getLimiteMaximoPago() + (precio * (1- self.getDescuentoAsociado)) * 0.05)
+                puntos.setLimiteMaximoPago(puntos.getLimiteMaximoPago() + (precio * (1- self.getDescuentoAsociado())) * 0.05)
+                print(puntos.getLimiteMaximoPago())
             elif (tipoMembresia == 2):
-                puntos.setLimiteMaximoPago(puntos.getLimiteMaximoPago() + (precio * (1- self.getDescuentoAsociado)) * 0.10)
-            clienteProceso.setPuntos(int(puntos.getLimiteMaximoPago))
+                puntos.setLimiteMaximoPago(puntos.getLimiteMaximoPago() + (precio * (1- self.getDescuentoAsociado())) * 0.10)
+            clienteProceso.setPuntos(int(puntos.getLimiteMaximoPago()))
 
         #Eliminamos su referencia de los metodos de pago asociados al cliente
         clienteProceso.getMetodosDePago().remove(self)
@@ -215,3 +220,9 @@ class MetodoPago():
     
     def setLimiteMaximoPago(self, limiteMaximoPago):
         self._limiteMaximoPago = limiteMaximoPago
+
+    def getSucursalCine(self):
+        return self._sucursalCine
+    
+    def setSucursalCine(self, sucursalCine):
+        self._sucursalCine = sucursalCine
