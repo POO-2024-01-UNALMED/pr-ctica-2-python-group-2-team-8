@@ -38,3 +38,16 @@ class ServicioComida(Servicio):
 
     def procesarPagoRealizado(self, cliente):
         self.descuento = True
+        for productoOrden in self.orden:
+            validacionIngresoHistorial = True
+            for productoHistorial in cliente.getHistorialDePedidos():
+                if (productoOrden.nombre.lower() == productoHistorial.nombre.lower() and
+                    productoOrden.tamaño.lower() == productoHistorial.tamaño.lower()):
+                    validacionIngresoHistorial = False
+                    break
+            if validacionIngresoHistorial:
+                cliente.getProductosDisponiblesParaCalificar().append(productoOrden)
+                cliente.getHistorialDePedidos().append(productoOrden)
+
+
+        
