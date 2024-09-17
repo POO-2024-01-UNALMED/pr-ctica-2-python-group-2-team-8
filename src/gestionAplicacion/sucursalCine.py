@@ -89,7 +89,7 @@ class SucursalCine:
                 
                 for horario in horariosAEliminar:
 
-                    pelicula.getAsientosSalasVirtuales().pop(pelicula.getHorariosPresentacion().indexOf(horario))
+                    pelicula.getAsientosSalasVirtuales().pop(pelicula.getHorariosPresentacion().index(horario))
                     pelicula.getHorariosPresentacion().remove(horario)
 
     def _crearHorariosPeliculasPorSala(self):
@@ -254,22 +254,21 @@ class SucursalCine:
 	    <li>Elimina los horarios de películas que ya no serán presentados.</li>
 	    </ol>
         """
-        
+        SucursalCine._dropHorariosVencidos()
+
         ticketsAEliminar = []
 
         for sede in SucursalCine._sucursalesCine:
 
             sede._ticketsParaDescuento.clear()
 
-            for ticket in sede._ticketsDisponibles:
+            for ticket in SucursalCine._ticketsDisponibles:
                 
                 if ticket.getSucursalCompra() == sede._ubicacion and ticket.getHorario().date() == SucursalCine._fechaActual.date():
                     sede._ticketsParaDescuento.append(ticket)
 
-                if (ticket.getHorario() + ticket.getPelicula().getDuracion) < SucursalCine._fechaActual:
+                if (ticket.getHorario()).date() < SucursalCine._fechaActual.date():
                     ticketsAEliminar.append(ticket)
-                
-        SucursalCine._dropHorariosVencidos()
 
         for ticket in ticketsAEliminar:
             SucursalCine._ticketsDisponibles.remove(ticket)
@@ -332,20 +331,24 @@ class SucursalCine:
         """
 
         SucursalCine._fechaActual += timedelta( seconds = 20 )
-
+        print(SucursalCine._fechaActual.date(), SucursalCine._fechaRevisionLogicaDeNegocio, SucursalCine._fechaValidacionNuevoDiaDeTrabajo)
         if SucursalCine._fechaActual.date() >= SucursalCine._fechaRevisionLogicaDeNegocio:
+            print('Lógica semanal aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
             #Avanzamos la próxima evaluación a la próxima semana
             SucursalCine._fechaRevisionLogicaDeNegocio = (self._fechaActual + timedelta( weeks = 1 )).date()
             #Ejecutamos la lógica semanal
             SucursalCine.logicaSemanalSistemNegocio()
         
         if SucursalCine._fechaActual.date() >= SucursalCine._fechaValidacionNuevoDiaDeTrabajo:
+            print(type(SucursalCine._fechaActual.date()), 'Lógica diaria aaaaaaaaaaaaaaaaaaaaaaaaaaaaa', type(SucursalCine._fechaRevisionLogicaDeNegocio))
             #Avanzamos la próxima evaluación al día siguiente
-            SucursalCine._fechaRevisionLogicaDeNegocio = (SucursalCine._fechaActual + timedelta( days = 1)).date()
+            SucursalCine._fechaRevisionLogicaDeNegocio = (SucursalCine._fechaActual + timedelta( days = 1 )).date()
             #Ejecutamos la lógica diaria
             SucursalCine.logicaDiariaReservarTicket()
+            print('Lógica diaria aaaaaaaaaaaaaaaaaaaaaaaaaaaaa', SucursalCine._fechaRevisionLogicaDeNegocio)
         
         if SucursalCine._fechaActual.time() >= SucursalCine._INICIO_HORARIO_LABORAL and SucursalCine._fechaActual.time() < SucursalCine._FIN_HORARIO_LABORAL:
+            print('Lógica jornada laboral aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
             SucursalCine.actualizarPeliculasSalasDeCine()
 
     @classmethod

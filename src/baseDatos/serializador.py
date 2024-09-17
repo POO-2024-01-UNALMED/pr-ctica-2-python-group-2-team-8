@@ -29,7 +29,7 @@ class Serializador:
 
             #Serializa los principales atributos de instancia
             Serializador.serializarListaInstancia(sucursal, 'bonos', sucursal.getBonosCreados())
-            Serializador.serializarListaInstancia(sucursal, 'cantidadTicketsCreados', sucursal.getCantidadTicketsGenerados())
+            Serializador.serializarListaInstancia(sucursal, 'cantidadTicketsCreados', sucursal.getCantidadTicketsCreados())
             Serializador.serializarListaInstancia(sucursal, 'inventarioCine', sucursal.getInventarioCine())
             Serializador.serializarListaInstancia(sucursal, 'lugar', sucursal.getUbicacion())
             Serializador.serializarListaInstancia(sucursal, 'salasDeCine', sucursal.getSalasDeCine())

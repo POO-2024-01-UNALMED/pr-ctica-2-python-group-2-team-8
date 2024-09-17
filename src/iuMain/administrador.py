@@ -1205,8 +1205,12 @@ class FrameFuncionalidad1(FieldFrame):
                         return 
                 
                 #Ingresamos al frame seleccionado por el usuario
+                self.refrescarFramesFuncionalidad1()
                 self._framesFuncionalidad1[eleccionUsuario].mostrarFrame()
-     
+    
+    def refrescarFramesFuncionalidad1(self):
+        self._framesFuncionalidad1 = [FrameReservarTicket(self), FrameIngresoASalaCine(self), FrameSalaDeEspera(self)]
+
     #Crear el frame inical de mi funcionalidad (Crear estándar visual frame para ello) (Mas o menos hecho)
     #Separar por módulos la lógica de cada funcionalidad
     #Definir lógica de procesos de pago (Con Gerson)
@@ -1375,7 +1379,7 @@ class FrameSeleccionarAsiento(FieldFrame):
     def setColumnas(self, evento):
         self._filaSeleccionada = int(self._comboBoxFilas.get())
 
-        self._comboBoxCols.configure(values = Pelicula.asientosDisponibles(self._filaSeleccionada, self._asientosPelicula), state = 'readonly')
+        self._comboBoxCols.configure(values = Pelicula.asientosDisponibles(self._filaSeleccionada - 1, self._asientosPelicula), state = 'readonly')
 
     def funBorrar(self):
         #Setteamos los valores por defecto de cada comboBox
@@ -1406,10 +1410,11 @@ class FrameSeleccionarAsiento(FieldFrame):
 
                     #Notificamos al cliente en caso de recibir el descuento
                     if ticketProceso.getPrecio() != self._peliculaProceso.getPrecio():
-                        messagebox.showinfo('¡FELICITACIONES!', f'Por ser el cliente número: {clienteProceso.getCineUbicacionActual().getCantidadTicketsGenerados()} has recibido un descuento del {'80%' if self._peliculaProceso.getTipoDeFormato() == '2D' else '50%'}')
+                        messagebox.showinfo('¡FELICITACIONES!', f'Por ser el cliente número: {clienteProceso.getCineUbicacionActual().getCantidadTicketsCreados()} has recibido un descuento del {'80%' if self._peliculaProceso.getTipoDeFormato() == '2D' else '50%'}')
 
                     #Ingresamos a la pasarela de pago
-                    pass
+                    frameSiguiente = FrameFuncionalidad1()
+                    FramePasarelaDePagos(frameSiguiente, ticketProceso.getPrecio(), ticketProceso).mostrarFrame()
 
 class FrameIngresoASalaCine(FieldFrame):
     
@@ -1909,14 +1914,6 @@ def objetosBasePractica2():
     game4 = Arkade("Hang Man", 30000.0, "Comedia");
     game5 = Arkade("Hang Man", 7500.0, "Drama");
 
-        #Para descuento con pelicula
-    ticket2 = Ticket(pelicula2_6, datetime(2024, 9, 16, 12, 20, 0), '1-4', False, sucursalCine2)
-    ticket2.setDueno(cliente1)
-    ticket2.setSucursalCompra(sucursalCine2)
-    ticket2.setSalaDeCine(salaDeCine2_4)
-    cliente1.getTickets().append(ticket2)
-    sucursalCine2.getTicketsParaDescuento().append(ticket2)
-
     Membresia.stockMembresia(SucursalCine.getSucursalesCine())
 
     #cliente1.setMembresia(membresia5)
@@ -1952,12 +1949,9 @@ def objetosBasePractica2():
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
-    ticket = Ticket(pelicula1_2, datetime(2024, 9, 16, 12, 20, 0), '4-4', False, sucursalCine1)
-    ticket.procesarPagoRealizado(cliente2)
-
-    cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
-    cliente4.setCodigosDescuento([ticket.generarCodigoTicket()])
-    cliente4.getCuenta().setSaldo(500000)
+    #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
+    #cliente4.setCodigosDescuento([ticket.generarCodigoTicket()])
+    #cliente4.getCuenta().setSaldo(500000)
 
 
 def ventanaDeInicio(): 
