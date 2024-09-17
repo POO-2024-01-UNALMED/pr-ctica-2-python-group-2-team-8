@@ -2525,7 +2525,7 @@ def objetosBasePractica2():
 
 
     for sucursal in SucursalCine.getSucursalesCine():
-        for i in range (10):
+        for i in range (20):
             sucursal.getTarjetasCinemar().append(TarjetaCinemar())
     
     #print(len(sucursalCine1.getTarjetasCinemar()), len(sucursalCine2.getTarjetasCinemar()), len(sucursalCine1.getTarjetasCinemar()) ) 
