@@ -272,8 +272,6 @@ class FrameReclamoDeBonos(FieldFrame):
             habilitado = [False],
         )
 
-        print(servicio.mostrarBonos(self._servicio))
-
         tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("courier new",14), anchor="center", bg = "#F0F8FF" )
         tituloV.grid(column=2, row=2, padx = (10,10), pady = (10,10))
 
@@ -311,7 +309,6 @@ class FrameReclamoDeBonos(FieldFrame):
                     else:
                         self._servicio.agregarOrden(pro.getProducto())
                         self._servicio.setBonosCliente([])
-                        print(self._servicio._sucursalUbicacion.getBonosCreados())
                         self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
                         FrameReclamoDeBonos(self._servicio).mostrarFrame()
 
@@ -333,9 +330,6 @@ class FrameGeneracionDeProductos(FieldFrame):
 
         self._sucursalActual = self._clienteProceso.getCineUbicacionActual()
         servicio._sucursalUbicacion = self._sucursalActual
-
-        for i in  servicio._sucursalUbicacion.getBonosCreados():
-            print(i.getProducto().getNombre())
 
         self._servicio = servicio
         servicio.setCliente(self._clienteProceso)
@@ -386,17 +380,17 @@ class FrameGeneracionDeProductos(FieldFrame):
         if self.evaluarExcepciones():
             producto = self._servicio.hacerPedido(self.getElementosInteractivos()[0].current() ,int(self._elementosInteractivos[1].get()),self._clienteProceso.getCineUbicacionActual())
             cantidad = int(self._elementosInteractivos[1].get())
-            print("Entro F")
+
             for p in self._servicio.getOrden():
-                print("Entro FFF")
+
                 if p.getNombre() == producto.getNombre() and p.getCantidad()>=cantidad and p.getTamaño() == producto.getTamaño():
-                    print("Entro F12")
+
                     if p.getCantidad()==cantidad:
-                        print("Entro F121")
+
                         self._servicio.getOrden().remove(p)
                         self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].setCantidad( self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].getCantidad() + (cantidad*2))
                     else:
-                        print("Entro F122")
+ 
                         p.setCantidad(p.getCantidad()-cantidad)
                         p.setPrecio(p.getPrecio()-(self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].getPrecio()*cantidad))
                         self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].setCantidad( self._servicio.getInventario()[self.getElementosInteractivos()[0].current()].getCantidad() + (cantidad*2))
@@ -419,8 +413,6 @@ class FrameFuncionalidad2(FieldFrame):
 
         self._sucursalActual = self._clienteProceso.getCineUbicacionActual()
 
-        for i in  self._sucursalActual.getBonosCreados():
-            print(i.getProducto().getNombre())
 
         super().__init__(
             tituloProceso = "Generacion de orden",
@@ -560,11 +552,11 @@ class FrameVentanaPrincipal(FieldFrame):
         self._labelImagen = tk.Label(self, image = self._imagenFramePrincipal)
         self._labelImagen.grid(row=0, column=0)
 
-        print(FieldFrame.getFrameMenuPrincipal())
+
 
         FieldFrame.setFrameMenuPrincipal(self)
 
-        print(FieldFrame.getFrameMenuPrincipal())
+
 
         #Se buscan los widget que tenga FieldFrame y se eliminan para este frame.
         for widget in self.winfo_children():
@@ -575,9 +567,9 @@ class FrameVentanaPrincipal(FieldFrame):
         self._menuArchivo = None
         self._menuProcesosConsultas = None
         self._menuAyuda = None
-        print(FieldFrame.getClienteProceso())
+
         self._clienteProceso = FieldFrame.getClienteProceso()
-        print(FieldFrame.getClienteProceso())
+
     def construirMenu(self):
         self._barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Times New Roman", 10))
         ventanaLogicaProyecto.config(menu=self._barraMenuPrincipal)
@@ -630,9 +622,9 @@ class FrameVentanaPrincipal(FieldFrame):
         SucursalCine.notificarFechaLimiteMembresia(self._clienteProceso)
 
         if self._clienteProceso.getMembresia() != None:
-            print(self._clienteProceso.getFechaLimiteMembresia())
+
             diasRestantes = self.evaluarDiasRestantes()
-            print(diasRestantes)
+
             if diasRestantes < 6:
                 try:
                     raise ExpiredMembershipException(diasRestantes)
@@ -2648,21 +2640,14 @@ def objetosBasePractica2():
 
 
 
-    #La mala para el que hizo eso me hizo estar buscando esto por media hora .l. atentamente Rusbel
-    #cliente1.setCineUbicacionActual(sucursalCine1)
-    
-    #for metodoPago in SucursalCine.getMetodosDePagoDisponibles():
-        #print(metodoPago.getNombre(), metodoPago.getTipo(), metodoPago.getDescuentoAsociado())
 
-    #print(cliente1.getMembresia().getTipoMembresia())
-    #print(MetodoPago.mostrarMetodosDePago(cliente1))
 
 
     for sucursal in SucursalCine.getSucursalesCine():
         for i in range (20):
             sucursal.getTarjetasCinemar().append(TarjetaCinemar())
     
-    #print(len(sucursalCine1.getTarjetasCinemar()), len(sucursalCine2.getTarjetasCinemar()), len(sucursalCine1.getTarjetasCinemar()) ) 
+    
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
