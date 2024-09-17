@@ -50,7 +50,7 @@ class Bono(Ibuyable):
     code = Bono.generarCodigoAleatorio(7)
 
     productoSeleccionado = productosComida[numeroAleatorio]
-    productoBono = Producto(productoSeleccionado.getNombre(),productoSeleccionado.getTamaño(),1,productoSeleccionado.getPrecio(),"comida")
+    productoBono = Producto(productoSeleccionado.getNombre(),productoSeleccionado.getTamaño(),1,0,"comida")
 
     bono = Bono(code, productoBono, productoSeleccionado.getTipoProducto(), cliente)
     productosComida[numeroAleatorio].setCantidad(productosComida[numeroAleatorio].getCantidad()-1)
@@ -90,7 +90,7 @@ class Bono(Ibuyable):
     code = Bono.generarCodigoAleatorio(7)
 
     productoSeleccionado = productosSouvenirs[numeroAleatorio]
-    productoBono = Producto(productoSeleccionado.getNombre(),productoSeleccionado.getTamaño(),1,productoSeleccionado.getPrecio(),"souvenir")
+    productoBono = Producto(productoSeleccionado.getNombre(),productoSeleccionado.getTamaño(),1,0,"souvenir")
 
     bono = Bono(code, productoBono, productoSeleccionado.getTipoProducto(), cliente)
     productosSouvenirs[numeroAleatorio].setCantidad(productosSouvenirs[numeroAleatorio].getCantidad()-1)
