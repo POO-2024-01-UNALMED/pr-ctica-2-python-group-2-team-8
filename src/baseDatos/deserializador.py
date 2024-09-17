@@ -2,6 +2,8 @@ import pickle
 from gestionAplicacion.sucursalCine import SucursalCine
 import os
 
+
+
 class Deserializador:
     
     #Creamos un método base que deserializa el primer elemento
