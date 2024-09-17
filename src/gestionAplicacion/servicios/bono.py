@@ -12,8 +12,6 @@ class Bono(Ibuyable):
     self._cliente = cliente
     cliente.getCineUbicacionActual().getBonosCreados().append(self)
 
-    self._dueno = None
-
   def factura(self):
         """
         :Description: Este método se encarga de retornar un string que contiene toda la información del ticket en forma de factura.
@@ -52,7 +50,7 @@ class Bono(Ibuyable):
     code = Bono.generarCodigoAleatorio(7)
 
     productoSeleccionado = productosComida[numeroAleatorio]
-    productoBono = Producto(productoSeleccionado.getNombre(),productoSeleccionado.getTamaño(),1,productoSeleccionado.getPrecio(),"comida")
+    productoBono = Producto(productoSeleccionado.getNombre(),productoSeleccionado.getTamaño(),"comida",0,1)
 
     bono = Bono(code, productoBono, productoSeleccionado.getTipoProducto(), cliente)
     productosComida[numeroAleatorio].setCantidad(productosComida[numeroAleatorio].getCantidad()-1)
@@ -92,7 +90,7 @@ class Bono(Ibuyable):
     code = Bono.generarCodigoAleatorio(7)
 
     productoSeleccionado = productosSouvenirs[numeroAleatorio]
-    productoBono = Producto(productoSeleccionado.getNombre(),productoSeleccionado.getTamaño(),1,productoSeleccionado.getPrecio(),"souvenir")
+    productoBono = Producto(productoSeleccionado.getNombre(),productoSeleccionado.getTamaño(),"souvenir",0,1)
 
     bono = Bono(code, productoBono, productoSeleccionado.getTipoProducto(), cliente)
     productosSouvenirs[numeroAleatorio].setCantidad(productosSouvenirs[numeroAleatorio].getCantidad()-1)

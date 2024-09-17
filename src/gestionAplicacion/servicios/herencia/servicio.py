@@ -2,8 +2,9 @@ from abc import ABC, abstractmethod
 import random
 from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.servicios.producto import Producto
+from gestionAplicacion.usuario.ibuyable import Ibuyable
 
-class Servicio (ABC):
+class Servicio (ABC, Ibuyable):
     cliente  = None
     descuento = True
     def __init__(self, nombre, sucursalUbicacion):
@@ -34,8 +35,13 @@ class Servicio (ABC):
         return b
 
     def actualizarBonos(self):
-        for bono in self.cliente.getCineUbicacionActual().getBonosCreados():
-            if bono.getTipoServicio() == self.getNombre() and bono.getCliente() == self.cliente:
+        print("No entro")
+        for bono in self._sucursalUbicacion.getBonosCreados():
+            print("Entro")
+            print(bono.getTipoServicio(),  self.getNombre())
+            print(bono.getCliente().getNombre(), self.cliente.getNombre())
+            if bono.getTipoServicio() == self.getNombre() and bono.getCliente().getNombre() == self.cliente.getNombre():
+                print("Entro----------")
                 self.getBonosCliente().append(bono) 
 
     def descuentarPorGenero(self, cine):
@@ -63,7 +69,8 @@ class Servicio (ABC):
             n=1
             for p in self._orden:
                 if producto.getNombre() == p.getNombre() and producto.getTamaño() == p.getTamaño():
-                    p.setCantidad(p.getCantidad() + producto.getCantidad())
+                    print(producto.getCantidad())
+                    p.setCantidad(int(p.getCantidad()) + int(producto.getCantidad()))
                     p.setPrecio(p.getPrecio() + producto.getPrecio())
                     break
                 elif len(self._orden) == n:
