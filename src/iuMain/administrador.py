@@ -2095,6 +2095,9 @@ class FramePasarelaDePagos(FieldFrame):
                     mensaje+=elementoIbuyable.factura()
                 messagebox.showinfo(title="Pago realizado", message= f"Pago realizado exitosamente. \n{mensaje}")
                 MetodoPago.asignarMetodosDePago(self.getClienteProceso())
+                if isinstance(self._elementosIbuyable[0], Servicio):
+                    self._elementosIbuyable[0].setOrden([])
+                    self._elementosIbuyable[0].setValorPedido(0)
                 self._frameSiguiente.mostrarFrame()
 
         
