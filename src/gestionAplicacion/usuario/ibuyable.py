@@ -1,11 +1,7 @@
-from abc import ABC, abstractmethod
+class Ibuyable():
 
-class Ibuyable(ABC):
-
-    @abstractmethod
     def procesarPagoRealizado(self, cliente):
         pass
     
-    @abstractmethod
     def factura(self):
         pass

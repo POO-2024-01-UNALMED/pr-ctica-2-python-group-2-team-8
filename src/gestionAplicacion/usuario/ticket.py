@@ -58,7 +58,7 @@ class Ticket(Ibuyable):
 	    :param cliente: Se pide como parámetro el cliente (De tipo Cliente) que realizó exitosamente el pago.
         :type cliente: Cliente
         """
-        
+
         #Implementar solución para las importaciones circulares
         #cliente.getMetodosDePagoDisponibles[0].asignarMetodosDePago(cliente)
 
@@ -88,7 +88,7 @@ class Ticket(Ibuyable):
 
         #En caso de que la compra haya sido realizada en un horario en presentación, modificamos la disponibilidad del asiento en la sala
         if self._compraEnPresentacion:
-            self._salaDeCine.getAsientos()[filaAsiento][columnaAsiento].setDisponibilidad(False)
+            self._salaDeCine.getAsientos()[filaAsiento - 1][columnaAsiento - 1].setDisponibilidad(False)
 
         #Proceso para funcionalidad 2
         if self._horario.date() == self._sucursalCompra.getFechaActual().date():

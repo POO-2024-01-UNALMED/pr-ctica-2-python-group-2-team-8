@@ -605,12 +605,11 @@ class FrameVentanaPrincipal(FieldFrame):
         
         if noHayHorariosPresentaciones:
             messagebox.showinfo('Actualización fecha y hora', 'Hemos detectado que han concluido todas las presentaciones del día de hoy, por lo tanto, se pasará al dia siguiente de forma automática. Gracias por su compresión\n')
-            sucursalCineActual.setFechaActual((sucursalCineActual.getFechaActual() + timedelta( days = 1 )).replace(hours = 10, minutes = 0, seconds = 0)) #Inicio de la jornada laboral al otro día
+            sucursalCineActual.setFechaActual((sucursalCineActual.getFechaActual() + timedelta( days = 1 )).replace(hour = SucursalCine.getInicioHorarioLaboral().hour, minute = SucursalCine.getInicioHorarioLaboral().minute)) #Inicio de la jornada laboral al otro día
     
         sucursalCineActual.avanzarTiempo() #Avanzamos el tiempo y ejecutamos lógica semenal o diaria según el caso
         self.logicaMembresia()
         self.refrescarFramesFuncionalidades() #Actualizamos los frames, ya que se han visto modificados por el avance de tiempo
-        print(sucursalCineActual.getFechaActual())
     
     def logicaMembresia(self):
         pass
@@ -1458,7 +1457,6 @@ class FrameFuncionalidad1(FieldFrame):
         self._clienteProceso.getCineUbicacionActual().avanzarTiempo()
         #Definimos los frames a usar durante el desarrollo de la funcionalidad 1
         self._framesFuncionalidad1 = [FrameReservarTicket(self), FrameIngresoASalaCine(self), FrameSalaDeEspera(self)]
-        
 
         #Usamos el constructor de FieldFrame
         super().__init__(
@@ -1502,7 +1500,10 @@ class FrameFuncionalidad1(FieldFrame):
                 
                 #Ingresamos al frame seleccionado por el usuario
                 self.refrescarFramesFuncionalidad1()
-                self._framesFuncionalidad1[eleccionUsuario].mostrarFrame()
+                if len(Pelicula.filtrarCarteleraPorCliente(self._clienteProceso)) > 0:
+                    self._framesFuncionalidad1[eleccionUsuario].mostrarFrame()
+                else:
+                    FieldFrame.getFrameMenuPrincipal().avanzarDia()
     
     def refrescarFramesFuncionalidad1(self):
         self._framesFuncionalidad1 = [FrameReservarTicket(self), FrameIngresoASalaCine(self), FrameSalaDeEspera(self)]
@@ -2102,11 +2103,10 @@ class FramePasarelaDePagos(FieldFrame):
             else:
                 mensaje = ""
                 for elementoIbuyable in self._elementosIbuyable:
-                    mensaje+=elementoIbuyable.factura()
                     elementoIbuyable.procesarPagoRealizado(self.getClienteProceso())
+                    mensaje+=elementoIbuyable.factura()
                 messagebox.showinfo(title="Pago realizado", message= f"Pago realizado exitosamente. \n{mensaje}")
                 MetodoPago.asignarMetodosDePago(self.getClienteProceso())
-                self._elementosIbuyable[0].procesarPagoRealizado(self._clienteProceso)
                 self._frameSiguiente.mostrarFrame()
 
 
@@ -2481,8 +2481,8 @@ if __name__ == '__main__':
 
     #Creamos los objetos de la lógica del proyecto
     
-    objetosBasePractica2()
-    #Deserializador.deserializar()
+    #objetosBasePractica2()
+    Deserializador.deserializar()
 
     #Creacion de la ventana de inicio 
     ventanaInicio = tk.Tk()
