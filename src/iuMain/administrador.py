@@ -24,6 +24,7 @@ from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
 from excepciones.iuExceptions import UiExceptions, UiEmptyValues, UiDefaultValues
 from excepciones.pagosExceptions import PagosExceptions, PagoSinCompletar, CerrarPago
+from excepciones.errorAplicacion import ErrorAplicacion
 from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
 from gestionAplicacion.servicios.arkade import Arkade
 from gestionAplicacion.usuario.ticket import Ticket
@@ -155,7 +156,7 @@ class FieldFrame(tk.Frame):
             
             return True
         
-        except UiExceptions as e:
+        except ErrorAplicacion as e:
             messagebox.showerror('Error', e.mostrarMensaje())
             return False
     
@@ -884,7 +885,7 @@ class FrameTarjetaCinemar(FieldFrame):
             
             return True
         
-        except UiExceptions as e:
+        except ErrorAplicacion as e:
             messagebox.showerror('Error', e.mostrarMensaje())
             return False
 
@@ -2138,7 +2139,7 @@ class FramePasarelaDePagos(FieldFrame):
     def _generarError(self):
         try:
             raise CerrarPago()
-        except PagosExceptions as e:
+        except ErrorAplicacion as e:
             messagebox.showerror('Error', e.mostrarMensaje())
 
     def funAceptar(self):
@@ -2163,7 +2164,7 @@ class FramePasarelaDePagos(FieldFrame):
                 #Generamos el error de pago inconcluso
                 try:
                     raise PagoSinCompletar(self._valorAPagar)
-                except PagosExceptions as e:
+                except ErrorAplicacion as e:
                     messagebox.showerror('Error', e.mostrarMensaje())
 
                 self.getElementosInteractivos()[0].configure(state="normal")
@@ -2247,6 +2248,8 @@ class FrameRecargarTarjetaCinemar(FramePasarelaDePagos):
         ventanaLogicaProyecto.config(bg= "#F0F8FF")
         self.config(bg= "#F0F8FF")
 
+        self.establecerError()
+
     def funAceptar(self):
         
         estado = self.getElementosInteractivos()[0].cget("state")
@@ -2266,6 +2269,13 @@ class FrameRecargarTarjetaCinemar(FramePasarelaDePagos):
 
             if (self._valorAPagar > 0):
                 messagebox.showwarning(title="Proceso de pago", message= f"Falta por pagar: {self._valorAPagar}")
+                
+                #Generamos el error de pago inconcluso
+                try:
+                    raise PagoSinCompletar(self._valorAPagar)
+                except ErrorAplicacion as e:
+                    messagebox.showerror('Error', e.mostrarMensaje())
+
                 self.getElementosInteractivos()[0].configure(state="normal")
                 self.setValueEntry("Valor a recargar :", int(self._valorAPagar))
                 self.getElementosInteractivos()[0].configure(state="disabled")
@@ -2282,6 +2292,7 @@ class FrameRecargarTarjetaCinemar(FramePasarelaDePagos):
                 self._clienteProceso.getCuenta().ingresarSaldo(self.valorAPagarTotal)
                 messagebox.showinfo(title="Recarga Exitosa", message= f"Pago realizado exitosamente. Su nuevo saldo es: {self._clienteProceso.getCuenta().getSaldo()} \n{mensaje}")
                 MetodoPago.asignarMetodosDePago(self.getClienteProceso())
+                self.getFrameMenuPrincipal().construirMenu()
                 FrameEleccion(FrameZonaJuegos()).mostrarFrame()
                 #self._frameSiguiente.mostrarFrame() 
 
@@ -2324,7 +2335,7 @@ class FrameRecargarTarjetaCinemar(FramePasarelaDePagos):
 
             return True
         
-        except UiExceptions as e:
+        except ErrorAplicacion as e:
             messagebox.showerror('Error', e.mostrarMensaje())
             return False
 
