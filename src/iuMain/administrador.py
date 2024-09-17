@@ -50,16 +50,18 @@ class FieldFrame(tk.Frame):
         self._elementosInteractivos = []
         self._frameAnterior = frameAnterior
         
-        tituloFrame = tk.Label(self, text=tituloProceso, font= ("Verdana bold",30), anchor="center")
+        self.config(bg = "#F0F8FF")
+        ventanaLogicaProyecto.config(bg= "#F0F8FF")
+        tituloFrame = tk.Label(self, text=tituloProceso, font= ("courier new",27, "bold italic"), anchor="center", bg="#F0F8FF")
         tituloFrame.grid(row=0, column=0, columnspan=4, sticky='we')
 
-        descripcionFrame = tk.Label(self, text=descripcionProceso, font= ("Verdana",10), anchor="center", wraplength=500)
+        descripcionFrame = tk.Label(self, text=descripcionProceso, font= ("courier new",10), anchor="center", wraplength=500, bg = "#F0F8FF")
         descripcionFrame.grid(row=1, column=0, columnspan=4, sticky='we')
 
-        tituloCrit = tk.Label(self, text = tituloCriterios, font= ("Verdana bold",20), anchor="center")
+        tituloCrit = tk.Label(self, text = tituloCriterios, font= ("courier new",15, "bold"), anchor="center", bg = "#F0F8FF")
         tituloCrit.grid(column=0, row=2, padx = (10,10), pady = (10,10))
 
-        tituloVal = tk.Label(self, text = tituloValores, font= ("Verdana bold",20), anchor="center")
+        tituloVal = tk.Label(self, text = tituloValores, font= ("courier new",15, "bold"), anchor="center", bg = "#F0F8FF")
         tituloVal.grid(column=1, row=2, padx = (10,10), pady = (10,10))
 
 ####################################################################################################
@@ -71,7 +73,7 @@ class FieldFrame(tk.Frame):
 
         for i in range(len(textEtiquetas)):
 
-            labelCriterio = tk.Label(self, text = textEtiquetas[i], font= ("Verdana",12), anchor="center")
+            labelCriterio = tk.Label(self, text = textEtiquetas[i], font= ("courier new",12), anchor="center", bg = "#F0F8FF")
             labelCriterio.grid(column=0, row=i+3, padx = (10,10), pady = (10,10))
 
             elementoInteractivo = None
@@ -100,21 +102,21 @@ class FieldFrame(tk.Frame):
             self._elementosInteractivos.append(elementoInteractivo)
 
         if botonVolver:
-            frameBotones = tk.Frame(self)
+            frameBotones = tk.Frame(self, bg = "#F0F8FF" )
 
-            tk.Button(frameBotones, text="Aceptar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funAceptar,
+            tk.Button(frameBotones, text="Aceptar", font = ("courier new", 12), fg = "black", bg = "#87CEFA",command=self.funAceptar,
             width=12,height=2).grid(pady = (10,10), padx=(20, 20), column = 0, row = len(self._infoEtiquetas)+3, sticky = 'we')
-            tk.Button(frameBotones, text="Volver", font = ("Verdana", 12), fg = "white", bg = "gray", command=self.funVolver,
+            tk.Button(frameBotones, text="Volver", font = ("courier new", 12), fg = "black", bg = "#87CEFA", command=self.funVolver,
             width=12,height=2).grid(pady = (10,10), padx=(20, 20), column = 1, row = len(self._infoEtiquetas)+3, sticky = 'we')
-            tk.Button(frameBotones, text="Borrar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funBorrar,
+            tk.Button(frameBotones, text="Borrar", font = ("courier new", 12), fg = "black", bg = "#87CEFA",command=self.funBorrar,
             width=12,height=2).grid(pady = (10,10), padx=(20, 20), column = 2, row = len(self._infoEtiquetas)+3, sticky = 'we')
 
             frameBotones.grid(column = 0, row = len(self._infoEtiquetas) + 3 + desplazarBotonesFila, columnspan=2, sticky='we')
         
         else:
-            tk.Button(self, text="Borrar", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.funBorrar,
+            tk.Button(self, text="Borrar", font = ("courier new", 12), fg = "black", bg = "#87CEFA",command=self.funBorrar,
             width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 1, row = len(self._infoEtiquetas)+3 + desplazarBotonesFila)
-            tk.Button(self, text="Aceptar", font = ("Verdana", 12), fg = "white", bg = "gray", command=self.funAceptar,
+            tk.Button(self, text="Aceptar", font = ("courier new", 12), fg = "black", bg = "#87CEFA", command=self.funAceptar,
             width=12,height=2).grid(pady = (10,10), padx=(10,10), column = 0, row = len(self._infoEtiquetas)+3 + desplazarBotonesFila)
 
     def getValue(self, criterio):
@@ -272,13 +274,13 @@ class FrameReclamoDeBonos(FieldFrame):
 
         print(servicio.mostrarBonos(self._servicio))
 
-        tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("Verdana bold",20), anchor="center")
+        tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("courier new",14), anchor="center", bg = "#F0F8FF" )
         tituloV.grid(column=2, row=2, padx = (10,10), pady = (10,10))
 
-        labelCriterio = tk.Label(self, text = servicio.mostrarOrden(),anchor="w", font= ("Verdana",10))
+        labelCriterio = tk.Label(self, text = servicio.mostrarOrden(),anchor="w", font= ("courier new",10), bg = "#F0F8FF" )
         labelCriterio.grid(row=3, column=2, sticky="w")
 
-        agregarb = tk.Button(self,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command=self.agregar,
+        agregarb = tk.Button(self,text="Agregar Producto", font = ("courier new", 12), fg = "black", bg = "#87CEFA",command=self.agregar,
         width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 2, row = 4,)
 
     def agregar(self):
@@ -348,13 +350,13 @@ class FrameGeneracionDeProductos(FieldFrame):
             infoElementosInteractuables = [[servicio.mostrarInventario(), "Seleccione un Producto"],None],
             habilitado = [False,True,True],
         )
-        tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("Verdana bold",20), anchor="center")
+        tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("courier new",14, "bold"), anchor="center", bg = "#F0F8FF" )
         tituloV.grid(column=2, row=2, padx = (10,10), pady = (10,10))
 
-        self._labelCriterio = tk.Label(self, text = "",anchor="w", font= ("Verdana",10))
+        self._labelCriterio = tk.Label(self, text = "",anchor="w", font= ("courier new",10))
         self._labelCriterio.grid(row=3, column=2,rowspan=2, sticky="w")
 
-        self._agregarb = tk.Button(self,text="Agregar Producto", font = ("Verdana", 12), fg = "white", bg = "gray",command = self.agregar,
+        self._agregarb = tk.Button(self,text="Agregar Producto", font = ("courier new", 12), fg = "black", bg = "#87CEFA",command = self.agregar,
         width=15,height=2).grid(pady = (10,10), padx=(10,10), column = 2, row = 5,)
 
         self._eliminarb=None
@@ -665,11 +667,11 @@ class FrameVentanaPrincipal(FieldFrame):
         return self._barraMenuPrincipal
 
     def getMenuArchivo(self):
-        print(self._menuArchivo)
+
         return self._menuArchivo
     
     def getMenuProcesosConsultas(self):
-        print(self._menuProcesosConsultas)
+
         return self._menuProcesosConsultas
 
     def getMenuAyuda(self):
@@ -851,7 +853,7 @@ class FrameTarjetaCinemar(FieldFrame):
         FrameTarjetaCinemar.crear_tarjeta(self.canvas, self.clienteProceso.getNombre() , self.clienteProceso.getCuenta().getSaldo(), self.clienteProceso._colorFondoTarjeta, 
                     (self.clienteProceso._fuenteTarjeta, 16, "bold italic"), (self.clienteProceso._fuenteTarjeta, 12), self.clienteProceso._colorTextoTarjeta)
 
-
+       
         for i, widget in enumerate(self.widgets[-1].winfo_children()):
             
             if i ==0:
@@ -1818,7 +1820,7 @@ class FrameIngresoASalaCine(FieldFrame):
         )
 
         #Creamos un label para mostrar la información de la sala de cine seleccionada
-        self._labelInfoSalaCine = tk.Label(self, text='', font= ("Verdana",12), anchor="center")
+        self._labelInfoSalaCine = tk.Label(self, text='', font= ("courier new",11), anchor="center", bg = "#F0F8FF" )
         self._labelInfoSalaCine.grid(column=0, row=len(self._infoEtiquetas) + 3, columnspan=4)
         
         #Facilitamos el acceso al comboBox creado y le asignamos un evento
@@ -1902,7 +1904,7 @@ class FrameSalaDeEspera(FieldFrame):
         self.getElementosInteractivos()[0].grid_configure(sticky='we')
 
         #Creamos y ubicamos el label que mostrará información sobre el ticket seleccionado
-        self._labelInfoTicketSeleccionado = tk.Label(self, text='', font= ("Verdana",12), anchor="center")
+        self._labelInfoTicketSeleccionado = tk.Label(self, text='', font= ("courier new",11), anchor="center", bg = "#F0F8FF" )
         self._labelInfoTicketSeleccionado.grid(column=0, row=len(self._infoEtiquetas) + 3, columnspan=4)
 
         #Facilitamos el acceso al comboBox de tickets y le asignamos un evento
@@ -2108,7 +2110,7 @@ class FrameFuncionalidad5(FieldFrame):
             desplazarBotonesFila=1
         )
         #Se crean un Label que muestra la información de la membresia como nombre, y requisitos.
-        self._membresiaOpcion = tk.Label(self, text=f"", font= ("Verdana bold",12), anchor="center")
+        self._membresiaOpcion = tk.Label(self, text=f"", font= ("courier new",11), anchor="center", bg = "#F0F8FF" )
         self._membresiaOpcion.grid(column = 0, row = len(self._infoEtiquetas) + 3, columnspan=2, sticky='we')
 
         #Se obtiene el ComboBox y se vincula un evento para actualizar el Label dependiendo que escoja en el ComboBox.
@@ -2186,10 +2188,10 @@ class FramePasarelaDePagos(FieldFrame):
             desplazarBotonesFila=2
         )
         #Se crean los label que muestran el nuevo valor a pagar luego de aplicar el descuento del método de pago y la información del método de pago a usar.
-        self._precioDescuento = tk.Label(self, text=f"", font= ("Verdana bold",15), anchor="center")
+        self._precioDescuento = tk.Label(self, text=f"", font= ("courier new",13), anchor="center", bg = "#F0F8FF" )
         self._precioDescuento.grid(column = 0, row = len(self._infoEtiquetas) + 3, columnspan=2, sticky='we')
         
-        self._metodoSeleccionado = tk.Label(self, text= f"", font= ("Verdana bold",12), anchor="center")
+        self._metodoSeleccionado = tk.Label(self, text= f"", font= ("courier new",10), anchor="center", bg = "#F0F8FF" )
         self._metodoSeleccionado.grid(column = 0, row = len(self._infoEtiquetas) + 4, columnspan=2, sticky='we')
 
         #Se obtiene el ComboBox y se vincula un evento para actualizar el Label dependiendo que escoja en el ComboBox.
@@ -2201,7 +2203,7 @@ class FramePasarelaDePagos(FieldFrame):
     def descuentoEnPantalla(self, event):
         self._metodoSeleccionado.config(text=f"Método de pago: {self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getNombre()}, Descuento: {int(self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado() * 100)}%, Máximo saldo: {self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getLimiteMaximoPago()}")
         self._precioDescuento.config(text=f"Nuevo valor: {self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))}")
-        #print(self._precioDescuento)
+
     
     def establecerError(self):
         self.getFrameMenuPrincipal().getMenuArchivo().delete(0,'end')
@@ -2613,8 +2615,6 @@ def objetosBasePractica2():
     membresia4 = Membresia("Challenger", 4, 25000, 25, 2)
     membresia5 = Membresia("Radiante", 5, 30000, 30, 2)
 
-    print(SucursalCine.getTiposDeMembresia())
-
     metodoPago1 = MetodoPago("Bancolombia", 0.10, 200000, sucursalCine1)
     metodoPago2 = MetodoPago("AV Villas", 0.05, 120000, sucursalCine1)
     metodoPago3 = MetodoPago("Banco Agrario", 0.15, 300000, sucursalCine1)
@@ -2625,6 +2625,9 @@ def objetosBasePractica2():
     game3 = Arkade("Hang Man", 10000.0, "Tecnología", ["PYTHON", "POO", "CLASE", "GUZMAN", "ATRIBUTO"]);
     game4 = Arkade("Hang Man", 30000.0, "Comedia", ["RISA", "FUNNY", "JAJAJA", "CHISTE", "BROMA"]);
     game5 = Arkade("Hang Man", 7500.0, "Drama", ["MUJER", "LLORAR", "ACTUACION", "FINGIR", "PROBLEMA"]);
+    game6 = Arkade("Hang Man", 7800.0, "Romance", ["AMOR", "KISS", "BESO", "LOVE", "PAREJA"]);
+    game7 = Arkade("Hang Man", 25000, "Ciencia ficción", ["CYBORG", "IRREAL", "FANTASY", "UFFO", "ROBOT"]);
+    game8 = Arkade("Hang Man", 25000, "Infantil", ["TOY", "KID", "PLAY", "GAME", "FUN"]);
 
     Membresia.stockMembresia(SucursalCine.getSucursalesCine())
 
@@ -2648,8 +2651,8 @@ def objetosBasePractica2():
     #La mala para el que hizo eso me hizo estar buscando esto por media hora .l. atentamente Rusbel
     #cliente1.setCineUbicacionActual(sucursalCine1)
     
-    for metodoPago in SucursalCine.getMetodosDePagoDisponibles():
-        print(metodoPago.getNombre(), metodoPago.getTipo(), metodoPago.getDescuentoAsociado())
+    #for metodoPago in SucursalCine.getMetodosDePagoDisponibles():
+        #print(metodoPago.getNombre(), metodoPago.getTipo(), metodoPago.getDescuentoAsociado())
 
     #print(cliente1.getMembresia().getTipoMembresia())
     #print(MetodoPago.mostrarMetodosDePago(cliente1))
@@ -2851,8 +2854,8 @@ if __name__ == '__main__':
 
     #Creamos los objetos de la lógica del proyecto
     
-    #Deserializador.deserializar()
-    objetosBasePractica2()
+    Deserializador.deserializar()
+    #objetosBasePractica2()
     #Creacion de la ventana de inicio 
     ventanaInicio = tk.Tk()
     ventanaInicio.title("Ventana de Inicio Cinemar")
