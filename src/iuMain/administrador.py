@@ -1957,8 +1957,8 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
             peliculaCombo=self._clienteProceso.getCineUbicacionActual().peorPelicula()
             opcionHorarioPelicula=peliculaCombo.seleccionarHorarioMasLejano()
             numAsientoProceso=peliculaCombo.seleccionarAsientoAleatorio(opcionHorarioPelicula)
-            codigoBono=productoCombo1.generarCodigoAleatorio(7)
-            ticketProceso= Ticket(peliculaCombo,opcionHorarioPelicula,numAsientoProceso,False,self._clienteProceso.getCineUbicacionActual)
+            codigoBono=Producto.generarCodigoAleatorio(7)
+            ticketProceso= Ticket(peliculaCombo,opcionHorarioPelicula,numAsientoProceso,False,self._clienteProceso.getCineUbicacionActual())
             bonoProceso= Bono(codigoBono,Producto(productoCombo1.getNombre(),productoCombo1.getTamaño(),productoCombo1.getTipoProducto(),productoCombo1.getPrecio(),1,productoCombo1.getGenero(),self._clienteProceso.getCineUbicacionActual()),productoCombo1.getTipoProducto(),self._clienteProceso)
             confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._productoSeleccionado}; y le has dado una calificacion de: {self._calificacionProductoSeleccionado}')
             if confirmacionUsuario:
