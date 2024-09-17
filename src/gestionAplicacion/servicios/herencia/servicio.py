@@ -2,8 +2,9 @@ from abc import ABC, abstractmethod
 import random
 from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.servicios.producto import Producto
+from gestionAplicacion.usuario.ibuyable import Ibuyable
 
-class Servicio (ABC):
+class Servicio (ABC, Ibuyable):
     cliente  = None
     descuento = True
     def __init__(self, nombre, sucursalUbicacion):

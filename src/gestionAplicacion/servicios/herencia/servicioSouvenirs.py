@@ -1,8 +1,7 @@
 import datetime
 from gestionAplicacion.servicios.herencia.servicio import Servicio
-from gestionAplicacion.usuario.ibuyable import Ibuyable
 
-class ServicioSouvenir(Servicio, Ibuyable):
+class ServicioSouvenir(Servicio):
     
     def __init__(self, nombre, sucursalUbicacion):
         super().__init__(nombre, sucursalUbicacion)
