@@ -314,11 +314,12 @@ class FrameReclamoDeBonos(FieldFrame):
                         FrameReclamoDeBonos(self._servicio).mostrarFrame()
 
             if condicion:
-                condicion=False
-                self._servicio.agregarOrden(pro.getProducto())
-                self._servicio.setBonosCliente([])
-                self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
-                FrameReclamoDeBonos(self._servicio).mostrarFrame()
+                for pro in self._servicio.getBonosCliente():
+                    condicion=False
+                    self._servicio.agregarOrden(pro.getProducto())
+                    self._servicio.setBonosCliente([])
+                    self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
+                    FrameReclamoDeBonos(self._servicio).mostrarFrame()
     
     def funAceptar(self):
         total = self._servicio.calcularTotal()
