@@ -16,9 +16,9 @@ class ServicioSouvenir(Servicio):
 
 
     def descuentarPorCompra(self, metodo):
-        if metodo.getNombre() != "efectivo":
-            for producto in self.orden:
-                if (producto.getTamaño() in ["katana", "emociones"]) and (producto.getPrecio() > 100000):
+        if metodo.getNombre() != "Efectivo":
+            for producto in self._orden:
+                if (producto.getTamaño() in ["Katana", "Emociones"]) and (producto.getPrecio() > 100000):
                     self._valorPedido -= self._valorPedido * 0.05
                     return True
             return False
@@ -36,3 +36,7 @@ class ServicioSouvenir(Servicio):
             "===========================================================\n"
         )
         return factura
+
+    def procesarPagoRealizado(self, cliente):
+        self._orden = []
+        self._valorPedido = 0.0
