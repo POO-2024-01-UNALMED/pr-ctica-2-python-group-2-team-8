@@ -39,5 +39,4 @@ class ServicioSouvenir(Servicio, Ibuyable):
         return factura
 
     def procesarPagoRealizado(self, cliente):
-        self._orden = []
         self.descuento = True
