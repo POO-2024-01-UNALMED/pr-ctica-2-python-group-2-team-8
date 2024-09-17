@@ -1961,6 +1961,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
             peorPelicula=self._clienteProceso.getCineUbicacionActual().peorPelicula().getNombre()+ self._clienteProceso.getCineUbicacionActual().peorPelicula().getTipoDeFormato()
             productoCombo1=self._clienteProceso.getCineUbicacionActual().mejorProducto()
             peliculaCombo=self._clienteProceso.getCineUbicacionActual().peorPelicula()
+            valorComboGlobal=productoCombo1.getPrecio()+peliculaCombo.getPrecio()
             opcionHorarioPelicula=peliculaCombo.seleccionarHorarioMasLejano()
             numAsientoProceso=peliculaCombo.seleccionarAsientoAleatorio(opcionHorarioPelicula)
             codigoBono=Producto.generarCodigoAleatorio(7)
@@ -1973,7 +1974,7 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
 
                 if confirmacionParaPasarelaDePago:
                    
-                    FramePasarelaDePagos(self.getFrameMenuPrincipal(), SucursalCine.getTiposDeMembresia()[FrameFuncionalidad5.membresiaSeleccionadaInt - 1].getValorSuscripcionMensual()).mostrarFrame(),ticketProceso,bonoProceso
+                    FramePasarelaDePagos(self.getFrameMenuPrincipal(), valorComboGlobal,ticketProceso,bonoProceso).mostrarFrame()
                 
                 
 
@@ -2400,7 +2401,7 @@ def ventanaDeInicio():
 
     imagenes1 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel1.png"),
-        #tk.PhotoImage(file="src/iuMain/imagenes/san1.png"),
+       # tk.PhotoImage(file="src/iuMain/imagenes/san1.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a4.png"),

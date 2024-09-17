@@ -1,8 +1,9 @@
 import random
 from gestionAplicacion.servicios.producto import Producto
+from gestionAplicacion.usuario.ibuyable import Ibuyable
 #from iuMain.administrador import *
 
-class Bono:
+class Bono(Ibuyable):
   
   def __init__(self, codigo = None, producto = None, tipoServicio = None, cliente = None):
     self._codigo = codigo
@@ -10,6 +11,19 @@ class Bono:
     self._tipoServicio = tipoServicio
     self._cliente = cliente
     cliente.getCineUbicacionActual().getBonosCreados().append(self)
+
+    self._dueno = None
+
+  def factura(self):
+        """
+        :Description: Este método se encarga de retornar un string que contiene toda la información del ticket en forma de factura.
+	    :return String: Este método retorna un String que representa la factura de compra con el fin de ser mostrada en pantalla
+	    luego de realizar una compra.
+        """
+
+        return	f"========= Factura Ticket =========\nNombre dueño : {self._cliente.getNombre()}\nDocumento : {self._cliente.getDocumento()}\nNombre producto:{self._producto.getNombre()}\nTamaño producto:{self._producto.getTamaño()}"
+
+
 
   @classmethod
   def generarBonoComidaJuegos(cls,sucursal, cliente): 
@@ -47,6 +61,9 @@ class Bono:
     Administrador.mostrarBono(productosComida, numeroAleatorio, tipoProducto, code)
 
     return bono
+  
+  
+    
 
   @classmethod
   def generarBonoSouvenirJuegos(cls,sucursal, cliente): 
