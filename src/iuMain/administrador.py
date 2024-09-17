@@ -2230,6 +2230,7 @@ class FrameRecargarTarjetaCinemar(FramePasarelaDePagos):
                     mensaje+=elementoIbuyable.factura()
                 self._clienteProceso.getCuenta().ingresarSaldo(self.valorAPagarTotal)
                 messagebox.showinfo(title="Recarga Exitosa", message= f"Pago realizado exitosamente. Su nuevo saldo es: {self._clienteProceso.getCuenta().getSaldo()} \n{mensaje}")
+                MetodoPago.asignarMetodosDePago(self.getClienteProceso())
                 FrameEleccion(FrameZonaJuegos()).mostrarFrame()
                 #self._frameSiguiente.mostrarFrame() 
 
