@@ -41,8 +41,8 @@ class ServicioComida(Servicio):
         for productoOrden in self._orden:
             validacionIngresoHistorial = True
             for productoHistorial in cliente.getHistorialDePedidos():
-                if (productoOrden.nombre.lower() == productoHistorial.nombre.lower() and
-                    productoOrden.tamaño.lower() == productoHistorial.tamaño.lower()):
+                if (productoOrden._nombre.lower() == productoHistorial._nombre.lower() and
+                    productoOrden._tamaño.lower() == productoHistorial._tamaño.lower()):
                     validacionIngresoHistorial = False
                     break
             if validacionIngresoHistorial:
