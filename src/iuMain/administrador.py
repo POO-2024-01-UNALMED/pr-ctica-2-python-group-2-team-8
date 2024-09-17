@@ -2399,7 +2399,7 @@ def ventanaDeInicio():
 
 
     imagenes1 = [
-        tk.PhotoImage(file="src/iuMain/imagenes/a1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/rusbel1.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a4.png"),
@@ -2407,7 +2407,7 @@ def ventanaDeInicio():
     ]
 
     imagenes2 = [
-        tk.PhotoImage(file="src/iuMain/imagenes/b1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/rusbel2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b4.png"),
@@ -2415,7 +2415,7 @@ def ventanaDeInicio():
     ]
 
     imagenes3 = [
-        tk.PhotoImage(file="src/iuMain/imagenes/c1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/rusbel3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c4.png"),
@@ -2423,7 +2423,7 @@ def ventanaDeInicio():
     ]
 
     imagenes4 = [
-        tk.PhotoImage(file="src/iuMain/imagenes/d1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/rusbel4.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d4.png"),
