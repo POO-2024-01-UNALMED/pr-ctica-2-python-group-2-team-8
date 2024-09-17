@@ -183,7 +183,6 @@ class Pelicula:
         """
 
         self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)][fila - 1][columna - 1] = 1
-        print(self._asientosSalasVirtuales[self._horariosPresentacion.index(horario)])
 
     def isDisponibilidadAsientoSalaVirtual(self, horario, fila = 100, columna = 100):
 
@@ -386,7 +385,7 @@ class Pelicula:
         isAsientosDisponibles = False
 
         for horario in self.filtrarHorariosPelicula():
-          isAsientosDisponibles = self.isDisponibilidadAlgunAsientoSalaVirtual(horario)
+          isAsientosDisponibles = self.isDisponibilidadAsientoSalaVirtual(horario)
         if isAsientosDisponibles:
            horariosPelicula = horario
 

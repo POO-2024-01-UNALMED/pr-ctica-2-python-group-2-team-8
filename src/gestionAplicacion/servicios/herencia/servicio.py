@@ -5,6 +5,7 @@ from gestionAplicacion.servicios.producto import Producto
 
 class Servicio (ABC):
     cliente  = None
+    descuento = True
     def __init__(self, nombre, sucursalUbicacion):
         self._nombre = nombre
         self._inventario = []
@@ -53,7 +54,7 @@ class Servicio (ABC):
 
     def calcularTotal(self):
         total = 0
-        for producto in self.orden:
+        for producto in self._orden:
             total += producto.getPrecio()
         return total
 
@@ -176,3 +177,9 @@ class Servicio (ABC):
 
     def setBonosCliente(self, bonosCliente):
         self._bonosCliente = bonosCliente
+
+    def getDescuento(self):
+        return self.descuento
+
+    def setDescuento(self, descuento):
+        self.descuento= descuento

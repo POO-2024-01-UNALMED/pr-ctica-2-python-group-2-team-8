@@ -50,10 +50,6 @@ class Producto():
                 filtroPeliculasMismoNombre.append(producto)
         
         return filtroPeliculasMismoNombre
-    
-
-   
-    
 
     def getGenero(self):
         return self._genero

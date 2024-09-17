@@ -305,6 +305,11 @@ class FrameReclamoDeBonos(FieldFrame):
                 self._servicio.setBonosCliente([])
                 self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
                 FrameReclamoDeBonos(self._servicio).mostrarFrame()
+    
+    def funAceptar(self):
+        total = self._servicio.calcularTotal()
+        self._servicio.setValorPedido(total)
+        FramePasarelaDePagos(self.getFrameMenuPrincipal(),total,self._servicio).mostrarFrame()
 
 class FrameGeneracionDeProductos(FieldFrame):
     def __init__(self, servicio):
@@ -600,12 +605,11 @@ class FrameVentanaPrincipal(FieldFrame):
         
         if noHayHorariosPresentaciones:
             messagebox.showinfo('Actualización fecha y hora', 'Hemos detectado que han concluido todas las presentaciones del día de hoy, por lo tanto, se pasará al dia siguiente de forma automática. Gracias por su compresión\n')
-            sucursalCineActual.setFechaActual((sucursalCineActual.getFechaActual() + timedelta( days = 1 )).replace(hours = 10, minutes = 0, seconds = 0)) #Inicio de la jornada laboral al otro día
+            sucursalCineActual.setFechaActual((sucursalCineActual.getFechaActual() + timedelta( days = 1 )).replace(hour = SucursalCine.getInicioHorarioLaboral().hour, minute = SucursalCine.getInicioHorarioLaboral().minute)) #Inicio de la jornada laboral al otro día
     
         sucursalCineActual.avanzarTiempo() #Avanzamos el tiempo y ejecutamos lógica semenal o diaria según el caso
         self.logicaMembresia()
         self.refrescarFramesFuncionalidades() #Actualizamos los frames, ya que se han visto modificados por el avance de tiempo
-        print(sucursalCineActual.getFechaActual())
     
     def logicaMembresia(self):
         pass
@@ -1444,7 +1448,6 @@ class FrameFuncionalidad1(FieldFrame):
         self._clienteProceso.getCineUbicacionActual().avanzarTiempo()
         #Definimos los frames a usar durante el desarrollo de la funcionalidad 1
         self._framesFuncionalidad1 = [FrameReservarTicket(self), FrameIngresoASalaCine(self), FrameSalaDeEspera(self)]
-        
 
         #Usamos el constructor de FieldFrame
         super().__init__(
@@ -1487,8 +1490,15 @@ class FrameFuncionalidad1(FieldFrame):
                         return 
                 
                 #Ingresamos al frame seleccionado por el usuario
-                self._framesFuncionalidad1[eleccionUsuario].mostrarFrame()
-     
+                self.refrescarFramesFuncionalidad1()
+                if len(Pelicula.filtrarCarteleraPorCliente(self._clienteProceso)) > 0:
+                    self._framesFuncionalidad1[eleccionUsuario].mostrarFrame()
+                else:
+                    FieldFrame.getFrameMenuPrincipal().avanzarDia()
+    
+    def refrescarFramesFuncionalidad1(self):
+        self._framesFuncionalidad1 = [FrameReservarTicket(self), FrameIngresoASalaCine(self), FrameSalaDeEspera(self)]
+
     #Crear el frame inical de mi funcionalidad (Crear estándar visual frame para ello) (Mas o menos hecho)
     #Separar por módulos la lógica de cada funcionalidad
     #Definir lógica de procesos de pago (Con Gerson)
@@ -1657,7 +1667,7 @@ class FrameSeleccionarAsiento(FieldFrame):
     def setColumnas(self, evento):
         self._filaSeleccionada = int(self._comboBoxFilas.get())
 
-        self._comboBoxCols.configure(values = Pelicula.asientosDisponibles(self._filaSeleccionada, self._asientosPelicula), state = 'readonly')
+        self._comboBoxCols.configure(values = Pelicula.asientosDisponibles(self._filaSeleccionada - 1, self._asientosPelicula), state = 'readonly')
 
     def funBorrar(self):
         #Setteamos los valores por defecto de cada comboBox
@@ -1688,10 +1698,11 @@ class FrameSeleccionarAsiento(FieldFrame):
 
                     #Notificamos al cliente en caso de recibir el descuento
                     if ticketProceso.getPrecio() != self._peliculaProceso.getPrecio():
-                        messagebox.showinfo('¡FELICITACIONES!', f'Por ser el cliente número: {clienteProceso.getCineUbicacionActual().getCantidadTicketsGenerados()} has recibido un descuento del {'80%' if self._peliculaProceso.getTipoDeFormato() == '2D' else '50%'}')
+                        messagebox.showinfo('¡FELICITACIONES!', f'Por ser el cliente número: {clienteProceso.getCineUbicacionActual().getCantidadTicketsCreados()} has recibido un descuento del {'80%' if self._peliculaProceso.getTipoDeFormato() == '2D' else '50%'}')
 
                     #Ingresamos a la pasarela de pago
-                    pass
+                    frameSiguiente = FrameFuncionalidad1()
+                    FramePasarelaDePagos(frameSiguiente, ticketProceso.getPrecio(), ticketProceso).mostrarFrame()
 
 class FrameIngresoASalaCine(FieldFrame):
     
@@ -1939,14 +1950,21 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
             self._calificacionProductoSeleccionado = int(self._comboBoxCalificarItem.get())
             mejorProducto=self._clienteProceso.getCineUbicacionActual().mejorProducto().getNombre()+ self._clienteProceso.getCineUbicacionActual().mejorProducto().getTamaño()
             peorPelicula=self._clienteProceso.getCineUbicacionActual().peorPelicula().getNombre()+ self._clienteProceso.getCineUbicacionActual().peorPelicula().getTipoDeFormato()
+            productoCombo1=self._clienteProceso.getCineUbicacionActual().mejorProducto()
+            peliculaCombo=self._clienteProceso.getCineUbicacionActual().peorPelicula()
+            opcionHorarioPelicula=peliculaCombo.seleccionarHorarioMasLejano()
+            numAsientoProceso=peliculaCombo.seleccionarAsientoAleatorio(opcionHorarioPelicula)
+            codigoBono=Producto.generarCodigoAleatorio(7)
+            ticketProceso= Ticket(peliculaCombo,opcionHorarioPelicula,numAsientoProceso,False,self._clienteProceso.getCineUbicacionActual())
+            bonoProceso= Bono(codigoBono,Producto(productoCombo1.getNombre(),productoCombo1.getTamaño(),productoCombo1.getTipoProducto(),productoCombo1.getPrecio(),1,productoCombo1.getGenero(),self._clienteProceso.getCineUbicacionActual()),productoCombo1.getTipoProducto(),self._clienteProceso)
             confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._productoSeleccionado}; y le has dado una calificacion de: {self._calificacionProductoSeleccionado}')
             if confirmacionUsuario:
                 
-                confirmacionParaPasarelaDePago = messagebox.askokcancel(f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {mejorProducto}; y  {peorPelicula}' "¿Deseas Continuar?")
+                confirmacionParaPasarelaDePago = messagebox.askokcancel('Confirmación datos',f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {mejorProducto}; y  {peorPelicula}' "¿Deseas Continuar?")
 
                 if confirmacionParaPasarelaDePago:
                    
-                    FramePasarelaDePagos()
+                    FramePasarelaDePagos(self.getFrameMenuPrincipal(), SucursalCine.getTiposDeMembresia()[FrameFuncionalidad5.membresiaSeleccionadaInt - 1].getValorSuscripcionMensual()).mostrarFrame(),ticketProceso,bonoProceso
                 
                 
 
@@ -1955,14 +1973,21 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
              self._calificacionPeliculaSeleccionada = int(self._comboBoxCalificarItem.get())
              peorProducto=self._clienteProceso.getCineUbicacionActual().peorProducto().getNombre()+ self._clienteProceso.getCineUbicacionActual().peorProducto().getTamaño()
              mejorPelicula=self._clienteProceso.getCineUbicacionActual().mejorPelicula().getNombre()+ self._clienteProceso.getCineUbicacionActual().mejorPelicula().getTipoDeFormato()
-             
+             productoCombo1=self._clienteProceso.getCineUbicacionActual().peorProducto()
+             peliculaCombo=self._clienteProceso.getCineUbicacionActual().mejorPelicula()
+             valorComboGlobal=productoCombo1.getPrecio()+peliculaCombo.getPrecio()
+             opcionHorarioPelicula=peliculaCombo.seleccionarHorarioMasLejano()
+             numAsientoProceso=peliculaCombo.seleccionarAsientoAleatorio(opcionHorarioPelicula)
+             codigoBono=Producto.generarCodigoAleatorio(7)
+             ticketProceso= Ticket(peliculaCombo,opcionHorarioPelicula,numAsientoProceso,False,self._clienteProceso.getCineUbicacionActual())
+             bonoProceso= Bono(codigoBono,Producto(productoCombo1.getNombre(),productoCombo1.getTamaño(),productoCombo1.getTipoProducto(),productoCombo1.getPrecio(),1,productoCombo1.getGenero(),self._clienteProceso.getCineUbicacionActual()),productoCombo1.getTipoProducto(),self._clienteProceso)
              confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._peliculaSeleccionada}; y le has dado una calificacion de: {self._calificacionPeliculaSeleccionada}')
              if confirmacionUsuario:
                 
                 confirmacionParaPasarelaDePago = messagebox.askokcancel('Confirmación datos',f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {peorProducto}; y  {mejorPelicula}' "¿Deseas Continuar?")
 
                 if confirmacionParaPasarelaDePago:
-                    pass
+                    FramePasarelaDePagos(self.getFrameMenuPrincipal(),valorComboGlobal,ticketProceso,bonoProceso).mostrarFrame()
         
 
         
@@ -2042,14 +2067,20 @@ class FramePasarelaDePagos(FieldFrame):
 
     def funAceptar(self):
         if self.evaluarExcepciones():
-
-            if isinstance(self._elementosIbuyable, Servicio):
-                messagebox.showinfo(title="", message= "")
-
             metodoPagoSeleccionado = self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()]
+            if isinstance(self._elementosIbuyable[0], Servicio):
+                if self._elementosIbuyable[0].descuento:
+                    if ("Efectivo" not in self._elementosInteractivos[1].get()) and self._elementosIbuyable[0].descuentarPorCompra(metodoPagoSeleccionado):
+                        self._elementosIbuyable[0].setDescuento(False)
+                        self.getElementosInteractivos()[0].configure(state="normal")
+                        self.setValueEntry("Precio original :", self._elementosIbuyable[0].getValorPedido())
+                        self.getElementosInteractivos()[0].configure(state="disabled")
+                        self._valorAPagar = self._elementosIbuyable[0].getValorPedido()
+                        messagebox.showinfo(title="Felicidades", message= f"Tenes un descuento sorpresa por escoger un metodo de pago con descuento y compras asociadas a dichos bancos")
+
+            
             precio = self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))
             self._valorAPagar = metodoPagoSeleccionado.realizarPago(precio, self.getClienteProceso())
-
             if (self._valorAPagar > 0):
                 messagebox.showwarning(title="Proceso de pago", message= f"Falta por pagar: {self._valorAPagar}")
                 self.getElementosInteractivos()[0].configure(state="normal")
@@ -2066,6 +2097,7 @@ class FramePasarelaDePagos(FieldFrame):
                     elementoIbuyable.procesarPagoRealizado(self.getClienteProceso())
                     mensaje+=elementoIbuyable.factura()
                 messagebox.showinfo(title="Pago realizado", message= f"Pago realizado exitosamente. \n{mensaje}")
+                MetodoPago.asignarMetodosDePago(self.getClienteProceso())
                 self._frameSiguiente.mostrarFrame()
 
         
@@ -2209,8 +2241,24 @@ def objetosBasePractica2():
     sucursalCine2 = SucursalCine("Marinilla")
     sucursalCine3 = SucursalCine("Medellín")
 
+    servicioComidaM = ServicioComida("comida", sucursalCine1)
+
     servicioComida = ServicioComida("comida", sucursalCine2)
     servicioSouvenirs = ServicioSouvenir("souvenir", sucursalCine2)
+
+    servicioSouvenirM = ServicioSouvenir("souvenir", sucursalCine3)
+
+    # Productos de la sucursal de Bucaramanga
+
+    producto1M =  Producto("Hamburguesa","Grande","comida",25000,200,"Normal",sucursalCine1)
+    producto2M =  Producto("Hamburguesa","Deadpool","comida",30000,200,"Comedia",sucursalCine1)
+    producto3M =  Producto("Perro caliente","Grande","comida",20000,200,"Normal",sucursalCine1)
+    producto4M =  Producto("Perro caliente","Bolt","comida",30000,200,"Comedia",sucursalCine1)
+    producto5M =  Producto("Crispetas","Muerte","comida",15000,200,"Acción",sucursalCine1)
+    producto6M =  Producto("Crispetas","Grandes","comida",16000,200,"Normal",sucursalCine1)
+    producto7M =  Producto("Gaseosa","Grande","comida",6000,200,"Normal",sucursalCine1)
+    producto8M =  Producto("Gaseosa","Pequeña","comida",3000,200,"Normal",sucursalCine1)
+
 
     # Productos de la sucursal de Marinilla
 
@@ -2228,6 +2276,14 @@ def objetosBasePractica2():
     producto3S = Producto("Gorra","L","souvenir",11000,200,"Normal",sucursalCine2)
     producto4S = Producto("Llavero","Katana","souvenir",22000,200,"Acción",sucursalCine2)
     producto5S = Producto("Peluche","Pajaro loco","souvenir",29000,200,"Comedia",sucursalCine2)
+
+    # Productos de la sucursal de Medellin
+
+    producto1SM =  Producto("Camisa","XL","souvenir",19000,200,"Normal",sucursalCine3)
+    producto2SM =  Producto("Camisa","Escuadron suicida","souvenir",30000,200,"Comedia",sucursalCine3)
+    producto3SM =  Producto("Gorra","L","souvenir",12000,200,"Normal",sucursalCine3)
+    producto4SM =  Producto("Llavero","Emociones","souvenir",30000,200,"Acción",sucursalCine3)
+    producto5SM =  Producto("Peluche","Deku","souvenir",30000,200,"Comedia",sucursalCine3)
     
 
     cliente1 = Cliente("Rusbel", 18, 13434, TipoDocumento.CC, sucursalCine2)
@@ -2325,14 +2381,6 @@ def objetosBasePractica2():
     game4 = Arkade("Hang Man", 30000.0, "Comedia", ["RISA", "FUNNY", "JAJAJA", "CHISTE", "BROMA"]);
     game5 = Arkade("Hang Man", 7500.0, "Drama", ["MUJER", "LLORAR", "ACTUACION", "FINGIR", "PROBLEMA"]);
 
-        #Para descuento con pelicula
-    ticket2 = Ticket(pelicula2_6, datetime(2024, 9, 16, 12, 20, 0), '1-4', False, sucursalCine2)
-    ticket2.setDueno(cliente1)
-    ticket2.setSucursalCompra(sucursalCine2)
-    ticket2.setSalaDeCine(salaDeCine2_4)
-    cliente1.getTickets().append(ticket2)
-    sucursalCine2.getTicketsParaDescuento().append(ticket2)
-
     Membresia.stockMembresia(SucursalCine.getSucursalesCine())
 
     #cliente1.setMembresia(membresia5)
@@ -2368,11 +2416,8 @@ def objetosBasePractica2():
 
     SucursalCine.logicaInicioSIstemaReservarTicket()
 
-    ticket = Ticket(pelicula1_2, datetime(2024, 9, 16, 12, 20, 0), '4-4', False, sucursalCine1)
-    ticket.procesarPagoRealizado(cliente2)
-
-    cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
-    cliente4.setCodigosDescuento([ticket.generarCodigoTicket()])
+    #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
+    #cliente4.setCodigosDescuento([ticket.generarCodigoTicket()])
     #cliente4.getCuenta().setSaldo(500000)
 
 
@@ -2478,7 +2523,8 @@ def ventanaDeInicio():
 
 
     imagenes1 = [
-        tk.PhotoImage(file="src/iuMain/imagenes/a1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/rusbel1.png"),
+        #tk.PhotoImage(file="src/iuMain/imagenes/san1.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a4.png"),
@@ -2486,7 +2532,8 @@ def ventanaDeInicio():
     ]
 
     imagenes2 = [
-        tk.PhotoImage(file="src/iuMain/imagenes/b1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/rusbel2.png"),
+        #tk.PhotoImage(file="src/iuMain/imagenes/san2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b4.png"),
@@ -2494,7 +2541,8 @@ def ventanaDeInicio():
     ]
 
     imagenes3 = [
-        tk.PhotoImage(file="src/iuMain/imagenes/c1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/rusbel3.png"),
+        #tk.PhotoImage(file="src/iuMain/imagenes/san3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c4.png"),
@@ -2502,7 +2550,8 @@ def ventanaDeInicio():
     ]
 
     imagenes4 = [
-        tk.PhotoImage(file="src/iuMain/imagenes/d1.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/rusbel4.png"),
+        #tk.PhotoImage(file="src/iuMain/imagenes/san4.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d4.png"),
@@ -2560,8 +2609,8 @@ if __name__ == '__main__':
 
     #Creamos los objetos de la lógica del proyecto
     
-    objetosBasePractica2()
-    #Deserializador.deserializar()
+    #objetosBasePractica2()
+    Deserializador.deserializar()
 
     #Creacion de la ventana de inicio 
     ventanaInicio = tk.Tk()

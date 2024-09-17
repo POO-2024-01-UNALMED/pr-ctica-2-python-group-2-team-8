@@ -1,7 +1,8 @@
 import datetime
 from gestionAplicacion.servicios.herencia.servicio import Servicio
+from gestionAplicacion.usuario.ibuyable import Ibuyable
 
-class ServicioComida(Servicio):
+class ServicioComida(Servicio, Ibuyable):
     
     def __init__(self, nombre, sucursalUbicacion):
         super().__init__(nombre, sucursalUbicacion)
@@ -17,8 +18,8 @@ class ServicioComida(Servicio):
 
     def descuentarPorCompra(self, metodo):
         if metodo.getNombre() != "efectivo":
-            for producto in self.orden:
-                if (producto.getTamaño() in ["cangreburger", "deadpool"]) and (producto.getPrecio() > 100000):
+            for producto in self._orden:
+                if (producto.getTamaño() in ["Cangreburger", "Deadpool"]) and (producto.getPrecio() > 100000):
                     self._valorPedido -= self._valorPedido * 0.05
                     return True
             return False
@@ -36,3 +37,8 @@ class ServicioComida(Servicio):
             "===========================================================\n"
         )
         return factura
+
+    def procesarPagoRealizado(self, cliente):
+        self._orden = []
+        self._valorPedido = 0.0
+        self.descuento = True

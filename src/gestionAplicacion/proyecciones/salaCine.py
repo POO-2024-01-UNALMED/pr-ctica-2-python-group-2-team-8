@@ -139,7 +139,7 @@ class SalaCine:
         for salaCine in filtroSalasDeCine:
             salaAñadida = False
             for ticket in clienteProceso.getTickets():
-                if ticket.getHorario() == salaCine._horarioPeliculaEnPresentacion and ticket.getSalaDeCine() is salaCine:
+                if ticket.getHorario() == salaCine._horarioPeliculaEnPresentacion and ticket.getSalaDeCine() is salaCine and f'Recomendada: Sala #{salaCine._numeroSala}' not in salasCineStr:
                     salasCineStr.append(f'Recomendada: Sala #{salaCine._numeroSala}')
                     salaAñadida = True
             
