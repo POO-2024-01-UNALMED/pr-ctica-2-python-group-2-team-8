@@ -223,13 +223,13 @@ class FieldFrame(tk.Frame):
 
         FieldFrame.setClienteProceso(clienteProceso)
 
-        self._frameMenuPrincipal = frameVentanaPrincipal
+        FieldFrame._frameMenuPrincipal = FrameVentanaPrincipal()
 
         self.refrescarFramesFuncionalidades()
 
         #Ejecutamos la lógica de la ventana del menú principal
-        frameVentanaPrincipal.construirMenu()
-        frameVentanaPrincipal.mostrarFrame()
+        FieldFrame.getFrameMenuPrincipal().construirMenu()
+        FieldFrame.getFrameMenuPrincipal().mostrarFrame()
     
     def refrescarFramesFuncionalidades(self):
         #Creación Frames funcionalidades
@@ -314,11 +314,12 @@ class FrameReclamoDeBonos(FieldFrame):
                         FrameReclamoDeBonos(self._servicio).mostrarFrame()
 
             if condicion:
-                condicion=False
-                self._servicio.agregarOrden(pro.getProducto())
-                self._servicio.setBonosCliente([])
-                self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
-                FrameReclamoDeBonos(self._servicio).mostrarFrame()
+                for pro in self._servicio.getBonosCliente():
+                    condicion=False
+                    self._servicio.agregarOrden(pro.getProducto())
+                    self._servicio.setBonosCliente([])
+                    self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
+                    FrameReclamoDeBonos(self._servicio).mostrarFrame()
     
     def funAceptar(self):
         total = self._servicio.calcularTotal()
@@ -557,8 +558,11 @@ class FrameVentanaPrincipal(FieldFrame):
         self._labelImagen = tk.Label(self, image = self._imagenFramePrincipal)
         self._labelImagen.grid(row=0, column=0)
 
+        print(FieldFrame.getFrameMenuPrincipal())
+
         FieldFrame.setFrameMenuPrincipal(self)
 
+        print(FieldFrame.getFrameMenuPrincipal())
 
         #Se buscan los widget que tenga FieldFrame y se eliminan para este frame.
         for widget in self.winfo_children():
@@ -569,8 +573,9 @@ class FrameVentanaPrincipal(FieldFrame):
         self._menuArchivo = None
         self._menuProcesosConsultas = None
         self._menuAyuda = None
+        print(FieldFrame.getClienteProceso())
         self._clienteProceso = FieldFrame.getClienteProceso()
-
+        print(FieldFrame.getClienteProceso())
     def construirMenu(self):
         self._barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Times New Roman", 10))
         ventanaLogicaProyecto.config(menu=self._barraMenuPrincipal)
@@ -591,7 +596,7 @@ class FrameVentanaPrincipal(FieldFrame):
         self._menuProcesosConsultas.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
         self._menuProcesosConsultas.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
 
-        self._menuAyuda.add_command(label="Acerca de", command=self.mostrarNombreAutores)
+        self._menuAyuda.add_command(label="Acerca de", command=self.avanzarDia)
     
     def mostrarDescripcionSistema(self):
          messagebox.showinfo("Información del Sistema", "En este programa puedes:\n•Comprar Tickets\n•Comprar comida y regalos\n•Usar la zona de juegos\n•Adquirir membresias\n•Calificar nuestros servicios")
@@ -623,12 +628,14 @@ class FrameVentanaPrincipal(FieldFrame):
         SucursalCine.notificarFechaLimiteMembresia(self._clienteProceso)
 
         if self._clienteProceso.getMembresia() != None:
+            print(self._clienteProceso.getFechaLimiteMembresia())
             diasRestantes = self.evaluarDiasRestantes()
+            print(diasRestantes)
             if diasRestantes < 6:
                 try:
                     raise ExpiredMembershipException(diasRestantes)
                 except ErrorAplicacion as e:
-                    messagebox.showError('Error', e.mostrarMensaje())
+                    messagebox.showerror('Error', e.mostrarMensaje())
 
     def avanzarDia(self):
 
@@ -647,7 +654,7 @@ class FrameVentanaPrincipal(FieldFrame):
             try:
                 raise NoMoreFilmsException(self._clienteProceso.getCineUbicacionActual().getFechaActual())
             except ErrorAplicacion as e:
-                messagebox.showEror('Error', e.mostrarMensaje())
+                messagebox.showerror('Error', e.mostrarMensaje())
             sucursalCineActual.setFechaActual((sucursalCineActual.getFechaActual() + timedelta( days = 1 )).replace(hour = SucursalCine.getInicioHorarioLaboral().hour, minute = SucursalCine.getInicioHorarioLaboral().minute)) #Inicio de la jornada laboral al otro día
     
         sucursalCineActual.avanzarTiempo() #Avanzamos el tiempo y ejecutamos lógica semenal o diaria según el caso
@@ -670,7 +677,7 @@ class FrameVentanaPrincipal(FieldFrame):
 
     def evaluarDiasRestantes(self):
         #Se verifica si la fecha actual esta pasada a la fecha limite de la membresia.
-        if (self._clienteProceso.getCineUbicacionActual().getFechaActual().date() > self._clienteProceso.getFechaLimiteMembresia()):
+        if (self._clienteProceso.getCineUbicacionActual().getFechaActual().date() >= self._clienteProceso.getFechaLimiteMembresia()):
             return 0
 
             
@@ -1324,7 +1331,7 @@ class FrameJuego(tk.Frame):
                     
                     if self.bonoCliente is None:
                         messagebox.showinfo("Sin productos", f"No te podemos generar un bono de tipo {self.tipoBono} ya que no hay productos en nuestro inventario")
-                        frameVentanaPrincipal.mostrarFrame()
+                        FieldFrame.getFrameMenuPrincipal().mostrarFrame()
                     else:
                         FrameBono(self.tipoBono, self.bonoCliente ).mostrarFrame()
         else:
@@ -1337,7 +1344,7 @@ class FrameJuego(tk.Frame):
                 if eleccionUsuario:
                     self.funVolver()
                 else:
-                    frameVentanaPrincipal.mostrarFrame()
+                    FieldFrame.getFrameMenuPrincipal().mostrarFrame()
 
     def reiniciar_juego(self):
         """Reinicia el juego con una nueva palabra y restablece los intentos."""
@@ -1379,7 +1386,7 @@ class FrameJuego(tk.Frame):
                     
                     if self.bonoCliente is None:
                         messagebox.showinfo("Sin productos", f"No te podemos generar un bono de tipo {self.tipoBono} ya que no hay productos en nuestro inventario")
-                        frameVentanaPrincipal.mostrarFrame()
+                        FieldFrame.getFrameMenuPrincipal().mostrarFrame()
                     else:
                         FrameBono(self.tipoBono, self.bonoCliente).mostrarFrame()
             else:
@@ -1400,7 +1407,7 @@ class FrameJuego(tk.Frame):
                     
                     if self.bonoCliente is None:
                         messagebox.showinfo("Sin productos", f"No te podemos generar un bono de tipo {self.tipoBono} ya que no hay productos en nuestro inventario")
-                        frameVentanaPrincipal.mostrarFrame()
+                        FieldFrame.getFrameMenuPrincipal().mostrarFrame()
                     else:
                         FrameBono(self.tipoBono, self.bonoCliente).mostrarFrame()
         else:
@@ -1497,7 +1504,7 @@ class FrameBono(FieldFrame):
 
             if self.getElementosInteractivos()[0].get() == 'Ir a la ventana principal':
 
-                frameVentanaPrincipal.mostrarFrame()
+                FieldFrame.getFrameMenuPrincipal().mostrarFrame()
 
             elif self.getElementosInteractivos()[0].get() == 'Ir a la zona de servicios':
                 FrameFuncionalidad2().mostrarFrame()
@@ -2690,7 +2697,7 @@ def ventanaDeInicio():
         ventanaLogicaProyecto.deiconify()
 
         #Mostramos el frame correspondiente
-        #frameVentanaPrincipal.mostrarFrame()
+        #FieldFrame.getFrameMenuPrincipal().mostrarFrame()
         frameIniciarSesion.mostrarFrame()
 
     #botonIngreso = tk.Button(frameInferiorIzquierdoP4, text = "Ingresar", font = ("Courier", 10, "bold"), bg= "#FFD700", command= ingresarVentanaPrincipal)
@@ -2864,7 +2871,6 @@ if __name__ == '__main__':
 
     #Frames de lógica proyecto
     frameIniciarSesion = FrameInicioSesion()
-    frameVentanaPrincipal = FrameVentanaPrincipal()
 
     ventanaLogicaProyecto.withdraw()
     ventanaInicio.mainloop()
