@@ -22,8 +22,9 @@ from gestionAplicacion.proyecciones.pelicula import Pelicula
 from gestionAplicacion.proyecciones.salaCine import SalaCine
 from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
-from excepciones.iuExceptions import UiExceptions, UiEmptyValues, UiDefaultValues
-from excepciones.pagosExceptions import PagosExceptions, PagoSinCompletar, CerrarPago
+from excepciones.uiExceptions import UiEmptyValues, UiDefaultValues
+from excepciones.pagosExceptions import PagoSinCompletar, CerrarPago
+from excepciones.timeExceptions import ExpiredMembershipException, NoMoreFilmsException
 from excepciones.errorAplicacion import ErrorAplicacion
 from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
 from gestionAplicacion.servicios.arkade import Arkade
@@ -568,6 +569,7 @@ class FrameVentanaPrincipal(FieldFrame):
         self._menuArchivo = None
         self._menuProcesosConsultas = None
         self._menuAyuda = None
+        self._clienteProceso = FieldFrame.getClienteProceso()
 
     def construirMenu(self):
         self._barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Times New Roman", 10))
@@ -590,7 +592,6 @@ class FrameVentanaPrincipal(FieldFrame):
         self._menuProcesosConsultas.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
 
         self._menuAyuda.add_command(label="Acerca de", command=self.mostrarNombreAutores)
-        self._menuAyuda.bind('<Leave>', self.avanzarDia) #Easter egg para avanzar el tiempo
     
     def mostrarDescripcionSistema(self):
          messagebox.showinfo("Información del Sistema", "En este programa puedes:\n•Comprar Tickets\n•Comprar comida y regalos\n•Usar la zona de juegos\n•Adquirir membresias\n•Calificar nuestros servicios")
@@ -617,16 +618,23 @@ class FrameVentanaPrincipal(FieldFrame):
     def mostrarNombreAutores(self):
          messagebox.showinfo("Autores de la Aplicación", "• Juan José Gonzalez Morales - Alias: El Juanjo\n• Edinson Andrés Ariza Mendoza - Alias: Pana Andy\n• Rusbel Danilo Jaramillo Hincapie - Alias: El Indigente\n• Gerson Bedoya Hinestroza - Alias: El viejo Gerson\n• Santiago Castro Herrera - Alias: EL LuisMi")
 
-    def logicaMembresia(self, clienteProceso):
-        advertenciaMembresia = SucursalCine.notificarFechaLimiteMembresia(clienteProceso)
-        if (advertenciaMembresia != ""):
-            messagebox.showwarning("Expiración de membresía", message= f"{advertenciaMembresia}")
+    def logicaMembresia(self):
+
+        SucursalCine.notificarFechaLimiteMembresia(self._clienteProceso)
+
+        if self._clienteProceso.getMembresia() != None:
+            diasRestantes = self.evaluarDiasRestantes()
+            if diasRestantes < 6:
+                try:
+                    raise ExpiredMembershipException(diasRestantes)
+                except ErrorAplicacion as e:
+                    messagebox.showError('Error', e.mostrarMensaje())
 
     def avanzarDia(self):
-        print("hola")
+
         #facilitamos el acceso a la sede y creamos una boolean de validación
         sucursalCineActual = FieldFrame.getClienteProceso().getCineUbicacionActual()
-        sucursalCineActual.setFechaActual((sucursalCineActual.getFechaActual() + timedelta( days = 1 )))
+        sucursalCineActual.setFechaActual((sucursalCineActual.getFechaActual() + timedelta( seconds= 20 )))
         noHayHorariosPresentaciones = True
 
         #Iteramos sobre cada sala de cine, consultando si tiene horarios de películas en presentación
@@ -636,11 +644,14 @@ class FrameVentanaPrincipal(FieldFrame):
                 break
         
         if noHayHorariosPresentaciones:
-            messagebox.showinfo('Actualización fecha y hora', 'Hemos detectado que han concluido todas las presentaciones del día de hoy, por lo tanto, se pasará al dia siguiente de forma automática. Gracias por su compresión\n')
+            try:
+                raise NoMoreFilmsException(self._clienteProceso.getCineUbicacionActual().getFechaActual())
+            except ErrorAplicacion as e:
+                messagebox.showEror('Error', e.mostrarMensaje())
             sucursalCineActual.setFechaActual((sucursalCineActual.getFechaActual() + timedelta( days = 1 )).replace(hour = SucursalCine.getInicioHorarioLaboral().hour, minute = SucursalCine.getInicioHorarioLaboral().minute)) #Inicio de la jornada laboral al otro día
     
         sucursalCineActual.avanzarTiempo() #Avanzamos el tiempo y ejecutamos lógica semenal o diaria según el caso
-        self.logicaMembresia(self.getClienteProceso())
+        self.logicaMembresia()
         self.refrescarFramesFuncionalidades() #Actualizamos los frames, ya que se han visto modificados por el avance de tiempo
 
     def getBarraMenuPrincipal(self):
@@ -656,6 +667,16 @@ class FrameVentanaPrincipal(FieldFrame):
 
     def getMenuAyuda(self):
         return self._menuAyuda
+
+    def evaluarDiasRestantes(self):
+        #Se verifica si la fecha actual esta pasada a la fecha limite de la membresia.
+        if (self._clienteProceso.getCineUbicacionActual().getFechaActual().date() > self._clienteProceso.getFechaLimiteMembresia()):
+            return 0
+
+            
+        #En caso de que falten 5 días o menos para que la membresía expire, se actualiza el mensaje con una advertencia.
+        elif (self._clienteProceso.getCineUbicacionActual().getFechaActual().date() < self._clienteProceso.getFechaLimiteMembresia()):
+            return (self._clienteProceso.getFechaLimiteMembresia() - self._clienteProceso.getCineUbicacionActual().getFechaActual().date()).days
 
 ###########################################################################################################################################
 
@@ -2823,8 +2844,8 @@ if __name__ == '__main__':
 
     #Creamos los objetos de la lógica del proyecto
     
-    Deserializador.deserializar()
-    #objetosBasePractica2()
+    #Deserializador.deserializar()
+    objetosBasePractica2()
     #Creacion de la ventana de inicio 
     ventanaInicio = tk.Tk()
     ventanaInicio.title("Ventana de Inicio Cinemar")

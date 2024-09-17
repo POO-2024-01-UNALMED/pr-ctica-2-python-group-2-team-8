@@ -124,7 +124,7 @@ class Deserializador:
 
         #Eliminamos los tickets caducados
         for ticket in ticketsAElimiinar:
-            SucursalCine.getTicketsDisponibles().remove(ticket)
+            sedeBase.getTicketsDisponibles().remove(ticket)
         
         #Eliminamos los tickets para descuento el día de hoy
         for sede in SucursalCine.getSucursalesCine():
