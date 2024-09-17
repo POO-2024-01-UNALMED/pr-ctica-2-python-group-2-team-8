@@ -38,7 +38,7 @@ class ServicioSouvenir(Servicio):
 
     def procesarPagoRealizado(self, cliente):
         self.descuento = True
-        for productoOrden in self.orden:
+        for productoOrden in self._orden:
             validacionIngresoHistorial = True
             for productoHistorial in cliente.getHistorialDePedidos():
                 if (productoOrden.nombre.lower() == productoHistorial.nombre.lower() and

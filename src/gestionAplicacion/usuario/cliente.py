@@ -14,6 +14,7 @@ class Cliente():
         #Atributos Funcionalidad 1
         self._tickets = []
         self._historialDePeliculas = []
+        self._historialDePedidos = []
 
         #Atributos Funcionalidad 2
 
@@ -249,6 +250,12 @@ class Cliente():
     
     def setHistorialDePeliculas(self, historialDePeliculas):
         self._historialDePeliculas = historialDePeliculas
+
+    def getHistorialDePedidos(self):
+        return self._historialDePedidos
+    
+    def setHistorialDePeliculas(self, historialDePedidos):
+        self._historialDePedidos = historialDePedidos    
 
     def getCineUbicacionActual(self):
         return self._cineUbicacionActual
