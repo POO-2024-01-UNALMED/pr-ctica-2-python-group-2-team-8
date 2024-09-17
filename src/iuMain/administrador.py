@@ -489,6 +489,7 @@ class FrameCrearUsuario(FieldFrame):
         self._tipoDocumentoCliente = tipoDocumentoSeleccionado
         self._numDocumentoCliente = numDocumentoSeleccionado
         self._sucursalActual = sucursalSeleccionada
+
         
     def funAceptar(self):
 
@@ -538,6 +539,7 @@ class FrameVentanaPrincipal(FieldFrame):
         self._labelImagen.grid(row=0, column=0)
 
         FieldFrame.setFrameMenuPrincipal(self)
+
 
         #Se buscan los widget que tenga FieldFrame y se eliminan para este frame.
         for widget in self.winfo_children():
@@ -634,6 +636,7 @@ class FrameZonaJuegos(FieldFrame):
             botonVolver = botonVolver, 
             frameAnterior = FieldFrame.getFrameMenuPrincipal() 
         )
+
 
         #se destruyen todos los widgets creados por el init del padre
         for widget in self.winfo_children():
