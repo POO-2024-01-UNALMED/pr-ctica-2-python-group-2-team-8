@@ -2588,33 +2588,33 @@ def ventanaDeInicio():
 
     imagenes1 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel1.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/a2.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Andy1.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/Juanjo1.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/a4.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Gerson1.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/san1.png"),
     ]
 
     imagenes2 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/b2.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Andy2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/Juanjo2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/b4.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Gerson2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/san2.png"),
     ]
 
     imagenes3 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel3.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/c2.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Andy3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/Juanjo3.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/c4.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Gerson3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/san3.png"),
     ]
 
     imagenes4 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/d2.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Andy4.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/Juanjo4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/d4.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Gerson4.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/san4.png"),
     ]
 
