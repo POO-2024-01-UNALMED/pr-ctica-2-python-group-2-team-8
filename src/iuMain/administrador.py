@@ -23,6 +23,7 @@ from gestionAplicacion.proyecciones.salaCine import SalaCine
 from gestionAplicacion.usuario.membresia import Membresia
 from gestionAplicacion.usuario.metodoPago import MetodoPago
 from excepciones.iuExceptions import UiExceptions, UiEmptyValues, UiDefaultValues
+from excepciones.pagosExceptions import PagosExceptions, PagoSinCompletar, CerrarPago
 from gestionAplicacion.usuario.tarjetaCinemar import TarjetaCinemar
 from gestionAplicacion.servicios.arkade import Arkade
 from gestionAplicacion.usuario.ticket import Ticket
@@ -534,7 +535,7 @@ class FrameCrearUsuario(FieldFrame):
                     #Verificamos que la edad ingresada sea apropiada para el documento seleccionado
                     if (self._tipoDocumentoCliente == TipoDocumento.CC.value and edadCliente >= 18) or (self._tipoDocumentoCliente == TipoDocumento.TI.value and edadCliente < 18) or (self._tipoDocumentoCliente == TipoDocumento.CE.value and edadCliente >= 18):
                         #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
-                        clienteCreado = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, self._sucursalActual)
+                        clienteCreado = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, [tipoDocumento for tipoDocumento in TipoDocumento if tipoDocumento.value == self._tipoDocumentoCliente][0], self._sucursalActual)
                         MetodoPago.asignarMetodosDePago(clienteCreado)
                         self.logicaInicioProcesosFuncionalidades(clienteCreado)
                     
@@ -561,30 +562,35 @@ class FrameVentanaPrincipal(FieldFrame):
         for widget in self.winfo_children():
             if isinstance(widget, tk.Button):
                 widget.destroy()
+        
+        self._barraMenuPrincipal = None
+        self._menuArchivo = None
+        self._menuProcesosConsultas = None
+        self._menuAyuda = None
 
     def construirMenu(self):
-        barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Times New Roman", 10))
-        ventanaLogicaProyecto.config(menu=barraMenuPrincipal)
-        menuArchivo = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Times New Roman", 10), activebackground= "light blue", activeforeground="black")
-        menuProcesosConsultas = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Times New Roman", 10), activebackground= "light blue", activeforeground="black")
-        menuAyuda = tk.Menu(barraMenuPrincipal, tearoff= 0, font=("Times New Roman", 10), activebackground= "light blue", activeforeground="black")
+        self._barraMenuPrincipal = tk.Menu(ventanaLogicaProyecto, font=("Times New Roman", 10))
+        ventanaLogicaProyecto.config(menu=self._barraMenuPrincipal)
+        self._menuArchivo = tk.Menu(self._barraMenuPrincipal, tearoff= 0, font=("Times New Roman", 10), activebackground= "light blue", activeforeground="black")
+        self._menuProcesosConsultas = tk.Menu(self._barraMenuPrincipal, tearoff= 0, font=("Times New Roman", 10), activebackground= "light blue", activeforeground="black")
+        self._menuAyuda = tk.Menu(self._barraMenuPrincipal, tearoff= 0, font=("Times New Roman", 10), activebackground= "light blue", activeforeground="black")
 
-        barraMenuPrincipal.add_cascade(label="Archivo", menu=menuArchivo, font=("Times New Roman", 10))
-        barraMenuPrincipal.add_cascade(label="Procesos y Consultas", menu= menuProcesosConsultas, font=("Times New Roman", 10))
-        barraMenuPrincipal.add_cascade(label="Ayuda", menu= menuAyuda, font=("Times New Roman", 10))
+        self._barraMenuPrincipal.add_cascade(label="Archivo", menu=self._menuArchivo, font=("Times New Roman", 10))
+        self._barraMenuPrincipal.add_cascade(label="Procesos y Consultas", menu= self._menuProcesosConsultas, font=("Times New Roman", 10))
+        self._barraMenuPrincipal.add_cascade(label="Ayuda", menu= self._menuAyuda, font=("Times New Roman", 10))
         
-        menuArchivo.add_command(label="Aplicación", command=self.mostrarDescripcionSistema)
-        menuArchivo.add_command(label="Salir", command=self.mostrarVentanaInicio)
+        self._menuArchivo.add_command(label="Aplicación", command=self.mostrarDescripcionSistema)
+        self._menuArchivo.add_command(label="Salir", command=self.mostrarVentanaInicio)
 
-        menuProcesosConsultas.add_command(label = "Sistema proyecciones", command = self.ingresarFuncionalidad1)
-        menuProcesosConsultas.add_command(label="Zona de juegos", command=self.ingresarFuncionalidad4)
-        menuProcesosConsultas.add_command(label="Calificaciones", command=self.ingresarFuncionalidad3)
-        menuProcesosConsultas.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
-        menuProcesosConsultas.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
+        self._menuProcesosConsultas.add_command(label = "Sistema proyecciones", command = self.ingresarFuncionalidad1)
+        self._menuProcesosConsultas.add_command(label="Zona de juegos", command=self.ingresarFuncionalidad4)
+        self._menuProcesosConsultas.add_command(label="Calificaciones", command=self.ingresarFuncionalidad3)
+        self._menuProcesosConsultas.add_command(label="Servicio de comida/souvenir", command= self.ingresarFuncionalidad2)
+        self._menuProcesosConsultas.add_command(label="Sistema de membresías", command=self.ingresarFuncionalidad5)
 
-        menuAyuda.add_command(label="Acerca de", command=self.mostrarNombreAutores)
-        menuAyuda.bind('<Leave>', self.avanzarDia) #Easter egg para avanzar el tiempo
-
+        self._menuAyuda.add_command(label="Acerca de", command=self.mostrarNombreAutores)
+        self._menuAyuda.bind('<Leave>', self.avanzarDia) #Easter egg para avanzar el tiempo
+    
     def mostrarDescripcionSistema(self):
          messagebox.showinfo("Información del Sistema", "En este programa puedes:\n•Comprar Tickets\n•Comprar comida y regalos\n•Usar la zona de juegos\n•Adquirir membresias\n•Calificar nuestros servicios")
     
@@ -631,6 +637,20 @@ class FrameVentanaPrincipal(FieldFrame):
     
     def logicaMembresia(self):
         pass
+
+    def getBarraMenuPrincipal(self):
+        return self._barraMenuPrincipal
+
+    def getMenuArchivo(self):
+        print(self._menuArchivo)
+        return self._menuArchivo
+    
+    def getMenuProcesosConsultas(self):
+        print(self._menuProcesosConsultas)
+        return self._menuProcesosConsultas
+
+    def getMenuAyuda(self):
+        return self._menuAyuda
 
 ###########################################################################################################################################
 
@@ -2092,15 +2112,39 @@ class FramePasarelaDePagos(FieldFrame):
         self._opcionComboBox = self.getElementosInteractivos()[1]
         self._opcionComboBox.bind("<<ComboboxSelected>>", self.descuentoEnPantalla)
 
+        self.establecerError()
     
     def descuentoEnPantalla(self, event):
         self._metodoSeleccionado.config(text=f"Método de pago: {self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getNombre()}, Descuento: {int(self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado() * 100)}%, Máximo saldo: {self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getLimiteMaximoPago()}")
         self._precioDescuento.config(text=f"Nuevo valor: {self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))}")
         #print(self._precioDescuento)
+    
+    def establecerError(self):
+        self.getFrameMenuPrincipal().getMenuArchivo().delete(0,'end')
+        self.getFrameMenuPrincipal().getMenuProcesosConsultas().delete(0,'end')
+        self.getFrameMenuPrincipal().getMenuAyuda().delete(0,'end')
+
+        self.getFrameMenuPrincipal().getMenuArchivo().add_command(label="Aplicación", command=self._generarError)
+        self.getFrameMenuPrincipal().getMenuArchivo().add_command(label="Salir", command=self._generarError)
+
+        self.getFrameMenuPrincipal().getMenuProcesosConsultas().add_command(label="Sistema proyecciones", command=self._generarError)
+        self.getFrameMenuPrincipal().getMenuProcesosConsultas().add_command(label="Zona de juegos", command=self._generarError)
+        self.getFrameMenuPrincipal().getMenuProcesosConsultas().add_command(label="Calificaciones", command=self._generarError)
+        self.getFrameMenuPrincipal().getMenuProcesosConsultas().add_command(label="Servicio de comida/souvenir", command=self._generarError)
+        self.getFrameMenuPrincipal().getMenuProcesosConsultas().add_command(label="Sistema de membresías", command=self._generarError)
+
+        self.getFrameMenuPrincipal().getMenuAyuda().add_command(label="Acerca de", command=self._generarError)
+
+    def _generarError(self):
+        try:
+            raise CerrarPago()
+        except PagosExceptions as e:
+            messagebox.showerror('Error', e.mostrarMensaje())
 
     def funAceptar(self):
         if self.evaluarExcepciones():
             metodoPagoSeleccionado = self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()]
+            
             if isinstance(self._elementosIbuyable[0], Servicio):
                 if self._elementosIbuyable[0].descuento:
                     if ("Efectivo" not in self._elementosInteractivos[1].get()) and self._elementosIbuyable[0].descuentarPorCompra(metodoPagoSeleccionado):
@@ -2115,7 +2159,13 @@ class FramePasarelaDePagos(FieldFrame):
             precio = self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))
             self._valorAPagar = metodoPagoSeleccionado.realizarPago(precio, self.getClienteProceso())
             if (self._valorAPagar > 0):
-                messagebox.showwarning(title="Proceso de pago", message= f"Falta por pagar: {self._valorAPagar}")
+                
+                #Generamos el error de pago inconcluso
+                try:
+                    raise PagoSinCompletar(self._valorAPagar)
+                except PagosExceptions as e:
+                    messagebox.showerror('Error', e.mostrarMensaje())
+
                 self.getElementosInteractivos()[0].configure(state="normal")
                 self.setValueEntry("Precio original :", int(self._valorAPagar))
                 self.getElementosInteractivos()[0].configure(state="disabled")
@@ -2134,10 +2184,11 @@ class FramePasarelaDePagos(FieldFrame):
                 if isinstance(self._elementosIbuyable[0], Servicio):
                     self._elementosIbuyable[0].setOrden([])
                     self._elementosIbuyable[0].setValorPedido(0)
+                
+                #Reestablecemos los eventos
+                self.getFrameMenuPrincipal().construirMenu()
                 self._frameSiguiente.mostrarFrame()
-
-        
-
+                
 class FrameRecargarTarjetaCinemar(FramePasarelaDePagos):
     def __init__(self):
 

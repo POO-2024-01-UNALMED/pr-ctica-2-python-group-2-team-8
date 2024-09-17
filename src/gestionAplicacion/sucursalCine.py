@@ -330,21 +330,18 @@ class SucursalCine:
         """
 
         SucursalCine._fechaActual += timedelta( seconds = 20 )
-        print(SucursalCine._fechaActual.date(), SucursalCine._fechaRevisionLogicaDeNegocio, SucursalCine._fechaValidacionNuevoDiaDeTrabajo)
+        
         if SucursalCine._fechaActual.date() >= SucursalCine._fechaRevisionLogicaDeNegocio:
-            print('Lógica semanal aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
             #Avanzamos la próxima evaluación a la próxima semana
             SucursalCine._fechaRevisionLogicaDeNegocio = (self._fechaActual + timedelta( weeks = 1 )).date()
             #Ejecutamos la lógica semanal
             SucursalCine.logicaSemanalSistemNegocio()
         
         if SucursalCine._fechaActual.date() >= SucursalCine._fechaValidacionNuevoDiaDeTrabajo:
-            print('Lógica diaria aaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
             #Avanzamos la próxima evaluación al día siguiente
             SucursalCine._fechaValidacionNuevoDiaDeTrabajo = (SucursalCine._fechaActual + timedelta( days = 1 )).date()
             #Ejecutamos la lógica diaria
             SucursalCine.logicaDiariaReservarTicket()
-            print('Lógica diaria aaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         
         if SucursalCine._fechaActual.time() >= SucursalCine._INICIO_HORARIO_LABORAL and SucursalCine._fechaActual.time() < SucursalCine._FIN_HORARIO_LABORAL:
             SucursalCine.actualizarPeliculasSalasDeCine()
