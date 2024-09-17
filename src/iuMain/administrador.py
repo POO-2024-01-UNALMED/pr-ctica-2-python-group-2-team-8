@@ -305,6 +305,11 @@ class FrameReclamoDeBonos(FieldFrame):
                 self._servicio.setBonosCliente([])
                 self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
                 FrameReclamoDeBonos(self._servicio).mostrarFrame()
+    
+    def funAceptar(self):
+        total = self._servicio.calcularTotal()
+        self._servicio.setValorPedido(total)
+        FramePasarelaDePagos(self.getFrameMenuPrincipal(),total,self._servicio).mostrarFrame()
 
 class FrameGeneracionDeProductos(FieldFrame):
     def __init__(self, servicio):
@@ -2051,11 +2056,18 @@ class FramePasarelaDePagos(FieldFrame):
 
     def funAceptar(self):
         if self.evaluarExcepciones():
-
-            if isinstance(self._elementosIbuyable, Servicio):
-                messagebox.showinfo(title="", message= "")
-
             metodoPagoSeleccionado = self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()]
+            if isinstance(self._elementosIbuyable[0], Servicio):
+                print(self._elementosIbuyable[0].descuentarPorCompra(metodoPagoSeleccionado))
+                if ("Efectivo" not in self._elementosInteractivos[1].get()) and self._elementosIbuyable[0].descuentarPorCompra(metodoPagoSeleccionado):
+                    print("EEEEEEEEEEEEEEEEEEEEEEEE")
+                    self.getElementosInteractivos()[0].configure(state="normal")
+                    self.setValueEntry("Precio original :", self._elementosIbuyable[0].getValorPedido())
+                    self.getElementosInteractivos()[0].configure(state="disabled")
+                    self._valorAPagar = self._elementosIbuyable[0].getValorPedido()
+                    messagebox.showinfo(title="Felicidades", message= f"Tenes un descuento sorpresa por escoger un metodo de pago con descuento y compras asociadas a dichos bancos")
+##################################
+
             precio = self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))
             self._valorAPagar = metodoPagoSeleccionado.realizarPago(precio, self.getClienteProceso())
 
@@ -2075,6 +2087,8 @@ class FramePasarelaDePagos(FieldFrame):
                     elementoIbuyable.procesarPagoRealizado(self.getClienteProceso())
                     mensaje+=elementoIbuyable.factura()
                 messagebox.showinfo(title="Pago realizado", message= f"Pago realizado exitosamente. \n{mensaje}")
+                MetodoPago.asignarMetodosDePago(self.getClienteProceso())
+                self._elementosIbuyable[0].procesarPagoRealizado(self._clienteProceso)
                 self._frameSiguiente.mostrarFrame()
 
 
@@ -2085,8 +2099,24 @@ def objetosBasePractica2():
     sucursalCine2 = SucursalCine("Marinilla")
     sucursalCine3 = SucursalCine("Medellín")
 
+    servicioComidaM = ServicioComida("comida", sucursalCine1)
+
     servicioComida = ServicioComida("comida", sucursalCine2)
     servicioSouvenirs = ServicioSouvenir("souvenir", sucursalCine2)
+
+    servicioSouvenirM = ServicioSouvenir("souvenir", sucursalCine3)
+
+    # Productos de la sucursal de Bucaramanga
+
+    producto1M =  Producto("Hamburguesa","Grande","comida",25000,200,"Normal",sucursalCine1)
+    producto2M =  Producto("Hamburguesa","Deadpool","comida",30000,200,"Comedia",sucursalCine1)
+    producto3M =  Producto("Perro caliente","Grande","comida",20000,200,"Normal",sucursalCine1)
+    producto4M =  Producto("Perro caliente","Bolt","comida",30000,200,"Comedia",sucursalCine1)
+    producto5M =  Producto("Crispetas","Muerte","comida",15000,200,"Acción",sucursalCine1)
+    producto6M =  Producto("Crispetas","Grandes","comida",16000,200,"Normal",sucursalCine1)
+    producto7M =  Producto("Gaseosa","Grande","comida",6000,200,"Normal",sucursalCine1)
+    producto8M =  Producto("Gaseosa","Pequeña","comida",3000,200,"Normal",sucursalCine1)
+
 
     # Productos de la sucursal de Marinilla
 
@@ -2104,6 +2134,14 @@ def objetosBasePractica2():
     producto3S = Producto("Gorra","L","souvenir",11000,200,"Normal",sucursalCine2)
     producto4S = Producto("Llavero","Katana","souvenir",22000,200,"Acción",sucursalCine2)
     producto5S = Producto("Peluche","Pajaro loco","souvenir",29000,200,"Comedia",sucursalCine2)
+
+    # Productos de la sucursal de Medellin
+
+    producto1SM =  Producto("Camisa","XL","souvenir",19000,200,"Normal",sucursalCine3)
+    producto2SM =  Producto("Camisa","Escuadron suicida","souvenir",30000,200,"Comedia",sucursalCine3)
+    producto3SM =  Producto("Gorra","L","souvenir",12000,200,"Normal",sucursalCine3)
+    producto4SM =  Producto("Llavero","Emociones","souvenir",30000,200,"Acción",sucursalCine3)
+    producto5SM =  Producto("Peluche","Deku","souvenir",30000,200,"Comedia",sucursalCine3)
     
 
     cliente1 = Cliente("Rusbel", 18, 13434, TipoDocumento.CC, sucursalCine2)
