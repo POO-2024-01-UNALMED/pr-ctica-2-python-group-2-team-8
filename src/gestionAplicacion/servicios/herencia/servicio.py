@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import random
 from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.servicios.producto import Producto
-from gestionAplicacion.usuario.ibuyable import Ibuyable
 
 class Servicio (ABC):
     cliente  = None

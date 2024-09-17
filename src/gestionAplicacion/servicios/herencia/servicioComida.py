@@ -1,7 +1,8 @@
 import datetime
 from gestionAplicacion.servicios.herencia.servicio import Servicio
+from gestionAplicacion.usuario.ibuyable import Ibuyable
 
-class ServicioComida(Servicio):
+class ServicioComida(Servicio, Ibuyable):
     
     def __init__(self, nombre, sucursalUbicacion):
         super().__init__(nombre, sucursalUbicacion)
