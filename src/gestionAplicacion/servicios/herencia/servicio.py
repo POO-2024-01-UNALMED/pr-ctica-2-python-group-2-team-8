@@ -2,9 +2,11 @@ from abc import ABC, abstractmethod
 import random
 from gestionAplicacion.servicios.producto import Producto
 from gestionAplicacion.servicios.producto import Producto
+from gestionAplicacion.usuario.ibuyable import Ibuyable
 
-class Servicio (ABC):
+class Servicio (ABC,Ibuyable):
     cliente  = None
+    descuento = True
     def __init__(self, nombre, sucursalUbicacion):
         self._nombre = nombre
         self._inventario = []
@@ -53,7 +55,7 @@ class Servicio (ABC):
 
     def calcularTotal(self):
         total = 0
-        for producto in self.orden:
+        for producto in self._orden:
             total += producto.getPrecio()
         return total
 
@@ -176,3 +178,9 @@ class Servicio (ABC):
 
     def setBonosCliente(self, bonosCliente):
         self._bonosCliente = bonosCliente
+
+    def getDescuento(self):
+        return self.descuento
+
+    def setDescuento(self, descuento):
+        self.descuento= descuento

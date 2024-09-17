@@ -385,7 +385,7 @@ class Pelicula:
         isAsientosDisponibles = False
 
         for horario in self.filtrarHorariosPelicula():
-          isAsientosDisponibles = self.isDisponibilidadAlgunAsientoSalaVirtual(horario)
+          isAsientosDisponibles = self.isDisponibilidadAsientoSalaVirtual(horario)
         if isAsientosDisponibles:
            horariosPelicula = horario
 
