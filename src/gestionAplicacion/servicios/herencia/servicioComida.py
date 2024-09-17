@@ -39,6 +39,4 @@ class ServicioComida(Servicio, Ibuyable):
         return factura
 
     def procesarPagoRealizado(self, cliente):
-        self._orden = []
-        self._valorPedido = 0.0
         self.descuento = True
