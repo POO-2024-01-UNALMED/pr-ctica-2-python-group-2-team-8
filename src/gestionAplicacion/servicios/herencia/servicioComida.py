@@ -32,10 +32,22 @@ class ServicioComida(Servicio):
             f" Nombre dueño : {self.cliente.getNombre()}\n"
             f" Fecha de compra: {datetime.date.today()}\n"
             f"{self.mostrarOrden()}\n"
-            f" Total a pagar aplicando descuentos : ${self._valorPedido}\n"
             "===========================================================\n"
         )
         return factura
 
     def procesarPagoRealizado(self, cliente):
         self.descuento = True
+        for productoOrden in self.orden:
+            validacionIngresoHistorial = True
+            for productoHistorial in cliente.getHistorialDePedidos():
+                if (productoOrden.nombre.lower() == productoHistorial.nombre.lower() and
+                    productoOrden.tamaño.lower() == productoHistorial.tamaño.lower()):
+                    validacionIngresoHistorial = False
+                    break
+            if validacionIngresoHistorial:
+                cliente.getProductosDisponiblesParaCalificar().append(productoOrden)
+                cliente.getHistorialDePedidos().append(productoOrden)
+
+
+        

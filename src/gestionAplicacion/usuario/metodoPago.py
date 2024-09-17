@@ -164,8 +164,6 @@ class MetodoPago():
             for metodoPago in clienteProceso.getMetodosDePago():
                 if (metodoPago.getNombre() == "Puntos"):
                     puntos = metodoPago
-                    print("Entroo")
-                    print(puntos.getNombre())
                     break
 
         #Partimos de 1 para contar el método de pago puntos
