@@ -489,6 +489,7 @@ class FrameCrearUsuario(FieldFrame):
         self._tipoDocumentoCliente = tipoDocumentoSeleccionado
         self._numDocumentoCliente = numDocumentoSeleccionado
         self._sucursalActual = sucursalSeleccionada
+
         
     def funAceptar(self):
 
@@ -513,20 +514,16 @@ class FrameCrearUsuario(FieldFrame):
                     #Verificamos que la edad ingresada sea apropiada para el documento seleccionado
                     if (self._tipoDocumentoCliente == TipoDocumento.CC.value and edadCliente >= 18) or (self._tipoDocumentoCliente == TipoDocumento.TI.value and edadCliente < 18) or (self._tipoDocumentoCliente == TipoDocumento.CE.value and edadCliente >= 18):
                         #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
-                        self.logicaInicioProcesosFuncionalidades(Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, self._sucursalActual))
+                        clienteCreado = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, self._sucursalActual)
+                        MetodoPago.asignarMetodosDePago(clienteCreado)
+                        self.logicaInicioProcesosFuncionalidades(clienteCreado)
                     
                     else: 
                         messagebox.showerror('Error', 'Debes seleccionar una edad apropiada para el documento seleccionado anteriormente')
                 
                 else:
-                    messagebox.showerror('Error', 'La edad mínima para acceder a nuestras instalaciones es de 5 años')
-
-                #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
-                clienteCreado = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, self._sucursalActual)
-                MetodoPago.asignarMetodosDePago(clienteCreado)
-                self.logicaInicioProcesosFuncionalidades(clienteCreado)
-                
-        
+                    messagebox.showerror('Error', 'La edad mínima para acceder a nuestras instalaciones es de 5 años')      
+                 
 class FrameVentanaPrincipal(FieldFrame):
 
     def __init__(self):
@@ -538,6 +535,7 @@ class FrameVentanaPrincipal(FieldFrame):
         self._labelImagen.grid(row=0, column=0)
 
         FieldFrame.setFrameMenuPrincipal(self)
+
 
         #Se buscan los widget que tenga FieldFrame y se eliminan para este frame.
         for widget in self.winfo_children():
@@ -634,6 +632,7 @@ class FrameZonaJuegos(FieldFrame):
             botonVolver = botonVolver, 
             frameAnterior = FieldFrame.getFrameMenuPrincipal() 
         )
+
 
         #se destruyen todos los widgets creados por el init del padre
         for widget in self.winfo_children():
