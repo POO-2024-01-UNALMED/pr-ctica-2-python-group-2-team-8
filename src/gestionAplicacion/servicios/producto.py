@@ -11,7 +11,8 @@ class Producto():
         self._sucursalSede=sucursalSede
         self._totalEncuestasDeValoracionRealizadasComida=25
         self._strikeCambio = False
-        sucursalSede.getInventarioCine().append(self)
+        if sucursalSede is not None:
+            sucursalSede.getInventarioCine().append(self)
 
     def comprobarBonoEnOrden(self, servicio):
         for producto in servicio.getOrden():

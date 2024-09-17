@@ -12,7 +12,6 @@ class Bono(Ibuyable):
     self._cliente = cliente
     cliente.getCineUbicacionActual().getBonosCreados().append(self)
 
-    self._dueno = None
 
   def factura(self):
         """

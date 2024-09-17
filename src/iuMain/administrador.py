@@ -1002,7 +1002,6 @@ class FrameEleccionJuego(FieldFrame):
         for i, w in enumerate(self.widgets):
             if isinstance(w, ttk.Combobox):
                 pass
-                #w.config(width=30)
             else:
                 w.config(font = ("courier new", tamaños[i]), bg = "#F0F8FF")
 
@@ -1119,8 +1118,7 @@ class FrameEleccionJuego(FieldFrame):
                         if respuesta:
                             #Linea para llamar al frame de recargar tarjeta
                             FrameRecargarTarjetaCinemar().mostrarFrame()
-                        else:
-                            print('Dijo que no')
+
                  else:
                      if self.comboBoxCategorias.get() == Ticket.encontrarGeneroCodigoPelicula(self.interactuableCodigosDescuento.get()):
                          precio = precio -precio*0.2 
@@ -1136,8 +1134,7 @@ class FrameEleccionJuego(FieldFrame):
                             if respuesta:
                                 #Linea para llamar al frame de recargar tarjeta
                                 FrameRecargarTarjetaCinemar().mostrarFrame()
-                            else:
-                                print('Dijo que no')
+
                      else:
                          messagebox.showerror("Error", "Has seleccionado un codigo con genero diferente al juego, por lo que no puedes redimirlo")
              else:
@@ -1151,8 +1148,7 @@ class FrameEleccionJuego(FieldFrame):
                     if respuesta:
                         #Linea para llamar al frame de recargar tarjeta
                         FrameRecargarTarjetaCinemar().mostrarFrame()
-                    else:
-                        print('Dijo que no')
+
         
 class FrameJuego(tk.Frame):
 
@@ -1430,7 +1426,24 @@ class FrameBono(FieldFrame):
         self.canvas.create_rectangle(140, 100, 250, 120, outline="black", fill="#E6E6FA")
         self.canvas.create_text(195, 110, text=codigo, font=("courier new", 10), fill="#333")   
 
+    def funAceptar(self):
+        if self.evaluarExcepciones():
 
+            if self.getElementosInteractivos()[0].get() == 'Ir a la ventana principal':
+
+                frameVentanaPrincipal.mostrarFrame()
+
+            elif self.getElementosInteractivos()[0].get() == 'Ir a la zona de servicios':
+                FrameFuncionalidad2().mostrarFrame()
+
+            elif self.getElementosInteractivos()[0].get() == 'Volver a seleccionar juego':
+                FrameEleccionJuego(FrameEleccion(FrameZonaJuegos())).mostrarFrame()
+
+            elif self.getElementosInteractivos()[0].get() == 'Recargar Tarjeta Cinemar':
+                FrameRecargarTarjetaCinemar().mostrarFrame()
+            
+            elif self.getElementosInteractivos()[0].get() == 'Personalizar Tarjeta Cinemar':
+                FrameTarjetaCinemar(FrameZonaJuegos()).mostrarFrame()
 
 
 
@@ -2232,6 +2245,11 @@ class FrameRecargarTarjetaCinemar(FramePasarelaDePagos):
             if self._valorAPagar<0:
                 messagebox.showerror("Error", 'El valor a recargar no puede ser negativo')
                 return False
+            
+            if self._valorAPagar > sum([obj.getLimiteMaximoPago() for obj in self.getClienteProceso().getMetodosDePago()]):
+                messagebox.showerror("Error", f'El valor a recargar no puede superar {sum([obj.getLimiteMaximoPago() for obj in self.getClienteProceso().getMetodosDePago()])}$')
+                return False
+
             return True
         
         except UiExceptions as e:
