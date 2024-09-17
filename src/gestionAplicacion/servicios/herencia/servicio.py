@@ -6,6 +6,7 @@ from gestionAplicacion.usuario.ibuyable import Ibuyable
 
 class Servicio (ABC,Ibuyable):
     cliente  = None
+    descuento = True
     def __init__(self, nombre, sucursalUbicacion):
         self._nombre = nombre
         self._inventario = []
@@ -177,3 +178,9 @@ class Servicio (ABC,Ibuyable):
 
     def setBonosCliente(self, bonosCliente):
         self._bonosCliente = bonosCliente
+
+    def getDescuento(self):
+        return self.descuento
+
+    def setDescuento(self, descuento):
+        self.descuento= descuento

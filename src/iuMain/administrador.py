@@ -2072,19 +2072,18 @@ class FramePasarelaDePagos(FieldFrame):
         if self.evaluarExcepciones():
             metodoPagoSeleccionado = self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()]
             if isinstance(self._elementosIbuyable[0], Servicio):
-                print(self._elementosIbuyable[0].descuentarPorCompra(metodoPagoSeleccionado))
-                if ("Efectivo" not in self._elementosInteractivos[1].get()) and self._elementosIbuyable[0].descuentarPorCompra(metodoPagoSeleccionado):
-                    print("EEEEEEEEEEEEEEEEEEEEEEEE")
-                    self.getElementosInteractivos()[0].configure(state="normal")
-                    self.setValueEntry("Precio original :", self._elementosIbuyable[0].getValorPedido())
-                    self.getElementosInteractivos()[0].configure(state="disabled")
-                    self._valorAPagar = self._elementosIbuyable[0].getValorPedido()
-                    messagebox.showinfo(title="Felicidades", message= f"Tenes un descuento sorpresa por escoger un metodo de pago con descuento y compras asociadas a dichos bancos")
-##################################
+                if self._elementosIbuyable[0].descuento:
+                    if ("Efectivo" not in self._elementosInteractivos[1].get()) and self._elementosIbuyable[0].descuentarPorCompra(metodoPagoSeleccionado):
+                        self._elementosIbuyable[0].setDescuento(False)
+                        self.getElementosInteractivos()[0].configure(state="normal")
+                        self.setValueEntry("Precio original :", self._elementosIbuyable[0].getValorPedido())
+                        self.getElementosInteractivos()[0].configure(state="disabled")
+                        self._valorAPagar = self._elementosIbuyable[0].getValorPedido()
+                        messagebox.showinfo(title="Felicidades", message= f"Tenes un descuento sorpresa por escoger un metodo de pago con descuento y compras asociadas a dichos bancos")
 
+            
             precio = self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))
             self._valorAPagar = metodoPagoSeleccionado.realizarPago(precio, self.getClienteProceso())
-
             if (self._valorAPagar > 0):
                 messagebox.showwarning(title="Proceso de pago", message= f"Falta por pagar: {self._valorAPagar}")
                 self.getElementosInteractivos()[0].configure(state="normal")
@@ -2098,8 +2097,8 @@ class FramePasarelaDePagos(FieldFrame):
             else:
                 mensaje = ""
                 for elementoIbuyable in self._elementosIbuyable:
-                    elementoIbuyable.procesarPagoRealizado(self.getClienteProceso())
                     mensaje+=elementoIbuyable.factura()
+                    elementoIbuyable.procesarPagoRealizado(self.getClienteProceso())
                 messagebox.showinfo(title="Pago realizado", message= f"Pago realizado exitosamente. \n{mensaje}")
                 MetodoPago.asignarMetodosDePago(self.getClienteProceso())
                 self._elementosIbuyable[0].procesarPagoRealizado(self._clienteProceso)
