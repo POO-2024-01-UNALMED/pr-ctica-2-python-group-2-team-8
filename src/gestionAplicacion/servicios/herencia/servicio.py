@@ -35,25 +35,16 @@ class Servicio (ABC, Ibuyable):
         return b
 
     def actualizarBonos(self):
-        print("No entro")
         for bono in self._sucursalUbicacion.getBonosCreados():
-            print("Entro")
-            print(bono.getTipoServicio(),  self.getNombre())
-            print(bono.getCliente().getNombre(), self.cliente.getNombre())
             if bono.getTipoServicio() == self.getNombre() and bono.getCliente().getNombre() == self.cliente.getNombre():
-                print("Entro----------")
                 self.getBonosCliente().append(bono) 
 
     def descuentarPorGenero(self, cine):
         for producto in self._orden:
             for ticket in cine.getTicketsParaDescuento():
-                print("No ENTRO")
-                print(producto.getGenero(),  ticket.getPelicula().getGenero(),  self.cliente , ticket.getDueno())
                 if producto.getGenero() == ticket.getPelicula().getGenero() and self.cliente == ticket.getDueno():
-                    print("ENTROOOOO")
                     fecha = self._sucursalUbicacion.getFechaActual().date()
                     if fecha == ticket.getHorario().date() and ticket.isDescuento():
-                        print("ENTRO")
                         ticket.setDescuento(False)
                         return producto
         return None
@@ -69,7 +60,6 @@ class Servicio (ABC, Ibuyable):
             n=1
             for p in self._orden:
                 if producto.getNombre() == p.getNombre() and producto.getTamaño() == p.getTamaño():
-                    print(producto.getCantidad())
                     p.setCantidad(int(p.getCantidad()) + int(producto.getCantidad()))
                     p.setPrecio(p.getPrecio() + producto.getPrecio())
                     break

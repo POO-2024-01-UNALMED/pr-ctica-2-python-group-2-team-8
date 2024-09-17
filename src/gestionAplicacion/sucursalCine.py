@@ -418,8 +418,6 @@ class SucursalCine:
         for pelicula in peliculasEliminar:
             if pelicula in self.cartelera:
                 self._cartelera.remove(pelicula)
-            else:
-                print(f"La película {pelicula} no está en la cartelera.")
 
 #Description: Este metodo se encarga de remover los productos que fueron mal calificadas en dos sucursales, por lo
 #tanto por temas de negocio decidimos eliminar este producto por malas ventas, usando la funcion remove, quitandola
