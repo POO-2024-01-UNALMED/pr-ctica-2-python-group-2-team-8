@@ -32,7 +32,6 @@ class ServicioComida(Servicio):
             f" Nombre dueño : {self.cliente.getNombre()}\n"
             f" Fecha de compra: {datetime.date.today()}\n"
             f"{self.mostrarOrden()}\n"
-            f" Total a pagar aplicando descuentos : ${self._valorPedido}\n"
             "===========================================================\n"
         )
         return factura
