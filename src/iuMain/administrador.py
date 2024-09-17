@@ -1,9 +1,3 @@
-
-
-
-
-
-                 
 import sys
 import os
 
@@ -954,7 +948,7 @@ class FrameEleccion(FieldFrame):
             if self.valorComoBox[0] == "Ingresar a los juegos":
                 FrameEleccionJuego(self).mostrarFrame()
             elif self.valorComoBox[0] == "Recargar tarjeta Cinemar":
-                messagebox.showinfo(title="Información", message="No se ha programado esta opcion jiji")
+                FrameRecargarTarjetaCinemar().mostrarFrame()
             elif self.valorComoBox[0] == "Personalizar tarjeta Cinemar":
                 FrameTarjetaCinemar(FrameZonaJuegos()).mostrarFrame() 
     
@@ -1125,7 +1119,7 @@ class FrameEleccionJuego(FieldFrame):
                         respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
                         if respuesta:
                             #Linea para llamar al frame de recargar tarjeta
-                            print('Dijo que si')
+                            FrameRecargarTarjetaCinemar().mostrarFrame()
                         else:
                             print('Dijo que no')
                  else:
@@ -1142,7 +1136,7 @@ class FrameEleccionJuego(FieldFrame):
                             respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
                             if respuesta:
                                 #Linea para llamar al frame de recargar tarjeta
-                                print('Dijo que si')
+                                FrameRecargarTarjetaCinemar().mostrarFrame()
                             else:
                                 print('Dijo que no')
                      else:
@@ -1157,7 +1151,7 @@ class FrameEleccionJuego(FieldFrame):
                     respuesta = messagebox.askyesno("Saldo Insuficiente", "No tienes saldo suficiente para continuar. ¿Desea ir a recargar la tarjeta?")
                     if respuesta:
                         #Linea para llamar al frame de recargar tarjeta
-                        print('Dijo que si')
+                        FrameRecargarTarjetaCinemar().mostrarFrame()
                     else:
                         print('Dijo que no')
         
@@ -1359,15 +1353,7 @@ class FrameBono(FieldFrame):
         self.tipoBono = tipoBono
         self.bonoCliente = bono
 
-        """if redimioCodigo:
-            self.tipoBono = "Comida"
-        else:
-            self.tipoBono = "Souvenir"
 
-        if self.tipoBono == "Comida":
-            self.bonoCliente = Bono.generarBonoComidaJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)
-        elif self.tipoBono == "Souvenir": 
-            self.bonoCliente = Bono.generarBonoSouvenirJuegos(self.clienteProceso.getCineUbicacionActual(), self.clienteProceso)"""
 
 
         super().__init__(
@@ -1395,7 +1381,6 @@ class FrameBono(FieldFrame):
         self.widgets[5].grid_configure(row=6, column=1)
         self.widgets[6].grid_configure(row=7, column=1)
         self.widgets[7].grid_configure(row=7, column=0)
-        #self.widgets[5].grid_configure(row=7, column=0, sticky = "we", columnspan = 4)
 
         self.FrameBono = tk.Frame(self, width=300, height=150, bg = "black")
         self.FrameBono.grid(row =2, rowspan= 3, column= 0, columnspan= 4)
@@ -2077,9 +2062,9 @@ class FramePasarelaDePagos(FieldFrame):
 
     
     def descuentoEnPantalla(self, event):
-        self._metodoSeleccionado.config(text=f"Método de pago :{self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getNombre()}, Descuento :{int(self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado() * 100)}%, Máximo saldo:{self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getLimiteMaximoPago()}")
+        self._metodoSeleccionado.config(text=f"Método de pago: {self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getNombre()}, Descuento: {int(self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado() * 100)}%, Máximo saldo: {self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getLimiteMaximoPago()}")
         self._precioDescuento.config(text=f"Nuevo valor: {self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))}")
-        print(self._precioDescuento)
+        #print(self._precioDescuento)
 
     def funAceptar(self):
         if self.evaluarExcepciones():
@@ -2116,8 +2101,141 @@ class FramePasarelaDePagos(FieldFrame):
                 MetodoPago.asignarMetodosDePago(self.getClienteProceso())
                 self._frameSiguiente.mostrarFrame()
 
-
         
+
+class FrameRecargarTarjetaCinemar(FramePasarelaDePagos):
+    def __init__(self):
+
+        self._frameSiguiente = FrameEleccion(FrameZonaJuegos())
+        self._elementosIbuyable = ()
+        MetodoPago.asignarMetodosDePago(self._clienteProceso)
+        
+        FieldFrame.__init__(
+            self,
+            tituloProceso = "Recarga Tarjeta Cinemar",
+            descripcionProceso=f"(Fecha Actual: {self.getClienteProceso().getCineUbicacionActual().getFechaActual().date()}; Hora actual : {self.getClienteProceso().getCineUbicacionActual().getFechaActual().time().replace(microsecond = 0)})\n Ingresa el valor a recargar y selecciona el método de pago que desees",
+            tituloCriterios = "Criterio a seleccionar" ,
+            tituloValores= "Valores",
+            textEtiquetas=["Valor a recargar :", "Método de pago :"],
+            infoElementosInteractuables=[None, [MetodoPago.mostrarMetodosDePago(self.getClienteProceso()), "Seleccione una opción:"]],
+            habilitado=[True, False],
+            desplazarBotonesFila=2
+        )
+
+        self.widgets = []
+        
+        for widget in self.winfo_children():
+
+            self.widgets.append(widget)
+
+
+        tamaños = [21,11,15,15,12,12,12,12,15,15]
+        
+        for i, w in enumerate(self.widgets):
+            if isinstance(w, ttk.Combobox):
+                w.config(width= 50)
+            elif isinstance(w, tk.Entry):
+                pass
+            else:
+                w.config(font = ("courier new", tamaños[i]), bg = "#F0F8FF")
+
+        self.widgets[0].config(font = ("courier new", 21, "bold"))
+        self.widgets[2].config(font = ("courier new", 15, "bold"))
+        self.widgets[3].config(font = ("courier new", 15, "bold"))
+        self.widgets[-1].config(fg = "black", bg = '#87CEFA', font = ("courier new", 15, "bold"))
+        self.widgets[-2].config(fg = "black", bg = '#87CEFA', font = ("courier new", 15, "bold"))
+
+        #self.getElementosInteractivos()[1].grid_configure(sticky = "we", columnspan = 2)
+        
+        self._precioDescuento = tk.Label(self, text=f"", font= ("courier new",14), anchor="center", bg = "#F0F8FF")
+        self._precioDescuento.grid(column = 0, row = len(self._infoEtiquetas) + 3, columnspan=2, sticky='we')
+        
+        self._metodoSeleccionado = tk.Label(self, text= f"", font= ("courier new",11), anchor="center", bg = "#F0F8FF")
+        self._metodoSeleccionado.grid(column = 0, row = len(self._infoEtiquetas) + 4, columnspan=2, sticky='we')
+
+        self._opcionComboBox = self.getElementosInteractivos()[1]
+        self._opcionComboBox.bind("<<ComboboxSelected>>", self.descuentoEnPantalla)
+
+        self.valorAPagarTotal = 0
+        
+        ventanaLogicaProyecto.config(bg= "#F0F8FF")
+        self.config(bg= "#F0F8FF")
+
+    def funAceptar(self):
+        
+        estado = self.getElementosInteractivos()[0].cget("state")
+        if estado == "normal":
+            self._valorAPagar = int(self.getElementosInteractivos()[0].get())
+            self.valorAPagarTotal = int(self.getElementosInteractivos()[0].get())
+        
+        if self.evaluarExcepciones():
+
+
+            if isinstance(self._elementosIbuyable, Servicio):
+                messagebox.showinfo(title="", message= "")
+
+            metodoPagoSeleccionado = self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()]
+            precio = self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))
+            self._valorAPagar = metodoPagoSeleccionado.realizarPago(precio, self.getClienteProceso())
+
+            if (self._valorAPagar > 0):
+                messagebox.showwarning(title="Proceso de pago", message= f"Falta por pagar: {self._valorAPagar}")
+                self.getElementosInteractivos()[0].configure(state="normal")
+                self.setValueEntry("Valor a recargar :", int(self._valorAPagar))
+                self.getElementosInteractivos()[0].configure(state="disabled")
+                self._metodoSeleccionado.configure(text=f"")
+                self._precioDescuento.configure(text=f"")
+                self.getElementosInteractivos()[1].configure(values = MetodoPago.mostrarMetodosDePago(self.getClienteProceso()))
+                self.funBorrar()
+
+            else:
+                mensaje = ""
+                for elementoIbuyable in self._elementosIbuyable:
+                    elementoIbuyable.procesarPagoRealizado(self.getClienteProceso())
+                    mensaje+=elementoIbuyable.factura()
+                self._clienteProceso.getCuenta().ingresarSaldo(self.valorAPagarTotal)
+                messagebox.showinfo(title="Recarga Exitosa", message= f"Pago realizado exitosamente. Su nuevo saldo es: {self._clienteProceso.getCuenta().getSaldo()} \n{mensaje}")
+                FrameEleccion(FrameZonaJuegos()).mostrarFrame()
+                #self._frameSiguiente.mostrarFrame() 
+
+    def descuentoEnPantalla(self, event):
+        self._metodoSeleccionado.config(text=f"Método de pago: {self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getNombre()}, Descuento: {int(self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado() * 100)}%, Recarga Máxima: {self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getLimiteMaximoPago()}")
+        
+        if not self.getElementosInteractivos()[0].get() == "":
+            self._valorAPagar = int(self.getElementosInteractivos()[0].get())
+            self._precioDescuento.config(text=f"Valor con descuento: {self._valorAPagar * (1 - (self.getClienteProceso().getMetodosDePago()[self._opcionComboBox.current()].getDescuentoAsociado()))}")
+        else:
+            self._precioDescuento.config(text="")
+
+    def funBorrar(self):
+        for elementoInteractivo in self._elementosInteractivos:
+            if isinstance(elementoInteractivo, ttk.Combobox):
+                self.setValueComboBox(elementoInteractivo)
+            else:
+                elementoInteractivo.delete("0","end")
+        
+        self._precioDescuento.config(text="")
+        self._metodoSeleccionado.config(text = "")
+    
+    def evaluarExcepciones(self):
+        try:
+            valoresVacios = self.tieneCamposVacios()
+            if len(valoresVacios) > 0:
+                raise UiEmptyValues(valoresVacios)
+
+            valoresPorDefecto = self.tieneCamposPorDefecto()
+            if len(valoresPorDefecto) > 0:
+                raise UiDefaultValues(valoresPorDefecto)
+            
+            if self._valorAPagar<0:
+                messagebox.showerror("Error", 'El valor a recargar no puede ser negativo')
+                return False
+            return True
+        
+        except UiExceptions as e:
+            messagebox.showerror('Error', e.mostrarMensaje())
+            return False
+
 def objetosBasePractica2():
 
     sucursalCine1 = SucursalCine("Bucaramanga")
@@ -2174,12 +2292,6 @@ def objetosBasePractica2():
     cliente3 = Cliente('Gerson', 23, 98765, TipoDocumento.CC, sucursalCine3)
     cliente4 = Cliente('Juanjo', 18, 987, TipoDocumento.CC, sucursalCine1)
     cliente5 = Cliente('Santiago', 18, 1125274009, TipoDocumento.CC, sucursalCine3)
-
-    producto2b = Producto("Hamburguesa","Grande","comida",0,1,"Normal",sucursalCine2)
-    bono1 = Bono(1234,producto2b,"comida",cliente1)
-    producto1b = Producto("Camisa","XL","souvenir",0,1,"Normal",sucursalCine2)
-    bono2 = Bono(1234,producto1b,"souvenir",cliente1)
-    bono3 = Bono(1234,producto2b,"comida",cliente1)
 
     salaDeCine1_1 = SalaCine(1, "2D", sucursalCine1)
     salaDeCine1_2 = SalaCine(2, "3D", sucursalCine1)
@@ -2407,38 +2519,34 @@ def ventanaDeInicio():
 
     imagenes1 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel1.png"),
-       # tk.PhotoImage(file="src/iuMain/imagenes/san1.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/a3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Juanjo1.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/a4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/a5.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/san1.png"),
     ]
 
     imagenes2 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel2.png"),
-        #tk.PhotoImage(file="src/iuMain/imagenes/san2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/b3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Juanjo2.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/b4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/b5.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/san2.png"),
     ]
 
     imagenes3 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel3.png"),
-        #tk.PhotoImage(file="src/iuMain/imagenes/san3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/c3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Juanjo3.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/c4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/c5.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/san3.png"),
     ]
 
     imagenes4 = [
         tk.PhotoImage(file="src/iuMain/imagenes/rusbel4.png"),
-        #tk.PhotoImage(file="src/iuMain/imagenes/san4.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d2.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/d3.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/Juanjo4.png"),
         tk.PhotoImage(file="src/iuMain/imagenes/d4.png"),
-        tk.PhotoImage(file="src/iuMain/imagenes/d5.png"),
+        tk.PhotoImage(file="src/iuMain/imagenes/san4.png"),
     ]
 
     label1 = tk.Label(frameInferiorDerechoP6, image=imagenes1[0], bd = 3, relief="solid")
@@ -2517,8 +2625,3 @@ if __name__ == '__main__':
 
     ventanaLogicaProyecto.withdraw()
     ventanaInicio.mainloop()
-
-
-
-
-                 
