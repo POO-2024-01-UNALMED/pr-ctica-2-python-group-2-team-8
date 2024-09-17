@@ -43,8 +43,8 @@ class Bono:
     bono = Bono(code, productoBono, productoSeleccionado.getTipoProducto(), cliente)
     productosComida[numeroAleatorio].setCantidad(productosComida[numeroAleatorio].getCantidad()-1)
 
-    tipoProducto = "Comida"
-    Administrador.mostrarBono(productosComida, numeroAleatorio, tipoProducto, code)
+
+    
 
     return bono
 
@@ -80,8 +80,8 @@ class Bono:
     bono = Bono(code, productoBono, productoSeleccionado.getTipoProducto(), cliente)
     productosSouvenirs[numeroAleatorio].setCantidad(productosSouvenirs[numeroAleatorio].getCantidad()-1)
 
-    tipoProducto = "Comida"
-    Administrador.mostrarBono(productosSouvenirs, numeroAleatorio, tipoProducto, code)
+
+    
 
     return bono
 
