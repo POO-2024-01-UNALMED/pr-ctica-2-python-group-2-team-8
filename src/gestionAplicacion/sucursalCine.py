@@ -562,14 +562,14 @@ class SucursalCine:
                 for pelicula1 in peliculasCalificadas:
                     self.eliminarPeliculas([pelicula1])
                     if pelicula1.getTipoDeFormato() == "2D":
-                        Pelicula(pelicula1.getNombre(), int(pelicula1.precio * 0.9), pelicula1.genero, pelicula1.duracion, pelicula1.clasificacion, pelicula1.getTipoDeFormato(), sucursal)
+                        Pelicula(pelicula1.getNombre(), int(pelicula1.precio * 0.9), pelicula1.getGenero(), pelicula1.getDuracion(), pelicula1.getClasificacion(), pelicula1.getTipoDeFormato(), sucursal)
             else:
                 self.eliminarPeliculas(peliculasCalificadas)
         elif calificacionReal > 4.5:
             sucursal = self.seleccionarSucursalAleatoriamente()
             for pelicula2 in peliculasCalificadas:
                 if pelicula2.getTipoDeFormato() == "2D":
-                    Pelicula(pelicula2.getNombre(), int(pelicula2.precio * 1.10), pelicula2.genero, pelicula2.duracion, pelicula2.clasificacion, pelicula2.getTipoDeFormato(), sucursal)
+                    Pelicula(pelicula2.getNombre(), int(pelicula2.precio * 1.10), pelicula2.getGenero(), pelicula2.getDuracion(), pelicula2.getClasificacion(), pelicula2.getTipoDeFormato(), sucursal)
 
 
 #################### PORQUE ESTA ESTE METODO AQUI Y EN SERVICIO?????????????????????

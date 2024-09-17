@@ -255,15 +255,19 @@ class FrameReclamoDeBonos(FieldFrame):
     def __init__(self, servicio):
 
         self._servicio=servicio
-        servicio.actualizarBonos()
+        self._sucursalActual = self._clienteProceso.getCineUbicacionActual()
+        self._servicio._sucursalUbicacion = self._sucursalActual
+        self._servicio.actualizarBonos()
 
         super().__init__(
             tituloProceso = "Bonos",
             descripcionProceso = "En este apartado podras reclamar los bonos que tenes asociados",
             textEtiquetas = ['Bonos Disponibles'],
-            infoElementosInteractuables = [[servicio.mostrarBonos(servicio), "Seleccione un Producto"]],
+            infoElementosInteractuables = [[servicio.mostrarBonos(self._servicio), "Seleccione un Producto"]],
             habilitado = [False],
         )
+
+        print(servicio.mostrarBonos(self._servicio))
 
         tituloV = tk.Label(self, text = "Productos en tu orden:", font= ("Verdana bold",20), anchor="center")
         tituloV.grid(column=2, row=2, padx = (10,10), pady = (10,10))
@@ -299,6 +303,13 @@ class FrameReclamoDeBonos(FieldFrame):
                                             self._servicio.setBonosCliente([])
                                             self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
                                             FrameReclamoDeBonos(self._servicio).mostrarFrame()
+                    else:
+                        self._servicio.agregarOrden(pro.getProducto())
+                        self._servicio.setBonosCliente([])
+                        print(self._servicio._sucursalUbicacion.getBonosCreados())
+                        self._servicio._sucursalUbicacion.getBonosCreados().remove(pro)
+                        FrameReclamoDeBonos(self._servicio).mostrarFrame()
+
             if condicion:
                 condicion=False
                 self._servicio.agregarOrden(pro.getProducto())
@@ -313,6 +324,12 @@ class FrameReclamoDeBonos(FieldFrame):
 
 class FrameGeneracionDeProductos(FieldFrame):
     def __init__(self, servicio):
+
+        self._sucursalActual = self._clienteProceso.getCineUbicacionActual()
+        servicio._sucursalUbicacion = self._sucursalActual
+
+        for i in  servicio._sucursalUbicacion.getBonosCreados():
+            print(i.getProducto().getNombre())
 
         self._servicio = servicio
         servicio.setCliente(self._clienteProceso)
@@ -395,6 +412,9 @@ class FrameFuncionalidad2(FieldFrame):
     def __init__(self):
 
         self._sucursalActual = self._clienteProceso.getCineUbicacionActual()
+
+        for i in  self._sucursalActual.getBonosCreados():
+            print(i.getProducto().getNombre())
 
         super().__init__(
             tituloProceso = "Generacion de orden",
@@ -2258,6 +2278,7 @@ class FrameRecargarTarjetaCinemar(FramePasarelaDePagos):
 
 def objetosBasePractica2():
 
+
     sucursalCine1 = SucursalCine("Bucaramanga")
     sucursalCine2 = SucursalCine("Marinilla")
     sucursalCine3 = SucursalCine("Medellín")
@@ -2272,39 +2293,65 @@ def objetosBasePractica2():
     # Productos de la sucursal de Bucaramanga
 
     producto1M =  Producto("Hamburguesa","Grande","comida",25000,200,"Normal",sucursalCine1)
+    sucursalCine1.getInventarioCine().append(producto1M)
     producto2M =  Producto("Hamburguesa","Deadpool","comida",30000,200,"Comedia",sucursalCine1)
+    sucursalCine1.getInventarioCine().append(producto2M)
     producto3M =  Producto("Perro caliente","Grande","comida",20000,200,"Normal",sucursalCine1)
+    sucursalCine1.getInventarioCine().append(producto3M)
     producto4M =  Producto("Perro caliente","Bolt","comida",30000,200,"Comedia",sucursalCine1)
+    sucursalCine1.getInventarioCine().append(producto4M)
     producto5M =  Producto("Crispetas","Muerte","comida",15000,200,"Acción",sucursalCine1)
+    sucursalCine1.getInventarioCine().append(producto5M)
     producto6M =  Producto("Crispetas","Grandes","comida",16000,200,"Normal",sucursalCine1)
+    sucursalCine1.getInventarioCine().append(producto6M)
     producto7M =  Producto("Gaseosa","Grande","comida",6000,200,"Normal",sucursalCine1)
+    sucursalCine1.getInventarioCine().append(producto7M)
     producto8M =  Producto("Gaseosa","Pequeña","comida",3000,200,"Normal",sucursalCine1)
+    sucursalCine1.getInventarioCine().append(producto8M)
 
 
     # Productos de la sucursal de Marinilla
 
     producto1 = Producto("Hamburguesa","Grande","comida",20000,200,"Normal",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto1)
     producto2 = Producto("Hamburguesa","Cangreburger","comida",25000,200,"Comedia",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto2)
     producto3 = Producto("Perro caliente","Grande","comida",15000,200,"Normal",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto3)
     producto4 = Producto("Perro caliente","Don salchicha","comida",20000,200,"Comedia",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto4)
     producto5 = Producto("Crispetas","cazador de Demonios","comida",14000,200,"Acción",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto5)
     producto6 = Producto("Crispetas","Grandes","comida",13000,200,"Normal",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto6)
     producto7 = Producto("Gaseosa","Grande","comida",4000,200,"Normal",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto7)
     producto8 = Producto("Gaseosa","Pequeña","comida",2000,200,"Normal",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto8)
 
     producto1S = Producto("Camisa","XL","souvenir",16000,200,"Normal",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto1S)
     producto2S = Producto("Camisa","Bob Esponja","souvenir",27000,200,"Comedia",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto2S)
     producto3S = Producto("Gorra","L","souvenir",11000,200,"Normal",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto3S)
     producto4S = Producto("Llavero","Katana","souvenir",22000,200,"Acción",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto4S)
     producto5S = Producto("Peluche","Pajaro loco","souvenir",29000,200,"Comedia",sucursalCine2)
+    sucursalCine2.getInventarioCine().append(producto5S)
 
     # Productos de la sucursal de Medellin
 
     producto1SM =  Producto("Camisa","XL","souvenir",19000,200,"Normal",sucursalCine3)
+    sucursalCine3.getInventarioCine().append(producto1SM)
     producto2SM =  Producto("Camisa","Escuadron suicida","souvenir",30000,200,"Comedia",sucursalCine3)
+    sucursalCine3.getInventarioCine().append(producto2SM)
     producto3SM =  Producto("Gorra","L","souvenir",12000,200,"Normal",sucursalCine3)
+    sucursalCine3.getInventarioCine().append(producto3SM)
     producto4SM =  Producto("Llavero","Emociones","souvenir",30000,200,"Acción",sucursalCine3)
+    sucursalCine3.getInventarioCine().append(producto4SM)
     producto5SM =  Producto("Peluche","Deku","souvenir",30000,200,"Comedia",sucursalCine3)
+    sucursalCine3.getInventarioCine().append(producto5SM)
     
 
     cliente1 = Cliente("Rusbel", 18, 13434, TipoDocumento.CC, sucursalCine2)
@@ -2413,6 +2460,8 @@ def objetosBasePractica2():
 
 
 
+
+
     #La mala para el que hizo eso me hizo estar buscando esto por media hora .l. atentamente Rusbel
     #cliente1.setCineUbicacionActual(sucursalCine1)
     
@@ -2434,7 +2483,6 @@ def objetosBasePractica2():
     #cliente4.setCuenta(SucursalCine.getSucursalesCine()[0].getTarjetasCinemar()[0])
     #cliente4.setCodigosDescuento([ticket.generarCodigoTicket()])
     #cliente4.getCuenta().setSaldo(500000)
-
 
 def ventanaDeInicio(): 
 
@@ -2620,9 +2668,9 @@ if __name__ == '__main__':
 
     #Creamos los objetos de la lógica del proyecto
     
-    #objetosBasePractica2()
+    
     Deserializador.deserializar()
-
+    #objetosBasePractica2()
     #Creacion de la ventana de inicio 
     ventanaInicio = tk.Tk()
     ventanaInicio.title("Ventana de Incio Cinemar")

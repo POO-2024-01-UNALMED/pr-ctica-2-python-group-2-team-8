@@ -12,7 +12,6 @@ class Bono(Ibuyable):
     self._cliente = cliente
     cliente.getCineUbicacionActual().getBonosCreados().append(self)
 
-
   def factura(self):
         """
         :Description: Este método se encarga de retornar un string que contiene toda la información del ticket en forma de factura.

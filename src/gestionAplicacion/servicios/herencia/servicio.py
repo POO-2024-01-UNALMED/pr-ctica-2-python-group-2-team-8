@@ -34,8 +34,13 @@ class Servicio (ABC):
         return b
 
     def actualizarBonos(self):
-        for bono in self.cliente.getCineUbicacionActual().getBonosCreados():
-            if bono.getTipoServicio() == self.getNombre() and bono.getCliente() == self.cliente:
+        print("No entro")
+        for bono in self._sucursalUbicacion.getBonosCreados():
+            print("Entro")
+            print(bono.getTipoServicio(),  self.getNombre())
+            print(bono.getCliente().getNombre(), self.cliente.getNombre())
+            if bono.getTipoServicio() == self.getNombre() and bono.getCliente().getNombre() == self.cliente.getNombre():
+                print("Entro----------")
                 self.getBonosCliente().append(bono) 
 
     def descuentarPorGenero(self, cine):
