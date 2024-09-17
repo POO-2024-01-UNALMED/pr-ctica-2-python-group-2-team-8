@@ -40,4 +40,4 @@ class ServicioSouvenir(Servicio, Ibuyable):
 
     def procesarPagoRealizado(self, cliente):
         self._orden = []
-        self._valorPedido = 0.0
+        self.descuento = True

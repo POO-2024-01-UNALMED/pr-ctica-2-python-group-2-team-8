@@ -514,20 +514,16 @@ class FrameCrearUsuario(FieldFrame):
                     #Verificamos que la edad ingresada sea apropiada para el documento seleccionado
                     if (self._tipoDocumentoCliente == TipoDocumento.CC.value and edadCliente >= 18) or (self._tipoDocumentoCliente == TipoDocumento.TI.value and edadCliente < 18) or (self._tipoDocumentoCliente == TipoDocumento.CE.value and edadCliente >= 18):
                         #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
-                        self.logicaInicioProcesosFuncionalidades(Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, self._sucursalActual))
+                        clienteCreado = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, self._sucursalActual)
+                        MetodoPago.asignarMetodosDePago(clienteCreado)
+                        self.logicaInicioProcesosFuncionalidades(clienteCreado)
                     
                     else: 
                         messagebox.showerror('Error', 'Debes seleccionar una edad apropiada para el documento seleccionado anteriormente')
                 
                 else:
-                    messagebox.showerror('Error', 'La edad mínima para acceder a nuestras instalaciones es de 5 años')
-
-                #Creamos el cliente y nos dirigimos al menú principal de nuestro cine
-                clienteCreado = Cliente(nombreCliente, edadCliente, self._numDocumentoCliente, self._tipoDocumentoCliente, self._sucursalActual)
-                MetodoPago.asignarMetodosDePago(clienteCreado)
-                self.logicaInicioProcesosFuncionalidades(clienteCreado)
-                
-        
+                    messagebox.showerror('Error', 'La edad mínima para acceder a nuestras instalaciones es de 5 años')      
+                 
 class FrameVentanaPrincipal(FieldFrame):
 
     def __init__(self):
@@ -2102,6 +2098,9 @@ class FramePasarelaDePagos(FieldFrame):
                     mensaje+=elementoIbuyable.factura()
                 messagebox.showinfo(title="Pago realizado", message= f"Pago realizado exitosamente. \n{mensaje}")
                 MetodoPago.asignarMetodosDePago(self.getClienteProceso())
+                if isinstance(self._elementosIbuyable[0], Servicio):
+                    self._elementosIbuyable[0].setOrden([])
+                    self._elementosIbuyable[0].setValorPedido(0)
                 self._frameSiguiente.mostrarFrame()
 
         
