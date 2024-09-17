@@ -1948,14 +1948,21 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
             self._calificacionProductoSeleccionado = int(self._comboBoxCalificarItem.get())
             mejorProducto=self._clienteProceso.getCineUbicacionActual().mejorProducto().getNombre()+ self._clienteProceso.getCineUbicacionActual().mejorProducto().getTamaño()
             peorPelicula=self._clienteProceso.getCineUbicacionActual().peorPelicula().getNombre()+ self._clienteProceso.getCineUbicacionActual().peorPelicula().getTipoDeFormato()
+            productoCombo1=self._clienteProceso.getCineUbicacionActual().mejorProducto()
+            peliculaCombo=self._clienteProceso.getCineUbicacionActual().peorPelicula()
+            opcionHorarioPelicula=peliculaCombo.seleccionarHorarioMasLejano()
+            numAsientoProceso=peliculaCombo.seleccionarAsientoAleatorio(opcionHorarioPelicula)
+            codigoBono=productoCombo1.generarCodigoAleatorio(7)
+            ticketProceso= Ticket(peliculaCombo,opcionHorarioPelicula,numAsientoProceso,False,self._clienteProceso.getCineUbicacionActual)
+            bonoProceso= Bono(codigoBono,Producto(productoCombo1.getNombre(),productoCombo1.getTamaño(),productoCombo1.getTipoProducto(),productoCombo1.getPrecio(),1,productoCombo1.getGenero(),self._clienteProceso.getCineUbicacionActual()),productoCombo1.getTipoProducto(),self._clienteProceso)
             confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._productoSeleccionado}; y le has dado una calificacion de: {self._calificacionProductoSeleccionado}')
             if confirmacionUsuario:
                 
-                confirmacionParaPasarelaDePago = messagebox.askokcancel(f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {mejorProducto}; y  {peorPelicula}' "¿Deseas Continuar?")
+                confirmacionParaPasarelaDePago = messagebox.askokcancel('Confirmación datos',f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {mejorProducto}; y  {peorPelicula}' "¿Deseas Continuar?")
 
                 if confirmacionParaPasarelaDePago:
                    
-                    FramePasarelaDePagos()
+                    FramePasarelaDePagos(self.getFrameMenuPrincipal(), SucursalCine.getTiposDeMembresia()[FrameFuncionalidad5.membresiaSeleccionadaInt - 1].getValorSuscripcionMensual()).mostrarFrame(),ticketProceso,bonoProceso
                 
                 
 
@@ -1964,14 +1971,21 @@ class FrameFuncionalidad3Calificaciones(FieldFrame):
              self._calificacionPeliculaSeleccionada = int(self._comboBoxCalificarItem.get())
              peorProducto=self._clienteProceso.getCineUbicacionActual().peorProducto().getNombre()+ self._clienteProceso.getCineUbicacionActual().peorProducto().getTamaño()
              mejorPelicula=self._clienteProceso.getCineUbicacionActual().mejorPelicula().getNombre()+ self._clienteProceso.getCineUbicacionActual().mejorPelicula().getTipoDeFormato()
-             
+             productoCombo1=self._clienteProceso.getCineUbicacionActual().peorProducto()
+             peliculaCombo=self._clienteProceso.getCineUbicacionActual().mejorPelicula()
+             valorComboGlobal=productoCombo1.getPrecio()+peliculaCombo.getPrecio()
+             opcionHorarioPelicula=peliculaCombo.seleccionarHorarioMasLejano()
+             numAsientoProceso=peliculaCombo.seleccionarAsientoAleatorio(opcionHorarioPelicula)
+             codigoBono=Producto.generarCodigoAleatorio(7)
+             ticketProceso= Ticket(peliculaCombo,opcionHorarioPelicula,numAsientoProceso,False,self._clienteProceso.getCineUbicacionActual())
+             bonoProceso= Bono(codigoBono,Producto(productoCombo1.getNombre(),productoCombo1.getTamaño(),productoCombo1.getTipoProducto(),productoCombo1.getPrecio(),1,productoCombo1.getGenero(),self._clienteProceso.getCineUbicacionActual()),productoCombo1.getTipoProducto(),self._clienteProceso)
              confirmacionUsuario = messagebox.askokcancel('Confirmación datos', f'Has seleccionado el item: {self._peliculaSeleccionada}; y le has dado una calificacion de: {self._calificacionPeliculaSeleccionada}')
              if confirmacionUsuario:
                 
                 confirmacionParaPasarelaDePago = messagebox.askokcancel('Confirmación datos',f'Como calificaste un item te queremos ofrecer un combo especial personalizado, esta compuesto por: {peorProducto}; y  {mejorPelicula}' "¿Deseas Continuar?")
 
                 if confirmacionParaPasarelaDePago:
-                    pass
+                    FramePasarelaDePagos(self.getFrameMenuPrincipal(),valorComboGlobal,ticketProceso,bonoProceso).mostrarFrame()
         
 
         
